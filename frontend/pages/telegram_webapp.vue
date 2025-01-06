@@ -19,7 +19,9 @@ import {UserData} from "~/store/user.js";
 
 <template>
   Initial page for telegram web application Helloworld
-  <load-webapp-data />
+  <load-webapp-data/>
+  <h1>My Calendar App</h1>
+  <Calendar/>
 </template>
 
 <style scoped>

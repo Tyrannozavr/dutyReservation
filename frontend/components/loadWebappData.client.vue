@@ -24,11 +24,21 @@ userStore.set_telegram_data(telegram_id, first_name, last_name, username, langua
 </script>
 
 <template>
-<div>
-
-</div>
+<!--<div>-->
+<!--  <div class="mb-4">platform {{tg.platform}}</div>-->
+<!--  <div class="mb-4">scheme {{tg.colorScheme}}</div>-->
+<!--  <div class="mb-4">theme  {{tg.themeParams}}</div>-->
+<!--  <div class="mb-4">header color {{tg.headerColor}}</div>-->
+<!--  <div class="mb-4">background color {{tg.backgroundColor}}</div>-->
+<!--  <div class="mb-4">is expanded {{tg.isExpanded}}</div>-->
+<!--</div>-->
 </template>
 
 <style scoped>
 
 </style>
+<!--scheme dark-->
+<!--theme { "accent_text_color": "#6ab2f2", "bg_color": "#17212b", "bottom_bar_bg_color": "#17212b", "button_color": "#5288c1", "button_text_color": "#ffffff", "destructive_text_color": "#ec3942", "header_bg_color": "#17212b", "hint_color": "#708499", "link_color": "#6ab3f3", "secondary_bg_color": "#232e3c", "section_bg_color": "#17212b", "section_header_text_color": "#6ab3f3", "section_separator_color": "#111921", "subtitle_text_color": "#708499", "text_color": "#f5f5f5" }-->
+<!--header color #17212b-->
+<!--background color #17212b-->
+<!--is expanded true-->
