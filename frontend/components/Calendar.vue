@@ -20,10 +20,21 @@
       </div>
     </div>
   </div>
+  <users-list :people="people"/>
 </template>
 
 <script setup>
 const currentYear = new Date().getFullYear();
+import {UserData} from "~/store/user.ts";
+
+const userStore = UserData();
+const people = computed(() => {
+  return selectedDay.value ? [{
+    username: userStore.username ? `@${userStore.username}` : '',
+    name: userStore.getUserFio(),
+    date: selectedDay.value ? `${selectedDay.value.getDate()}.${selectedDay.value.getMonth() + 1}.${selectedDay.value.getFullYear()}` : null
+  }] : [];
+})
 const months = [
   'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
   'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
@@ -31,8 +42,6 @@ const months = [
 const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
 const selectedMonth = ref(new Date().getMonth());
-// const disabledDates = ref([new Date(currentYear, selectedMonth.value, 5), new Date(currentYear, selectedMonth.value, 10)]); // Example disabled dates
-// const disabledDates = ref([new Date(currentYear, selectedMonth.value, 5)]); // Example disabled dates
 const daysInMonth = ref([]);
 const disabledDates = computed(() => {
   return selectedDay.value ? [
@@ -58,15 +67,13 @@ const updateDaysInMonth = () => {
           disabledDate.getDate() === dayDate.getDate() &&
           disabledDate.getMonth() === dayDate.getMonth() &&
           disabledDate.getFullYear() === dayDate.getFullYear()
-      )
+      )дш
     };
   });
 };
 
 // Handle date selection logic
 const selectDate = (date) => {
-  // disabledDates.value.push(date)
-  // updateDaysInMonth()
   selectedDay.value = date
   updateDaysInMonth()
 };
@@ -84,7 +91,7 @@ updateDaysInMonth();
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 3px; /* Space between days */
+  /* gap: 3px; /* Space between days */
 }
 
 .calendar-header {
@@ -105,6 +112,7 @@ updateDaysInMonth();
   padding: 15px;
   text-align: center;
   cursor: pointer;
+
 }
 
 .calendar-day.empty {

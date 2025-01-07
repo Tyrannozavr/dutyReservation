@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {UserData} from "~/store/user.js";
+// import {UserData} from "~/store/user.js";
 // import {useWebAppPopup} from "vue-tg";
 // // const defaultUserData = UserData()
 // const {showAlert} = useWebAppPopup()
@@ -18,10 +18,9 @@ import {UserData} from "~/store/user.js";
 </script>
 
 <template>
-  Initial page for telegram web application Helloworld
-  <load-webapp-data/>
-  <h1>My Calendar App</h1>
-  <Calendar/>
+  <load-webapp-data />
+<!--  <Calendar/>-->
+  hwlloeorld
 </template>
 
 <style scoped>

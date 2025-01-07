@@ -71,6 +71,10 @@ yarn preview
 # bun
 bun run preview
 ```
+## to run a tunnel from localhost just run the command
+```bash
+loclx tunnel http --to localhost:3000
+```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 https://vue-tg.pages.dev/installation

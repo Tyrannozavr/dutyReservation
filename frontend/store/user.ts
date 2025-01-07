@@ -14,7 +14,9 @@ interface  UserState {
         last_name?: string | null,
         username?: string | null,
         language_code?: string | null
-    ) => void
+    ) => void,
+    getUserFio: () => string,
+    getToken: () => string,
 }
 
 export const UserData = defineStore('user', {
@@ -33,6 +35,15 @@ export const UserData = defineStore('user', {
     actions: {
         getToken() {
             return this.token
+        },
+        getUserFio() {
+            return `${this.first_name} ${this.last_name ? this.last_name : ""}`
+        },
+        setToken(token: string) {
+            this.token = token
+        },
+        setAuthenticated(is_authenticated: boolean) {
+            this.is_authenticated = is_authenticated
         },
         set_telegram_data(telegram_id: number, first_name: string, last_name: string | null = null,
                           username: string | null = null, language_code: string | null = null) {
