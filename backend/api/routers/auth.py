@@ -1,14 +1,25 @@
+from fastapi import HTTPException
 from fastapi.routing import APIRouter
 
 from api.dependencies.auth import InitDataDep
 
 router = APIRouter()
 
-@router.post("/telegram/auth",  status_code=200|201)
+
+@router.post(
+    "/telegram/auth",
+    status_code=200,
+    responses={
+        200: {"description": "Successful authorization"},
+        201: {"description": "Resource created"},
+        404: {"description": "InitData isn't appropriate"},
+    }
+)
 def telegram_auth(init_data: InitDataDep):
     """allows to get access to this platform using telegram's webapp initData"""
-    print(init_data)
-    return {"message": "Hello World"}
+    if not init_data:
+        raise HTTPException(status_code=404, detail="InitData isn't appropriate")
+    return init_data
 
 
 'user=%7B%22id%22%3A972834722%2C%22first_name%22%3A%22%D0%94%D0%BC%D0%B8%D1%82%D1%80%D0%B8%D0%B9%22%2C%22last_name%22%3A%22%D0%A1%D1%87%D0%B8%D1%81%D0%BB%D1%91%D0%BD%D0%BE%D0%BA%22%2C%22username%22%3A%22tyrannozavr%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FxJjYkAlqp7Mvl8tGiKvIH2Qvh2SEY2ZYE2gKivsD9qU.svg%22%7D&chat_instance=5919894213088809580&chat_type=private&auth_date=1736280453&signature=ru-H3ccFkx-Z1bBwBQ98MW38-3C02T2cAUbf0yP94VbJEKp0kcWI2VWVs_4U4vJm2_Zilxj6BDIFTH54uI8jBA&hash=93063c75042cb6076876c9d7b4540e409c6e71338454e9dcb93dfeb1'

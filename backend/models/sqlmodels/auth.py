@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field
 
 
-class TelegramUserData(SQLModel):
+class TelegramUserData(SQLModel, table=True):
     id: int = Field(primary_key=True, default_factory=None)
     first_name: str = Field()
     last_name: str | None = Field(default=None)
@@ -11,8 +11,8 @@ class TelegramUserData(SQLModel):
     photo_url: str | None = Field(default=None)
 
 
-class TelegramInitData(SQLModel):
-    user_id: int = Field(foreign_key="telegramuserdata.id", unique=True)
+class TelegramInitData(SQLModel, table=True):
+    user_id: int = Field(foreign_key="telegramuserdata.id", unique=True, primary_key=True)
     chat_instance: int | None = Field(default=None)
     chat_type: str | None = Field(default=None)
 
