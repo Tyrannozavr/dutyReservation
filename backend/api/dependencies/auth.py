@@ -8,7 +8,7 @@ from urllib.parse import parse_qsl
 from fastapi import Body
 from fastapi.params import Depends
 
-from api.core.config import Settings, get_settings
+from core.config import Settings, get_settings
 from models.pydantic.auth import TelegramInitDataInDb, TelegramUserDataInDb
 
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
@@ -41,9 +41,10 @@ def check_webapp_signature(init_data: InitDataStringDep, token: str) -> bool:
     ).hexdigest()
     return calculated_hash == hash_
 
+SettingsDep = Annotated[Settings, Depends(get_settings)]
 
 def validated_telegram_init_data(init_data: InitDataStringDep,
-                                 settings: Annotated[Settings, Depends(get_settings)]) -> dict | None:
+                                 settings: SettingsDep) -> dict | None:
     bot_token = settings.telegram_bot_token
     data_verified = check_webapp_signature(init_data=init_data, token=bot_token)
     if not data_verified:
@@ -56,3 +57,5 @@ def validated_telegram_init_data(init_data: InitDataStringDep,
 
 
 InitDataDep = Annotated[TelegramInitDataInDb, Depends(validated_telegram_init_data)]
+
+

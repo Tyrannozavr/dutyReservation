@@ -3,5 +3,5 @@ pydantic~=2.10.4
 sqlmodel~=0.0.22
 pydantic-settings~=2.7.1
 aiosqlite~=0.20.0
-
+pyjwt==2.10.1
 SQLAlchemy~=2.0.36
