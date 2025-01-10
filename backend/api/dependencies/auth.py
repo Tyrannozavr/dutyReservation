@@ -9,7 +9,7 @@ from fastapi import Body
 from fastapi.params import Depends
 
 from core.config import Settings, get_settings
-from models.pydantic.auth import TelegramInitDataInDb, TelegramUserDataInDb
+from models.pydantic.auth import TelegramInitData, TelegramUserDataInDb
 
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
 
@@ -52,10 +52,13 @@ def validated_telegram_init_data(init_data: InitDataStringDep,
     parsed_data = dict(parse_qsl(init_data))
     user_data = json.loads(parsed_data.pop("user"))
     user = TelegramUserDataInDb(**user_data)
-    init_data = TelegramInitDataInDb(**parsed_data, user=user)
+    init_data = TelegramInitData(**parsed_data, user=user)
     return init_data
 
 
-InitDataDep = Annotated[TelegramInitDataInDb, Depends(validated_telegram_init_data)]
+
+InitDataDep = Annotated[TelegramInitData, Depends(validated_telegram_init_data)]
+
+
 
 

@@ -1,5 +1,5 @@
-from fastapi import Body
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+
 
 class TelegramUserDataInDb(BaseModel):
     id: int
@@ -11,7 +11,13 @@ class TelegramUserDataInDb(BaseModel):
     photo_url: str | None
 
 
-class TelegramInitDataInDb(BaseModel):
+class TelegramInitData(BaseModel):
     user: TelegramUserDataInDb
     chat_instance: int
     chat_type: str | None
+
+
+class Token(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str

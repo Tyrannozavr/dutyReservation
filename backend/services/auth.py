@@ -2,18 +2,31 @@ from datetime import datetime, timezone, timedelta
 
 import jwt
 
-from api.dependencies.auth import SettingsDep
+from core.config import Settings
 
 
-def create_access_token(data: dict, settings: SettingsDep):
-    secret_key = settings.secret_key
-    expires_delta = timedelta(minutes=settings.access_token_expire_minutes)
-    algorithm = settings.auth_algorithm
+def create_token(data: dict, expire_time: float, secret_key: str, algorithm: str):
+    print(f'algorith is {algorithm}')
+    if expire_time <= 0:
+        raise Exception("expire time must be grater than zero")
+    expires_delta = timedelta(minutes=expire_time)
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm)
     return encoded_jwt
+
+
+def create_access_token(data: dict, settings: Settings):
+    expire_time = float(settings.access_token_expire_minutes)
+    access_token = create_token(data=data, expire_time=expire_time, secret_key=settings.secret_key,
+                                algorithm=settings.auth_algorithm)
+    return access_token
+
+def create_refresh_token(data: dict, settings: Settings):
+    expire_time = float(settings.refresh_token_expire_minutes)
+    refresh_token = create_token(data=data, expire_time=expire_time, secret_key=settings.secret_key,
+                                algorithm=settings.auth_algorithm)
+    return refresh_token
+
+

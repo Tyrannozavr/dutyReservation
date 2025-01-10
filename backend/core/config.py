@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     secret_key: str = Field(alias='SECRET_KEY')
     auth_algorithm: str = Field(alias='AUTH_ALGORITHM', default="HS256")
     access_token_expire_minutes: str = Field(alias='ACCESS_TOKEN_EXPIRE_MINUTES')
+    refresh_token_expire_minutes: str = Field(alias='REFRESH_TOKEN_EXPIRE_MINUTES')
 
     class Config:
         env_file = ".env"
