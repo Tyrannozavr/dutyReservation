@@ -64,11 +64,11 @@ def validated_telegram_init_data(init_data: InitDataStringDep,
 
 InitDataDep = Annotated[TelegramInitData, Depends(validated_telegram_init_data)]
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/telegram")
 
 
 
-def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep):
+def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep) -> TelegramUserDataInDb:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -76,12 +76,12 @@ def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep
     )
     try:
         payload_data = decode_token(token, settings=settings)
-        init_data = TelegramInitData(**payload_data)
+        user = TelegramUserDataInDb(**payload_data)
     except InvalidTokenError:
         raise credentials_exception
-    user = init_data.user
     if not user:
         raise credentials_exception
     return user
 
 
+AuthorizedUserType = Annotated[TelegramUserDataInDb, Depends(get_current_user)]
