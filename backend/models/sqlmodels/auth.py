@@ -1,6 +1,12 @@
 from sqlmodel import SQLModel, Field
 
 
+# class User(SQLModel, table=True):
+#     id: int = Field(primary_key=True)
+#     first_name: str = Field()
+#     last_name: str | None = Field(default=None)
+#     username: str | None = Field(default=None)
+
 class TelegramUserData(SQLModel, table=True):
     id: int = Field(primary_key=True, default_factory=None)
     first_name: str = Field()

@@ -5,11 +5,16 @@ from operator import itemgetter
 from typing import Annotated
 from urllib.parse import parse_qsl
 
-from fastapi import Body
+import jwt
+from fastapi import Body, HTTPException
 from fastapi.params import Depends
+from fastapi.security import OAuth2PasswordBearer
+from fastapi import status
+from jwt import InvalidTokenError
 
 from core.config import Settings, get_settings
 from models.pydantic.auth import TelegramInitData, TelegramUserDataInDb
+from services.auth import decode_token
 
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
 
@@ -59,6 +64,24 @@ def validated_telegram_init_data(init_data: InitDataStringDep,
 
 InitDataDep = Annotated[TelegramInitData, Depends(validated_telegram_init_data)]
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
+
+def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload_data = decode_token(token, settings=settings)
+        init_data = TelegramInitData(**payload_data)
+    except InvalidTokenError:
+        raise credentials_exception
+    user = init_data.user
+    if not user:
+        raise credentials_exception
+    return user
 
 
