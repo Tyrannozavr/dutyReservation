@@ -1,20 +1,75 @@
-from sqlmodel import SQLModel, Field
+from typing import Optional
+
+from sqlmodel import SQLModel, Field, Relationship
+
+TELEGRAM_PREFIX = "tg_999"
+
+# class Team(SQLModel, table=True):
+#     id: int | None = Field(default=None, primary_key=True)
+#     name: str = Field(index=True)
+#     headquarters: str
+#
+#     heroes: list["Hero"] = Relationship(back_populates="team")
+#
+#
+# class Hero(SQLModel, table=True):
+#     id: int | None = Field(default=None, primary_key=True)
+#     name: str = Field(index=True)
+#     secret_name: str
+#     age: int | None = Field(default=None, index=True)
+#
+#     team_id: int | None = Field(default=None, foreign_key="team.id")
+#     team: Team | None = Relationship(back_populates="heroes")
 
 
-# class User(SQLModel, table=True):
-#     id: int = Field(primary_key=True)
-#     first_name: str = Field()
-#     last_name: str | None = Field(default=None)
-#     username: str | None = Field(default=None)
+class User(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    first_name: str | None = Field(default=None)
+    last_name: str | None = Field(default=None)
+    internal_username: str = Field(unique=True)
+    tg_data: Optional["TelegramUserData"] = Relationship(back_populates="user")
+
+    @property
+    def username(self):
+        if self.internal_username.startswith(TELEGRAM_PREFIX):
+            return self.internal_username[len(TELEGRAM_PREFIX):]
+        return self.internal_username
 
 class TelegramUserData(SQLModel, table=True):
-    id: int = Field(primary_key=True, default_factory=None)
-    first_name: str = Field()
-    last_name: str | None = Field(default=None)
-    username: str | None = Field(default=None)
+    telegram_id: int = Field(primary_key=True)
     language_code: str | None = Field(default=None)
     allows_write_to_pm: bool | None = Field(default=None)
     photo_url: str | None = Field(default=None)
+
+    user_id: int = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="tg_data")
+
+
+#
+# class User(SQLModel, table=True):
+#     id: int = Field(primary_key=True)
+#     first_name: str | None = Field(default=None)
+#     last_name: str | None = Field(default=None)
+#     internal_username: str = Field(unique=True)
+#     tg_data: "TelegramUserData" | None = Relationship(back_populates="user")
+#
+#
+#     @property
+#     def username(self):
+#         if self.internal_username.startswith(TELEGRAM_PREFIX):
+#             return self.internal_username[len(TELEGRAM_PREFIX):]
+#         return self.internal_username
+#
+# class TelegramUserData(SQLModel, table=True):
+#     user_id: int = Field(foreign_key="user.id")
+#     telegram_id: int = Field(primary_key=True, default_factory=None)
+#     language_code: str | None = Field(default=None)
+#     allows_write_to_pm: bool | None = Field(default=None)
+#     photo_url: str | None = Field(default=None)
+#     user: "User" = Relationship(back_populates="tg_data")
+
+
+
 
 
 
