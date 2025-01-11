@@ -18,6 +18,7 @@ class User(SQLModel, table=True):
     last_name: str | None = Field(default=None)
     internal_username: str = Field(unique=True)
     tg_data: Optional["TelegramUserData"] = Relationship(back_populates="user")
+    duties: Optional["Duty"] = Relationship(back_populates="user")
 
     @property
     def username(self):
