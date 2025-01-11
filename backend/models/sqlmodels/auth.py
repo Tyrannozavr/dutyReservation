@@ -2,25 +2,15 @@ from typing import Optional, Any
 
 from sqlmodel import SQLModel, Field, Relationship
 
-TELEGRAM_PREFIX = "tg_999"
+from models.pydantic.auth import UserOriginsTypes
 
-# class Team(SQLModel, table=True):
-#     id: int | None = Field(default=None, primary_key=True)
-#     name: str = Field(index=True)
-#     headquarters: str
-#
-#     heroes: list["Hero"] = Relationship(back_populates="team")
-#
-#
-# class Hero(SQLModel, table=True):
-#     id: int | None = Field(default=None, primary_key=True)
-#     name: str = Field(index=True)
-#     secret_name: str
-#     age: int | None = Field(default=None, index=True)
-#
-#     team_id: int | None = Field(default=None, foreign_key="team.id")
-#     team: Team | None = Relationship(back_populates="heroes")
+TELEGRAM_PREFIX = "tg_999_"
 
+
+
+def generate_user_link(username: str, origin: UserOriginsTypes):
+    if origin is UserOriginsTypes.telegram:
+        return f"https://t.me/{username}"
 
 class User(SQLModel, table=True):
     id: int = Field(primary_key=True)
@@ -35,10 +25,13 @@ class User(SQLModel, table=True):
             return self.internal_username[len(TELEGRAM_PREFIX):]
         return self.internal_username
 
+
     @property
     def link(self):
         if self.is_from_telegram:
-            return f"https://t.me/{self.username}"
+            return generate_user_link(username=self.username, origin=UserOriginsTypes.telegram)
+        return ""
+
 
     @property
     def is_from_telegram(self):
@@ -84,7 +77,6 @@ class TelegramUserData(SQLModel, table=True):
             user_data["username"] = data.pop("username")
 
         # Initialize the User model if user_data is populated
-        print('create user ', user_data)
         if user_data:
             self.user = User(**user_data)
         super().__init__(**data)

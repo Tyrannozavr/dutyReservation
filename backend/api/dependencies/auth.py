@@ -12,6 +12,7 @@ from jwt import InvalidTokenError
 
 from core.config import Settings, get_settings
 from models.pydantic.auth import TelegramUserData, UserInDb
+from models.sqlmodels.auth import User
 from services.auth import decode_token
 
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
@@ -66,7 +67,7 @@ InitDataDep = Annotated[TelegramUserData, Depends(validated_telegram_init_data)]
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/telegram")
 
 
-def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep) -> UserInDb:
+def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -74,7 +75,7 @@ def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep
     )
     try:
         payload_data = decode_token(token, settings=settings)
-        user = UserInDb(**payload_data)
+        user = User(**payload_data)
     except InvalidTokenError:
         raise credentials_exception
     if not user:
@@ -82,4 +83,4 @@ def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep
     return user
 
 
-AuthorizedUserType = Annotated[UserInDb, Depends(get_current_user)]
+AuthorizedUserType = Annotated[User, Depends(get_current_user)]
