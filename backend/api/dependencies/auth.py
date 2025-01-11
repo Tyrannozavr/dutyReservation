@@ -4,8 +4,6 @@ import json
 from operator import itemgetter
 from typing import Annotated
 from urllib.parse import parse_qsl
-
-import jwt
 from fastapi import Body, HTTPException
 from fastapi.params import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -13,7 +11,7 @@ from fastapi import status
 from jwt import InvalidTokenError
 
 from core.config import Settings, get_settings
-from models.pydantic.auth import TelegramInitData, TelegramUserDataInDb
+from models.pydantic.auth import TelegramUserData, UserInDb
 from services.auth import decode_token
 
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
@@ -46,29 +44,29 @@ def check_webapp_signature(init_data: InitDataStringDep, token: str) -> bool:
     ).hexdigest()
     return calculated_hash == hash_
 
+
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 
+
 def validated_telegram_init_data(init_data: InitDataStringDep,
-                                 settings: SettingsDep) -> dict | None:
+                                 settings: SettingsDep) -> TelegramUserData | None:
     bot_token = settings.telegram_bot_token
     data_verified = check_webapp_signature(init_data=init_data, token=bot_token)
     if not data_verified:
         return None
     parsed_data = dict(parse_qsl(init_data))
     user_data = json.loads(parsed_data.pop("user"))
-    user = TelegramUserDataInDb(**user_data)
-    init_data = TelegramInitData(**parsed_data, user=user)
+    user = UserInDb(**user_data)
+    init_data = TelegramUserData(**parsed_data, **user_data, user=user)
     return init_data
 
 
-
-InitDataDep = Annotated[TelegramInitData, Depends(validated_telegram_init_data)]
+InitDataDep = Annotated[TelegramUserData, Depends(validated_telegram_init_data)]
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/telegram")
 
 
-
-def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep) -> TelegramUserDataInDb:
+def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep) -> UserInDb:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -76,7 +74,7 @@ def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep
     )
     try:
         payload_data = decode_token(token, settings=settings)
-        user = TelegramUserDataInDb(**payload_data)
+        user = UserInDb(**payload_data)
     except InvalidTokenError:
         raise credentials_exception
     if not user:
@@ -84,4 +82,4 @@ def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep
     return user
 
 
-AuthorizedUserType = Annotated[TelegramUserDataInDb, Depends(get_current_user)]
+AuthorizedUserType = Annotated[UserInDb, Depends(get_current_user)]
