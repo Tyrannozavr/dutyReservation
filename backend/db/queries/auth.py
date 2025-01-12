@@ -1,4 +1,4 @@
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from models.pydantic.auth import TelegramUserData as TelegramUserDataPydantic, UserInDb
 from models.sqlmodels.auth import TelegramUserData as TelegramUserDataDb, User, TELEGRAM_PREFIX
@@ -28,3 +28,8 @@ def create_user(user_data: UserInDb, db: Session) -> User:
 
 def get_user_by_id(user_id: int, db: Session) -> User:
     return db.get(User, user_id)
+
+def get_user_by_username(username: str, db: Session) -> User:
+    stmt = select(User).where(User.username == username)
+    user = db.exec(stmt).first()
+    return user

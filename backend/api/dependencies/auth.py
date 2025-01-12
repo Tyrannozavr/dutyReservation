@@ -68,7 +68,7 @@ def validated_telegram_init_data(init_data: InitDataStringDep,
 InitDataDep = Annotated[TelegramUserData, Depends(validated_telegram_init_data)]
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="auth/login_init_data",
+    tokenUrl="auth/login",
     description="IMPORTANT! use initData from telegram webapp as username and string \"telegram\" "
                 "as password",
 )
@@ -84,7 +84,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], settings: Se
     try:
         payload_data = decode_token(token, settings=settings)
         user = get_user_by_id(user_id=payload_data.user_id, db=db)
-        # user = User(**payload_data)
+        user = User(**payload_data)
     except InvalidTokenError:
         raise credentials_exception
     if not user:

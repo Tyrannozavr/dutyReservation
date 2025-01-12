@@ -1,5 +1,9 @@
 from datetime import datetime, timezone, timedelta
 from typing import Annotated
+
+from sqlmodel import Session
+
+from db.queries.auth import get_user_by_username
 from models.pydantic.auth import Token, TokenData
 
 import jwt
@@ -32,6 +36,12 @@ def create_refresh_token(data: TokenData, settings: Settings):
                                 algorithm=settings.auth_algorithm)
     return refresh_token
 
+def get_tokens(data: TokenData, settings: Settings):
+
+    access_token = create_access_token(data=data, settings=settings)
+    refresh_token = create_refresh_token(data=data, settings=settings)
+    return Token(access_token=access_token, refresh_token=refresh_token,  token_type="bearer")
+
 
 def decode_token(token: str, settings: Settings) -> TokenData:
     secret_key = settings.secret_key
@@ -49,10 +59,11 @@ def get_hashed_password(plaintext_password: str) -> str:
 def verify_password(plaintext_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plaintext_password, hashed_password)
 
+def authenticate_user(username: str, password: str, db: Session):
+    user = get_user_by_username(username=username, db=db)
+    if not user:
+        return False
+    if not verify_password(plaintext_password=password, hashed_password=user.hashed_password):
+        return False
+    return user
 
-
-def get_tokens(data: TokenData, settings: Settings):
-
-    access_token = create_access_token(data=data, settings=settings)
-    refresh_token = create_refresh_token(data=data, settings=settings)
-    return Token(access_token=access_token, refresh_token=refresh_token,  token_type="bearer")
