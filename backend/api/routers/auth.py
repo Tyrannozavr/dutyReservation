@@ -51,3 +51,4 @@ def get_user(user: AuthorizedUserType, db: SessionDep):
     stmt = select(User).where(User.id == user_id).join(User.tg_data)
     user_in_db = db.exec(stmt).first()
     return user_in_db
+
