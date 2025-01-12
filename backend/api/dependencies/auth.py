@@ -69,13 +69,11 @@ oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="auth/login_init_data",
     description="IMPORTANT! use initData from telegram webapp as username and string \"telegram\" "
                 "as password",
-
 )
 
 
 
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], settings: SettingsDep) -> User:
-# def get_current_user(token: Annotated[str, oauth2_scheme], settings: SettingsDep) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
