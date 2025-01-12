@@ -11,3 +11,5 @@ class Duty(SQLModel, table=True):
     user: User = Relationship(back_populates="duties")
 
     date: datetime.date = Field(default=None, unique=True)
+
+
