@@ -1,13 +1,15 @@
 import datetime
 
-from sqlmodel import Session, select, extract
+from sqlmodel import Session, select
 
 from models.sqlmodels.duty import Duty
+
+
 class DutyQueriesMixin:
 
     @staticmethod
-    async def get_all_duties_in_month(month_number: int, db: Session):
-        stmt = select(Duty).filter(extract("month", Duty.date) == month_number)
+    async def get_all_duties_in_room(room_id: int, db: Session):
+        stmt = select(Duty).where(Duty.room_id == room_id)
         duties = db.exec(stmt).all()
         return duties
 
@@ -18,15 +20,15 @@ class DutyQueriesMixin:
         return duty
 
     @staticmethod
-    async def create_duty(request_user_id: int, date: datetime.date, db: Session):
-        duty = Duty(user_id=request_user_id, date=date)
+    async def create_duty(user_id: int, room_id: int, date: datetime.date, db: Session):
+        duty = Duty(user_id=user_id, room_id=room_id, date=date)
         db.add(duty)
         db.commit()
         db.refresh(duty)
         return duty
 
     @staticmethod
-    async def change_duty(db: Session, date: datetime.date, duty_id: int | None = None, duty: Duty | None = None):
+    async def change_duty_date(db: Session, date: datetime.date, duty_id: int | None = None, duty: Duty | None = None):
         """duty or duty_id must be provided"""
         if duty is None and duty_id is None:
             raise ValueError("Either duty or duty_id must be provided")
@@ -47,8 +49,14 @@ class DutyQueriesMixin:
         db.delete(duty)
         db.commit()
 
+
+
+
+
 class Queries(DutyQueriesMixin):
     pass
 
 
-queries = Queries()
+
+
+duty_queries = Queries()
