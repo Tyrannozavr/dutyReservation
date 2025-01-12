@@ -9,7 +9,7 @@ from api.dependencies.duty import DutiesRoomDp, DutyIdDp
 from api.errors.duty import UserHasNoPermission
 from db.queries.duty import duty_queries
 
-router = APIRouter(prefix="/{room_identifier}", tags=["room"])
+router = APIRouter(prefix="/{room_identifier}")
 
 
 @router.get("/")

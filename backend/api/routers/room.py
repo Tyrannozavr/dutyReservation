@@ -1,14 +1,12 @@
-import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Path
+from fastapi import APIRouter, Body
 from pydantic import BaseModel
 
 from api.dependencies.auth import AuthorizedUserType
 from api.dependencies.database import SessionDep
 from api.dependencies.duty import DutiesRoomDp
 from api.errors.duty import UserHasNoPermission
-from db.queries.duty import duty_queries
 from db.queries.room import room_queries
 from models.sqlmodels.duty import Duty
 
