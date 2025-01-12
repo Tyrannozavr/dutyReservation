@@ -13,3 +13,7 @@ class Duty(SQLModel, table=True):
     date: datetime.date = Field(default=None, unique=True)
 
 
+class DutyModes(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    duty_month: int = Field(default_factory=lambda: datetime.datetime.utcnow().month)
+    is_multiple_selection: bool = Field(default=False)
