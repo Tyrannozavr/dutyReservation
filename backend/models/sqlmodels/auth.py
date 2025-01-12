@@ -12,6 +12,7 @@ def generate_user_link(username: str, origin: UserOriginsTypes):
     if origin is UserOriginsTypes.telegram:
         return f"https://t.me/{username}"
 
+
 class User(SQLModel, table=True):
     id: int = Field(primary_key=True)
     first_name: str | None = Field(default=None)
@@ -19,6 +20,9 @@ class User(SQLModel, table=True):
     internal_username: str = Field(unique=True)
     tg_data: Optional["TelegramUserData"] = Relationship(back_populates="user")
     duties: Optional["Duty"] = Relationship(back_populates="user")
+    hashed_password: str | None = Field(default=None)
+    origin: UserOriginsTypes
+
 
     @property
     def username(self):

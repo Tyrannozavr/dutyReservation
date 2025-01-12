@@ -1,6 +1,6 @@
 from sqlmodel import Session
 
-from models.pydantic.auth import TelegramUserData as TelegramUserDataPydantic
+from models.pydantic.auth import TelegramUserData as TelegramUserDataPydantic, UserInDb
 from models.sqlmodels.auth import TelegramUserData as TelegramUserDataDb, User, TELEGRAM_PREFIX
 
 
@@ -19,3 +19,12 @@ def get_or_create_tg_user(init_data: TelegramUserDataPydantic, db: Session) -> T
         db.commit()
     return user_tg_data
 
+
+def create_user(user_data: UserInDb, db: Session) -> User:
+    user = User(**user_data.model_dump())
+    db.add(user)
+    db.commit()
+    return user
+
+def get_user_by_id(user_id: int, db: Session) -> User:
+    return db.get(User, user_id)

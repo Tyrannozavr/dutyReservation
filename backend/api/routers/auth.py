@@ -3,12 +3,14 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
 
-from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, validated_telegram_init_data
+from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, validated_telegram_init_data, \
+    UserDataCreateDep
 from api.dependencies.database import SessionDep
+from db.queries import auth
 from db.queries.auth import get_or_create_tg_user
-from models.pydantic.auth import Token, UserOut
+from models.pydantic.auth import Token, UserOut, UserInDb, TokenData
 from models.sqlmodels.auth import User
-from services.auth import create_access_token, create_refresh_token
+from services.auth import get_hashed_password, get_tokens
 
 router = APIRouter()
 
@@ -35,11 +37,37 @@ def telegram_auth(init_data: InitDataDep, settings: SettingsDep, db: SessionDep)
     if not init_data:
         raise HTTPException(status_code=404, detail="InitData isn't appropriate")
     user_tg_data = get_or_create_tg_user(init_data, db)
-    token_data = user_tg_data.user.model_dump()
-    access_token = create_access_token(data=token_data, settings=settings)
-    refresh_token = create_refresh_token(data=token_data, settings=settings)
-    return Token(access_token=access_token, refresh_token=refresh_token, token_type='bearer')
+    token_data = TokenData(user_id=user_tg_data.user_id, username=user_tg_data.user.username)
+    return get_tokens(data=token_data, settings=settings)
 
+@router.post(
+    "/register",
+    status_code=201,
+    response_model=Token,
+    responses={
+        201: {"description": "Resource created"},
+        404: {"description": "InitData isn't appropriate"},
+    }
+)
+async def create_user(
+        db:  SessionDep,
+        user_data: UserDataCreateDep,
+):
+    user_data_db = UserInDb(**user_data.model_dump(), hashed_password=get_hashed_password(user_data.password))
+
+    user = await auth.create_user(user_data=user_data_db, db=db)
+
+
+# @router.get(
+#     "/refresh",
+#     status_code=200,
+#     response_model=Token
+# )
+# def refresh_token(user: AuthorizedUserType, settings: SettingsDep):
+#     token_data = user.model_dump()
+#     access_token = create_access_token(data=token_data, settings=settings)
+#     refresh_token = create_refresh_token(data=token_data, settings=settings)
+#     return Token(access_token=access_token, refresh_token=refresh_token, token_type='bearer')
 
 @router.get(
     "/me",

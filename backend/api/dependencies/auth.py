@@ -11,8 +11,10 @@ from fastapi import status
 from jwt import InvalidTokenError
 from pydantic import BaseModel
 
+from api.dependencies.database import SessionDep
 from core.config import Settings, get_settings
-from models.pydantic.auth import TelegramUserData, UserInDb
+from db.queries.auth import get_user_by_id
+from models.pydantic.auth import TelegramUserData, UserInDb, UserDataIn
 from models.sqlmodels.auth import User
 from services.auth import decode_token
 
@@ -73,7 +75,7 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 
 
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], settings: SettingsDep) -> User:
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], settings: SettingsDep, db: SessionDep) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -81,7 +83,8 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], settings: Se
     )
     try:
         payload_data = decode_token(token, settings=settings)
-        user = User(**payload_data)
+        user = get_user_by_id(user_id=payload_data.user_id, db=db)
+        # user = User(**payload_data)
     except InvalidTokenError:
         raise credentials_exception
     if not user:
@@ -90,3 +93,4 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], settings: Se
 
 
 AuthorizedUserType = Annotated[User, Depends(get_current_user)]
+UserDataCreateDep = Annotated[UserDataIn, Body()]

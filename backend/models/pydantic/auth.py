@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 
 from pydantic import BaseModel
@@ -10,9 +11,9 @@ class BaseUser(BaseModel):
 
 class UserInDb(BaseUser):
     id: int
-    first_name: str
-    last_name: str | None
-    username: str | None
+    hashed_password: str | None = None
+
+
 
 class UserOut(BaseUser):
     link: str | None
@@ -34,6 +35,13 @@ class Token(BaseModel):
     refresh_token: str
     token_type: str
 
+
+class TokenData(BaseModel):
+    user_id: int
+    username: str
+    exp: datetime | None = None
+
+
 class TelegramUserDataIn(BaseModel):
     id: int
     first_name: str
@@ -46,3 +54,13 @@ class TelegramUserDataIn(BaseModel):
 
 class UserOriginsTypes(str, Enum):
     telegram = "telegram"
+    web = "web"
+
+
+class UserDataIn(BaseModel):
+    origin: UserOriginsTypes
+    username: str
+    first_name: str | None = None
+    last_name: str | None = None
+    language_code: str | None = None
+    password: str
