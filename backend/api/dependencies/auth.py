@@ -65,7 +65,12 @@ def validated_telegram_init_data(init_data: InitDataStringDep,
 
 InitDataDep = Annotated[TelegramUserData, Depends(validated_telegram_init_data)]
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="auth/login_init_data",
+    description="IMPORTANT! use initData from telegram webapp as username and string \"telegram\" "
+                "as password",
+
+)
 
 
 

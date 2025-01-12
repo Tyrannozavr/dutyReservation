@@ -3,21 +3,23 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
 
-from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, get_current_user, \
-    validated_telegram_init_data
+from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, validated_telegram_init_data
 from api.dependencies.database import SessionDep
 from db.queries.auth import get_or_create_tg_user
-from models.pydantic.auth import Token, UserOut, UserOriginsTypes
-from models.sqlmodels.auth import User, TelegramUserData
+from models.pydantic.auth import Token, UserOut
+from models.sqlmodels.auth import User
 from services.auth import create_access_token, create_refresh_token
 
 router = APIRouter()
 
 
-@router.post("/login")
+@router.post("/login_init_data", include_in_schema=False)
 def login(settings: SettingsDep, db: SessionDep, form_data: OAuth2PasswordRequestForm = Depends()):
+    """Takes initData from telegram webapp as username and any string as a password just to make it match with
+    required form"""
     init_data = validated_telegram_init_data(form_data.username, settings=settings)
     return telegram_auth(init_data=init_data, settings=settings, db=db)
+
 
 @router.post(
     "/telegram",
@@ -49,11 +51,6 @@ def get_user(user: AuthorizedUserType, db: SessionDep):
     stmt = select(User).where(User.id == user_id).join(User.tg_data)
     user_in_db = db.exec(stmt).first()
     return user_in_db
-
-
-
-
-
 
 # @router.get(
 #     "/me2",
