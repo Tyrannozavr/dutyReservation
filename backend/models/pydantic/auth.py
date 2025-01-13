@@ -4,7 +4,7 @@ from enum import Enum
 from pydantic import BaseModel
 
 
-class UserOriginsTypes(str, Enum):
+class UserOriginTypes(str, Enum):
     telegram = "telegram"
     web = "web"
 
@@ -18,6 +18,7 @@ class BaseUser(BaseModel):
 class UserInDb(BaseUser):
     id: int
     hashed_password: str | None = None
+    origin: UserOriginTypes
 
 
 class UserOut(BaseUser):
@@ -48,7 +49,7 @@ class TokenData(BaseModel):
     exp: datetime | None = None
     first_name: str | None = None
     last_name: str | None = None
-    origin: UserOriginsTypes
+    origin: UserOriginTypes
 
 
 class TelegramUserDataIn(BaseModel):
@@ -62,7 +63,7 @@ class TelegramUserDataIn(BaseModel):
 
 
 class UserDataIn(BaseModel):
-    origin: UserOriginsTypes
+    origin: UserOriginTypes
     username: str
     first_name: str | None = None
     last_name: str | None = None

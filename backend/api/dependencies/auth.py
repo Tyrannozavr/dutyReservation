@@ -14,7 +14,7 @@ from pydantic import BaseModel
 from api.dependencies.database import SessionDep
 from core.config import Settings, get_settings
 from db.queries.auth import get_user_by_id
-from models.pydantic.auth import TelegramUserData, UserInDb, UserDataIn
+from models.pydantic.auth import TelegramUserData, UserInDb, UserDataIn, UserOriginTypes
 from models.sqlmodels.auth import User
 from services.auth import decode_token
 
@@ -60,7 +60,7 @@ def validated_telegram_init_data(init_data: InitDataStringDep,
         return None
     parsed_data = dict(parse_qsl(init_data))
     user_data = json.loads(parsed_data.pop("user"))
-    user = UserInDb(**user_data)
+    user = UserInDb(**user_data, origin=UserOriginTypes.telegram)
     init_data = TelegramUserData(**parsed_data, **user_data, user=user)
     return init_data
 

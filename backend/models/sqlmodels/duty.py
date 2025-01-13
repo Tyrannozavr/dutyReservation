@@ -14,7 +14,7 @@ class DutiesRoom(SQLModel, table=True):
     month: int = Field(default_factory=lambda: datetime.datetime.utcnow().month)
     year: int = Field(default_factory=lambda: datetime.datetime.utcnow().year)
     is_multiple_selection: bool = Field(default=False)
-    duties: ["Duty"] = Relationship(back_populates="room")
+    duties: list["Duty"] = Relationship(back_populates="room")
 
 
 

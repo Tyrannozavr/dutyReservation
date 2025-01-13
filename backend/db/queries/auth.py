@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 
-from models.pydantic.auth import TelegramUserData as TelegramUserDataPydantic, UserInDb
+from models.pydantic.auth import TelegramUserData as TelegramUserDataPydantic, UserInDb, UserOriginTypes
 from models.sqlmodels.auth import TelegramUserData as TelegramUserDataDb, User, TELEGRAM_PREFIX
 
 

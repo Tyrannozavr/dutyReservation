@@ -9,7 +9,7 @@ from api.dependencies.database import SessionDep
 from api.errors.auth import IncorrectUsernameOrPassword
 from db.queries import auth
 from db.queries.auth import get_or_create_tg_user
-from models.pydantic.auth import Token, UserOut, UserInDb, TokenData, UserOriginsTypes
+from models.pydantic.auth import Token, UserOut, UserInDb, TokenData, UserOriginTypes
 from models.sqlmodels.auth import User
 from services.auth import get_hashed_password, get_tokens, authenticate_user
 
@@ -28,7 +28,7 @@ def login(settings: SettingsDep, db: SessionDep, form_data: OAuth2PasswordReques
         if not user:
             raise IncorrectUsernameOrPassword
         token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
-                               last_name=user.last_name, origin=UserOriginsTypes.web)
+                               last_name=user.last_name, origin=UserOriginTypes.web)
         return get_tokens(data=token_data, settings=settings)
 
 
@@ -48,7 +48,7 @@ def telegram_auth(init_data: InitDataDep, settings: SettingsDep, db: SessionDep)
     user_tg_data = get_or_create_tg_user(init_data, db)
     user = user_tg_data.user
     token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
-                           last_name=user.last_name, origin=UserOriginsTypes.telegram)
+                           last_name=user.last_name, origin=user.origin)
     return get_tokens(data=token_data, settings=settings)
 
 @router.post(
@@ -69,7 +69,7 @@ async def create_user(
 
     user = await auth.create_user(user_data=user_data_db, db=db)
     token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
-                           last_name=user.last_name, origin=UserOriginsTypes.web)
+                           last_name=user.last_name, origin=UserOriginTypes.web)
     return get_tokens(data=token_data, settings=settings)
 
 

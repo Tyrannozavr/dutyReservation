@@ -1,15 +1,15 @@
-from typing import Optional, Any
+from typing import Optional, Any, List
 
 from sqlmodel import SQLModel, Field, Relationship
 
-from models.pydantic.auth import UserOriginsTypes
+from models.pydantic.auth import UserOriginTypes
 
 TELEGRAM_PREFIX = "tg_999_"
 
 
 
-def generate_user_link(username: str, origin: UserOriginsTypes):
-    if origin is UserOriginsTypes.telegram:
+def generate_user_link(username: str, origin: UserOriginTypes):
+    if origin is UserOriginTypes.telegram:
         return f"https://t.me/{username}"
 
 
@@ -19,9 +19,10 @@ class User(SQLModel, table=True):
     last_name: str | None = Field(default=None)
     internal_username: str = Field(unique=True)
     tg_data: Optional["TelegramUserData"] = Relationship(back_populates="user")
-    duties: Optional["Duty"] = Relationship(back_populates="user")
+    duties: list["Duty"] = Relationship(back_populates="user")
     hashed_password: str | None = Field(default=None)
-    origin: UserOriginsTypes
+    origin: UserOriginTypes
+    rooms: list["DutiesRoom"] = Relationship(back_populates="owner")
 
 
     @property
@@ -34,7 +35,7 @@ class User(SQLModel, table=True):
     @property
     def link(self):
         if self.is_from_telegram:
-            return generate_user_link(username=self.username, origin=UserOriginsTypes.telegram)
+            return generate_user_link(username=self.username, origin=UserOriginTypes.telegram)
         return ""
 
 
