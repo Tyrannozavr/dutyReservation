@@ -12,7 +12,6 @@ class DutiesRoom(SQLModel, table=True):
     identifier: uuid.UUID = Field(default_factory=uuid.uuid4, unique=True)
     owner_id: int = Field(foreign_key="user.id")
     owner: User = Relationship(back_populates="rooms")
-    # month: int = Field(default_factory=lambda: datetime.datetime.utcnow().month)
     month: int = Field(default_factory=lambda: datetime.datetime.now(pytz.timezone("UTC")).month)
     year: int = Field(default_factory=lambda: datetime.datetime.now(pytz.timezone("UTC")).year)
     is_multiple_selection: bool = Field(default=False)
