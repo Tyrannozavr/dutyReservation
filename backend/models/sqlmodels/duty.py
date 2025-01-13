@@ -2,7 +2,7 @@ import datetime
 import uuid
 
 import pytz
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, UniqueConstraint
 
 from models.sqlmodels.auth import User
 
@@ -19,6 +19,7 @@ class DutiesRoom(SQLModel, table=True):
 
 
 class Duty(SQLModel, table=True):
+    __table_args__ = (UniqueConstraint("room_id", "date", name="uq_date_room"),)
     id: int = Field(primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="duties")

@@ -8,7 +8,7 @@ from models.sqlmodels.duty import Duty
 class DutyQueriesMixin:
 
     @staticmethod
-    async def get_all_duties_in_room(room_id: int, db: Session):
+    async def get_all_duties_in_room(room_id: int, db: Session) -> list[Duty]:
         stmt = select(Duty).where(Duty.room_id == room_id)
         duties = db.exec(stmt).all()
         return duties
