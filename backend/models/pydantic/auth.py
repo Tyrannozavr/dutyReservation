@@ -21,8 +21,25 @@ class UserInDb(BaseUser):
     origin: UserOriginTypes
 
 
+class UserDbCreate(BaseUser):
+    hashed_password: str | None = None
+    origin: UserOriginTypes
+
+
 class UserOut(BaseUser):
     link: str | None
+
+class TelegramInitData(BaseModel):
+    # Unique identifier for the telegram user
+    id: int
+    first_name: str
+    last_name: str | None
+    username: str | None
+    language_code: str | None
+    allows_write_to_pm: bool | None
+    photo_url: str | None
+
+
 
 
 class TelegramUserData(BaseModel):

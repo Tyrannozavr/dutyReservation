@@ -13,10 +13,10 @@ from pydantic import BaseModel
 
 from api.dependencies.database import SessionDep
 from core.config import Settings, get_settings
-from db.queries.auth import get_user_by_id
-from models.pydantic.auth import TelegramUserData, UserInDb, UserDataIn, UserOriginTypes
+from db.queries.auth import user_queries
+from models.pydantic.auth import TelegramUserData, UserInDb, UserDataIn, UserOriginTypes, TelegramInitData
 from models.sqlmodels.auth import User
-from services.auth import decode_token
+from services.auth import token_services
 
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
 
@@ -53,19 +53,20 @@ SettingsDep = Annotated[Settings, Depends(get_settings)]
 
 
 def validated_telegram_init_data(init_data: InitDataStringDep,
-                                 settings: SettingsDep) -> TelegramUserData | None:
+                                 settings: SettingsDep) -> TelegramInitData | None:
     bot_token = settings.telegram_bot_token
     data_verified = check_webapp_signature(init_data=init_data, token=bot_token)
     if not data_verified:
         return None
     parsed_data = dict(parse_qsl(init_data))
-    user_data = json.loads(parsed_data.pop("user"))
-    user = UserInDb(**user_data, origin=UserOriginTypes.telegram)
-    init_data = TelegramUserData(**parsed_data, **user_data, user=user)
+    # user_data = json.loads(parsed_data.pop("user"))
+    # user = UserInDb(**user_data, origin=UserOriginTypes.telegram)
+    # init_data = TelegramInitData(**parsed_data, **user_data, user=user)
+    init_data = TelegramInitData(**parsed_data)
     return init_data
 
 
-InitDataDep = Annotated[TelegramUserData, Depends(validated_telegram_init_data)]
+InitDataDep = Annotated[TelegramInitData, Depends(validated_telegram_init_data)]
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="auth/login",
@@ -82,8 +83,8 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], settings: Se
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload_data = decode_token(token, settings=settings)
-        user = get_user_by_id(user_id=payload_data.user_id, db=db)
+        payload_data = token_services.decode_token(token)
+        user = user_queries.get_user_by_id(user_id=payload_data.user_id, db=db)
         user = User(**payload_data)
     except InvalidTokenError:
         raise credentials_exception

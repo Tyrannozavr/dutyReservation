@@ -7,11 +7,11 @@ from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, 
     UserDataCreateDep
 from api.dependencies.database import SessionDep
 from api.errors.auth import IncorrectUsernameOrPassword
-from db.queries import auth
-from db.queries.auth import get_or_create_tg_user
-from models.pydantic.auth import Token, UserOut, UserInDb, TokenData, UserOriginTypes
-from models.sqlmodels.auth import User
-from services.auth import get_hashed_password, get_tokens, authenticate_user
+from db.queries.auth import user_queries
+from models.pydantic.auth import Token, UserOut, UserInDb, TokenData, UserOriginTypes, UserDbCreate
+from models.sqlmodels.auth import User, TelegramUserData
+from services.auth import user_services, token_services
+from tests.queries.auth import telegram_user_data
 
 router = APIRouter()
 
@@ -22,14 +22,15 @@ def login(settings: SettingsDep, db: SessionDep, form_data: OAuth2PasswordReques
     initData"""
     if form_data.password == "telegram":
         init_data = validated_telegram_init_data(form_data.username, settings=settings)
-        return telegram_auth(init_data=init_data, settings=settings, db=db)
+        return telegram_auth(init_data=init_data, db=db)
     else:
-        user = authenticate_user(username=form_data.username, password=form_data.password, db=db)
+        internal_username = User.get_internal_username(form_data.username, origin=UserOriginTypes.web)
+        user = user_services.authenticate_user(username=internal_username, password=form_data.password, db=db)
         if not user:
             raise IncorrectUsernameOrPassword
         token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
                                last_name=user.last_name, origin=UserOriginTypes.web)
-        return get_tokens(data=token_data, settings=settings)
+        return token_services.get_tokens(data=token_data)
 
 
 @router.post(
@@ -41,15 +42,25 @@ def login(settings: SettingsDep, db: SessionDep, form_data: OAuth2PasswordReques
         404: {"description": "InitData isn't appropriate"},
     }
 )
-def telegram_auth(init_data: InitDataDep, settings: SettingsDep, db: SessionDep):
+def telegram_auth(init_data: InitDataDep, db: SessionDep):
     """allows to get access to this platform using telegram's webapp initData"""
     if not init_data:
         raise HTTPException(status_code=404, detail="InitData isn't appropriate")
-    user_tg_data = get_or_create_tg_user(init_data, db)
+
+    # user_tg_data = user_queries.get_or_create_tg_user(init_data, db)
+    # user_data = UserDbCreate()
+    user = user_queries.create_user()
+    telegram_user_data = TelegramUserData(
+        language_code=init_data.language_code,
+        allows_write_to_pm=init_data.allows_write_to_pm,
+        photo_url=init_data.photo_url,
+        user=user
+    )
+    user_tg_data = user_queries.get_tg_user(init_data, db)
     user = user_tg_data.user
     token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
                            last_name=user.last_name, origin=user.origin)
-    return get_tokens(data=token_data, settings=settings)
+    return token_services.get_tokens(data=token_data)
 
 @router.post(
     "/register",
@@ -63,14 +74,11 @@ def telegram_auth(init_data: InitDataDep, settings: SettingsDep, db: SessionDep)
 async def create_user(
         db:  SessionDep,
         user_data: UserDataCreateDep,
-        settings: SettingsDep,
 ):
-    user_data_db = UserInDb(**user_data.model_dump(), hashed_password=get_hashed_password(user_data.password))
-
-    user = await auth.create_user(user_data=user_data_db, db=db)
+    user = await user_services.create_user(user_data=user_data, db=db)
     token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
                            last_name=user.last_name, origin=UserOriginTypes.web)
-    return get_tokens(data=token_data, settings=settings)
+    return token_services.get_tokens(data=token_data)
 
 
 # @router.get(
