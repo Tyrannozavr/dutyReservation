@@ -17,8 +17,6 @@ class RoomQueriesMixin:
                           is_multiple_selection: bool = False):
         room = DutiesRoom(owner_id=owner_id, month=month, year=year, is_multiple_selection=is_multiple_selection)
         db.add(room)
-        db.commit()
-        db.refresh(room)
         return room
 
     @staticmethod
@@ -32,7 +30,6 @@ class RoomQueriesMixin:
         stmt = select(DutiesRoom).where(DutiesRoom.id == room_id)
         room = db.exec(stmt).first()
         db.delete(room)
-        db.commit()
         return room
 
 

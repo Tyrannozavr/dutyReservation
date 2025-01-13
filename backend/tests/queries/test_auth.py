@@ -7,9 +7,10 @@ from models.pydantic.auth import UserDbCreate, UserInDb, \
     TelegramUserDataIn
 from models.sqlmodels.auth import *
 from models.sqlmodels.duty import *
-from tests.queries.database_creation import DATABASE_MEMORY_URL
 
-engine = create_engine(DATABASE_MEMORY_URL)
+DATABASE_URL = "sqlite:///:memory:"
+engine = create_engine(DATABASE_URL)
+
 # Create all tables in the test database
 SQLModel.metadata.create_all(engine)
 

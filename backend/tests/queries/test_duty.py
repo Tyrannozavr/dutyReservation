@@ -8,9 +8,11 @@ from db.queries.duty import DutyQueriesMixin
 from models.pydantic.auth import UserOriginTypes
 from models.sqlmodels.auth import User  # Assuming you have this model defined
 from models.sqlmodels.duty import DutiesRoom
-from tests.queries.database_creation import DATABASE_MEMORY_URL
 
-engine = create_engine(DATABASE_MEMORY_URL)
+
+DATABASE_URL = "sqlite:///:memory:"
+engine = create_engine(DATABASE_URL)
+
 # Create all tables
 SQLModel.metadata.create_all(engine)
 
@@ -41,7 +43,6 @@ async def test_create_duty(db_session, setup_data):
     user, room = setup_data
     duty = await DutyQueriesMixin.create_duty(user_id=user.id, room_id=room.id, date=datetime.date.today(),
                                               db=db_session)
-
     assert duty.user_id == user.id
     assert duty.room_id == room.id
     assert duty.date == datetime.date.today()

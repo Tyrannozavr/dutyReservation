@@ -26,7 +26,6 @@ class UserQueriesMixin:
                 user=user
             )
             db.add(user_tg_data)
-            # db.commit()
         return user_tg_data
 
     @staticmethod
@@ -34,7 +33,6 @@ class UserQueriesMixin:
         user_data = user_data.model_dump()
         user = User(**user_data)
         db.add(user)
-        # db.commit()
         return user
 
     @staticmethod
