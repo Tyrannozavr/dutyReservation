@@ -1,27 +1,15 @@
-import os
-import uuid
-
 import pytest
-from sqlmodel import Session, create_engine, SQLModel
-
-from models.sqlmodels.auth import *
-from models.sqlmodels.duty import *
+from sqlalchemy import create_engine
+from sqlmodel import Session
 
 from db.queries.auth import user_queries  # Adjust the import according to your project structure
-from models.pydantic.auth import TelegramUserData as TelegramUserDataPydantic, UserOriginTypes, UserDbCreate, UserInDb, \
+from models.pydantic.auth import UserDbCreate, UserInDb, \
     TelegramUserDataIn
+from models.sqlmodels.auth import *
+from models.sqlmodels.duty import *
+from tests.queries.database_creation import DATABASE_MEMORY_URL
 
-# Set up a test database
-# Ensure the directory for the database exists
-db_directory = '../../tests/db'
-if not os.path.exists(db_directory):
-    os.makedirs(db_directory)
-
-# Set up a test database
-DATABASE_URL = f"sqlite:///{db_directory}/test{uuid.uuid4()}.db"  # Use an SQLite database for testing
-
-engine = create_engine(DATABASE_URL)
-
+engine = create_engine(DATABASE_MEMORY_URL)
 # Create all tables in the test database
 SQLModel.metadata.create_all(engine)
 
@@ -34,19 +22,19 @@ def db_session():
         session.rollback()  # Rollback after each test
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def test_user_data_create():
     return UserDbCreate(first_name="Test", last_name="User", username="testuser",
                         origin=UserOriginTypes.telegram)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def test_user_data():
     return UserInDb(id=1, first_name="Test", last_name="User", username="testuser",
                     origin=UserOriginTypes.telegram)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def telegram_user_data():
     return TelegramUserDataIn(
         id=1225,
@@ -81,7 +69,7 @@ def test_get_user_by_id(db_session, test_user_data_create):
     # First, create the user in the database
     created_user = user_queries.create_user(test_user_data_create, db_session)
     db_session.commit()
-
+    db_session.refresh(created_user)
     # Now retrieve it by ID
     retrieved_user = user_queries.get_user_by_id(created_user.id, db_session)
     assert retrieved_user is not None

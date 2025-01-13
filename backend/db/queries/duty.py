@@ -23,8 +23,8 @@ class DutyQueriesMixin:
     async def create_duty(user_id: int, room_id: int, date: datetime.date, db: Session):
         duty = Duty(user_id=user_id, room_id=room_id, date=date)
         db.add(duty)
-        db.commit()
-        db.refresh(duty)
+        # db.commit()
+        # db.refresh(duty)
         return duty
 
     @staticmethod
@@ -33,7 +33,7 @@ class DutyQueriesMixin:
         if duty is None and duty_id is None:
             raise ValueError("Either duty or duty_id must be provided")
         if duty is None:
-            duty = DutyQueriesMixin.get_duty_by_id(duty_id=duty_id, db=db)
+            duty = await DutyQueriesMixin.get_duty_by_id(duty_id=duty_id, db=db)
         duty.date = date
         db.add(duty)
         db.commit()
@@ -45,18 +45,13 @@ class DutyQueriesMixin:
         if duty is None and duty_id is None:
             raise ValueError("Either duty or duty_id must be provided")
         if duty is None:
-            duty = DutyQueriesMixin.get_duty_by_id(duty_id=duty_id, db=db)
+            duty = await DutyQueriesMixin.get_duty_by_id(duty_id=duty_id, db=db)
         db.delete(duty)
-        db.commit()
-
-
-
+        # db.commit()
 
 
 class Queries(DutyQueriesMixin):
     pass
-
-
 
 
 duty_queries = Queries()

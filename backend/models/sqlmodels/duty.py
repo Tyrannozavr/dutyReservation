@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+import pytz
 from sqlmodel import SQLModel, Field, Relationship
 
 from models.sqlmodels.auth import User
@@ -11,11 +12,11 @@ class DutiesRoom(SQLModel, table=True):
     identifier: uuid.UUID = Field(default_factory=uuid.uuid4, unique=True)
     owner_id: int = Field(foreign_key="user.id")
     owner: User = Relationship(back_populates="rooms")
-    month: int = Field(default_factory=lambda: datetime.datetime.utcnow().month)
-    year: int = Field(default_factory=lambda: datetime.datetime.utcnow().year)
+    # month: int = Field(default_factory=lambda: datetime.datetime.utcnow().month)
+    month: int = Field(default_factory=lambda: datetime.datetime.now(pytz.timezone("UTC")).month)
+    year: int = Field(default_factory=lambda: datetime.datetime.now(pytz.timezone("UTC")).year)
     is_multiple_selection: bool = Field(default=False)
     duties: list["Duty"] = Relationship(back_populates="room")
-
 
 
 class Duty(SQLModel, table=True):
@@ -25,4 +26,4 @@ class Duty(SQLModel, table=True):
     room_id: int = Field(foreign_key="dutiesroom.id")
     room: DutiesRoom = Relationship(back_populates="duties")
 
-    date: datetime.date = Field(default=None, unique=True)
+    date: datetime.date = Field(default=None)
