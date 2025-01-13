@@ -13,7 +13,7 @@ from models.pydantic.auth import TelegramUserData as TelegramUserDataPydantic, U
 
 # Set up a test database
 # Ensure the directory for the database exists
-db_directory = './tests/db'
+db_directory = '../../tests/db'
 if not os.path.exists(db_directory):
     os.makedirs(db_directory)
 
@@ -89,12 +89,8 @@ def test_get_user_by_id(db_session, test_user_data_create):
 
 
 def test_get_user_by_username(db_session, test_user_data_create):
-    # First, create the user in the database
-    # user_queries.create_user(test_user_data_create, db_session)
-
     # Now retrieve it by username
     internal_username = User.get_internal_username(test_user_data_create.username, origin=UserOriginTypes.web)
     retrieved_user = user_queries.get_user_by_internal_username(internal_username, db_session)
-    print(internal_username, test_user_data_create.username)
     assert retrieved_user is not None
     assert retrieved_user.username == test_user_data_create.username
