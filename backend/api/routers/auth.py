@@ -10,7 +10,7 @@ from api.errors.auth import IncorrectUsernameOrPassword
 from db.queries.auth import user_queries
 from models.pydantic.auth import Token, UserOut, UserInDb, TokenData, UserOriginTypes, UserDbCreate
 from models.sqlmodels.auth import User, TelegramUserData
-from services.auth import user_services, token_services
+from services.samples import user_services, token_services
 from tests.queries.test_auth import telegram_user_data
 
 router = APIRouter()

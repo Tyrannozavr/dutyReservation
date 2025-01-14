@@ -16,7 +16,7 @@ from core.config import Settings, get_settings
 from db.queries.auth import user_queries
 from models.pydantic.auth import TelegramUserData, UserInDb, UserDataIn, UserOriginTypes, TelegramInitData
 from models.sqlmodels.auth import User
-from services.auth import token_services
+from services.samples import token_services
 
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
 

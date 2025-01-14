@@ -4,11 +4,8 @@ import jwt
 from passlib.context import CryptContext
 from sqlmodel import Session
 
-from core.config import get_settings
 from db.queries.auth import user_queries
 from models.pydantic.auth import Token, TokenData, UserDbCreate, UserDataIn
-
-settings = get_settings()
 
 
 class TokenServices:
@@ -72,10 +69,3 @@ class UserServices:
         user_db = UserDbCreate(**user_data.model_dump(), hashed_password=self._get_hashed_password(user_data.password))
         user = await user_queries.create_user(user_data=user_db, db=db)
         return user
-
-
-user_services = UserServices(pwd_context=CryptContext(schemes=["bcrypt"], deprecated="auto"))
-token_services = TokenServices(secret_key=settings.secret_key, algorithm=settings.auth_algorithm,
-                               access_expire_time=float(settings.access_token_expire_minutes),
-                               refresh_expire_time=float(settings.refresh_token_expire_minutes),
-                               token_type="bearer")
