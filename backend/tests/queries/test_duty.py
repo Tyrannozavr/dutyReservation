@@ -6,8 +6,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import SQLModel, Session
 
-from db.queries.duty import DutyQueriesMixin
+from db.queries.duty import DutyQueries
 from models.pydantic.auth import UserOriginTypes
+from models.pydantic.duty import DutyChange
 from models.sqlmodels.auth import User  # Assuming you have this model defined
 from models.sqlmodels.duty import DutiesRoom
 
@@ -25,6 +26,12 @@ def db_session():
         yield session
         session.rollback()
 
+@pytest.fixture(scope="function")
+def duty_queries(db_session):
+    """Create a new database session for a test."""
+    return DutyQueries(db_session)
+
+
 @pytest.fixture(scope="module")
 def setup_data():
     """Set up initial data for tests."""
@@ -40,76 +47,70 @@ def setup_data():
 
 
 @pytest.mark.asyncio
-async def test_create_duty(db_session, setup_data):
+async def test_create_duty(setup_data, duty_queries):
     user, room = setup_data
-    duty = await DutyQueriesMixin.create_duty(user_id=user.id, room_id=room.id, date=datetime.date.today(),
-                                              db=db_session)
+    duty = await duty_queries.create_duty(user_id=user.id, room_id=room.id, date=datetime.date.today())
     assert duty.user_id == user.id
     assert duty.room_id == room.id
     assert duty.date == datetime.date.today()
 
 
 @pytest.mark.asyncio
-async def test_get_duty_by_id(db_session, setup_data):
+async def test_get_duty_by_id(db_session, duty_queries, setup_data):
     user, room = setup_data
-    duty = await DutyQueriesMixin.create_duty(user_id=user.id, room_id=room.id, date=datetime.date.today(),
-                                              db=db_session)
+    duty = await duty_queries.create_duty(user_id=user.id, room_id=room.id, date=datetime.date.today())
     db_session.commit()
     db_session.refresh(duty)
-    retrieved_duty = await DutyQueriesMixin.get_duty_by_id(duty.id, db=db_session)
+    retrieved_duty = await duty_queries.get_duty_by_id(duty.id)
     assert retrieved_duty.id == duty.id
 
 
 @pytest.mark.asyncio
-async def test_get_all_duties_in_room(db_session, setup_data):
+async def test_get_all_duties_in_room(duty_queries, db_session, setup_data):
     user, room = setup_data
-    await DutyQueriesMixin.create_duty(user_id=user.id, room_id=room.id, date=datetime.date.today(), db=db_session)
+    await duty_queries.create_duty(user_id=user.id, room_id=room.id, date=datetime.date.today())
     try:
-        duties = await DutyQueriesMixin.get_all_duties_in_room(room.id, db=db_session)
+        duties = await duty_queries.get_all_duties_in_room(room.id)
     except IntegrityError:
         db_session.rollback()
-        duties = await DutyQueriesMixin.get_all_duties_in_room(room.id, db=db_session)
+        duties = await duty_queries.get_all_duties_in_room(room.id)
     assert len(duties) == 1
 
 
 @pytest.mark.asyncio
-async def test_change_duty_date(db_session, setup_data):
+async def test_change_duty_date(db_session, duty_queries, setup_data):
     date = datetime.date.today() - datetime.timedelta(days=1)
 
     user, room = setup_data
-    duty = await DutyQueriesMixin.create_duty(user_id=user.id, room_id=room.id, date=date, db=db_session)
+    duty = await duty_queries.create_duty(user_id=user.id, room_id=room.id, date=date)
     db_session.commit()
     db_session.refresh(duty)
     new_date = datetime.date.today() + datetime.timedelta(days=1)
-    updated_duty = await DutyQueriesMixin.change_duty_date(db=db_session, date=new_date, duty_id=duty.id)
-
+    duty_change = DutyChange(date=new_date)
+    updated_duty = await duty_queries.update_duty(duty_id=duty.id, duty_change=duty_change)
     assert updated_duty.date == new_date
 
 @pytest.mark.asyncio
-async def test_get_duties_for_user(db_session, setup_data):
-    LOCAL_USER_ID=12
+async def test_get_duties_for_user(db_session, duty_queries, setup_data):
+    local_user_id=12
     user, room = setup_data
     date_first = datetime.date.today() + timedelta(days=3)
     date_second = datetime.date.today() + timedelta(days=4)
 
-    await DutyQueriesMixin.create_duty(user_id=LOCAL_USER_ID, room_id=room.id, date=date_first,
-                                                db=db_session)
-    await DutyQueriesMixin.create_duty(user_id=LOCAL_USER_ID, room_id=room.id, date=date_second,
-                                                db=db_session)
+    await duty_queries.create_duty(user_id=local_user_id, room_id=room.id, date=date_first)
+    await duty_queries.create_duty(user_id=local_user_id, room_id=room.id, date=date_second)
 
     db_session.commit()
-    # db_session.refresh(duties)
-    user_duties = await DutyQueriesMixin.get_duties_by_user_id(user_id=LOCAL_USER_ID, db=db_session)
+    user_duties = await duty_queries.get_duties_by_user_id(user_id=local_user_id)
     assert len(user_duties) == 2
 
 
 @pytest.mark.asyncio
-async def test_delete_duty(db_session, setup_data):
+async def test_delete_duty(db_session, duty_queries, setup_data):
     user, room = setup_data
-    duties = await DutyQueriesMixin.get_all_duties_in_room(room_id=room.id, db=db_session)
+    duties = await duty_queries.get_all_duties_in_room(room_id=room.id)
     duty = duties[0]
-    db_session.refresh(duty)
-    await DutyQueriesMixin.delete_duty(db=db_session, duty_id=duty.id)
+    await duty_queries.delete_duty(duty_id=duty.id)
+    deleted_duty = await duty_queries.get_duty_by_id(duty.id)
 
-    deleted_duty = await DutyQueriesMixin.get_duty_by_id(duty.id, db=db_session)
     assert deleted_duty is None

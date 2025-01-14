@@ -2,57 +2,51 @@ import datetime
 
 from sqlmodel import Session, select
 
+from models.pydantic.duty import DutyChange
 from models.sqlmodels.duty import Duty
 
 
 class DutyQueriesMixin:
+    def __init__(self, db: Session):
+        self.db = db
 
-    @staticmethod
-    async def get_all_duties_in_room(room_id: int, db: Session) -> list[Duty]:
+    async def get_all_duties_in_room(self, room_id: int) -> list[Duty]:
         stmt = select(Duty).where(Duty.room_id == room_id)
-        duties = db.exec(stmt).all()
+        duties = self.db.exec(stmt).all()
         return duties
 
-    @staticmethod
-    async def get_duty_by_id(duty_id: int, db: Session):
+    async def get_duty_by_id(self, duty_id: int):
+        """it works fine even if the session wasn't commit before retrieving this (delete for example)"""
         stmt = select(Duty).where(Duty.id == duty_id)
-        duty = db.exec(stmt).first()
+        duty = self.db.exec(stmt).first()
         return duty
 
-    @staticmethod
-    async def create_duty(user_id: int, room_id: int, date: datetime.date, db: Session):
+    async def create_duty(self, user_id: int, room_id: int, date: datetime.date):
         duty = Duty(user_id=user_id, room_id=room_id, date=date)
-        db.add(duty)
+        self.db.add(duty)
         return duty
 
-    @staticmethod
-    async def change_duty_date(db: Session, date: datetime.date, duty_id: int | None = None, duty: Duty | None = None):
-        """duty or duty_id must be provided"""
+    async def update_duty(self, duty_id, duty_change: DutyChange):
+        duty_data = duty_change.model_dump(exclude_unset=True)
+        db_duty = self.db.get(Duty, duty_id)
+        db_duty.sqlmodel_update(duty_data)
+        return db_duty
+
+    async def delete_duty(self, duty_id: int | None = None, duty: Duty | None = None):
         if duty is None and duty_id is None:
             raise ValueError("Either duty or duty_id must be provided")
         if duty is None:
-            duty = await DutyQueriesMixin.get_duty_by_id(duty_id=duty_id, db=db)
-        duty.date = date
-        db.add(duty)
+            duty = await self.get_duty_by_id(duty_id=duty_id)
+        self.db.delete(duty)
         return duty
 
-    @staticmethod
-    async def delete_duty(db: Session, duty_id: int | None = None, duty: Duty | None = None):
-        if duty is None and duty_id is None:
-            raise ValueError("Either duty or duty_id must be provided")
-        if duty is None:
-            duty = await DutyQueriesMixin.get_duty_by_id(duty_id=duty_id, db=db)
-        db.delete(duty)
-        return duty
-
-    @staticmethod
-    async def get_duties_by_user_id(user_id: int, db: Session):
+    async def get_duties_by_user_id(self, user_id: int):
         stmt = select(Duty).where(Duty.user_id == user_id)
-        duties = db.exec(stmt).all()
+        duties = self.db.exec(stmt).all()
         return duties
 
-class Queries(DutyQueriesMixin):
+class DutyQueries(DutyQueriesMixin):
     pass
 
 
-duty_queries = Queries()
+# duty_queries = Queries()
