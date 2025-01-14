@@ -5,9 +5,9 @@ from pydantic import BaseModel
 
 from api.dependencies.auth import AuthorizedUserType
 from api.dependencies.database import SessionDep
-from api.dependencies.duty import DutiesRoomDp
+from api.dependencies.duty import DutiesRoomDp, DutyQueriesDep, RoomQueriesDep
 from api.errors.duty import UserHasNoPermission
-from db.queries.room import room_queries
+from db.queries.room import RoomQueriesMixin, RoomQueries
 from models.sqlmodels.duty import Duty
 
 router = APIRouter(tags=["room"])
@@ -21,7 +21,8 @@ async def get_rooms_by_user(
     user: AuthorizedUserType,
     db: SessionDep,
 ) -> list[Duty]:
-    room = await room_queries.get_all_user_rooms(user_id=user.id, db=db)
+    room_queries = RoomQueries(db=db)
+    room = await room_queries.get_all_user_rooms(user_id=user.id)
     return room
 
 @router.post("/")
@@ -31,7 +32,9 @@ async def create_room(
     room: Annotated[Duty, Body()],
     date: DateParam
 ) -> Duty:
-    room = await room_queries.create_room(room=room, db=db, owner_id=user.id, month=date.month, year=date.year)
+    room_queries = RoomQueries(db=db)
+
+    room = await room_queries.create_room(room=room, owner_id=user.id, month=date.month, year=date.year)
     return room
 
 
@@ -40,6 +43,7 @@ async def delete_room(
     user: AuthorizedUserType,
     db: SessionDep,
     room: DutiesRoomDp,
+    room_queries: RoomQueriesDep,
 ) -> dict[str, str]:
     if room.owner_id != user.id:
         raise UserHasNoPermission

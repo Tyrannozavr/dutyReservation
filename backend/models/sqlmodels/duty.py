@@ -8,7 +8,7 @@ from models.sqlmodels.auth import User
 
 
 class DutiesRoom(SQLModel, table=True):
-    id: int = Field(primary_key=True)
+    id: int | None = Field(primary_key=True, default=None)
     identifier: uuid.UUID = Field(default_factory=uuid.uuid4, unique=True)
     owner_id: int = Field(foreign_key="user.id")
     owner: User = Relationship(back_populates="rooms")

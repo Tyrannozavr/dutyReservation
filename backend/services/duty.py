@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
 
 from api.dependencies.database import SessionDep
+from db.errors.duty import DutyOccupied
 from db.queries.duty import DutyQueries
 from models.pydantic.duty import DutyCreate, DutyChange
 
@@ -14,10 +15,10 @@ class DutiesServices:
         self.queries = DutyQueries(db=db)
         self.db = db
 
-    def get_all_duties_in_room(self, room_id: int, db: Session):
+    def get_all_duties_in_room(self, room_id: int):
         return self.queries.get_all_duties_in_room(room_id)
 
-    def get_duty(self, duty_id, db: Session):
+    def get_duty(self, duty_id):
         return self.queries.get_duty_by_id(duty_id)
 
     def create_duty(self, duty: DutyCreate):
@@ -30,7 +31,7 @@ class DutiesServices:
             self.db.commit()
         except IntegrityError:
             self.db.rollback()
-            raise ValueError("Duty already exists")
+            raise DutyOccupied
 
     def update_duty(self, duty_id: int, duty_change: DutyChange):
         return self.queries.update_duty(duty_id=duty_id, duty_change=duty_change)
