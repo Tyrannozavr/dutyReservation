@@ -1,4 +1,5 @@
 import datetime
+from datetime import timedelta
 
 import pytest
 from sqlalchemy import create_engine
@@ -83,6 +84,23 @@ async def test_change_duty_date(db_session, setup_data):
     updated_duty = await DutyQueriesMixin.change_duty_date(db=db_session, date=new_date, duty_id=duty.id)
 
     assert updated_duty.date == new_date
+
+@pytest.mark.asyncio
+async def test_get_duties_for_user(db_session, setup_data):
+    LOCAL_USER_ID=12
+    user, room = setup_data
+    date_first = datetime.date.today() + timedelta(days=3)
+    date_second = datetime.date.today() + timedelta(days=4)
+
+    await DutyQueriesMixin.create_duty(user_id=LOCAL_USER_ID, room_id=room.id, date=date_first,
+                                                db=db_session)
+    await DutyQueriesMixin.create_duty(user_id=LOCAL_USER_ID, room_id=room.id, date=date_second,
+                                                db=db_session)
+
+    db_session.commit()
+    # db_session.refresh(duties)
+    user_duties = await DutyQueriesMixin.get_duties_by_user_id(user_id=LOCAL_USER_ID, db=db_session)
+    assert len(user_duties) == 2
 
 
 @pytest.mark.asyncio

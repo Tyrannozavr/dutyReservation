@@ -1,19 +1,20 @@
 import jwt
 import pytest
-from datetime import datetime, timedelta, timezone
-from unittest.mock import patch
+
 from models.pydantic.auth import TokenData, Token, UserOriginTypes
 from services.auth import TokenServices
 
-TEST_ACCESS_EXPIRE_TIME=30
-TEST_REFRESH_EXPIRE_TIME=60
-SECRET_KEY="test_secret"
-ALGORITHM="HS256"
+TEST_ACCESS_EXPIRE_TIME = 30
+TEST_REFRESH_EXPIRE_TIME = 60
+SECRET_KEY = "test_secret"
+ALGORITHM = "HS256"
+
 
 @pytest.fixture(scope="module")
 def token_service():
     return TokenServices(secret_key=SECRET_KEY, algorithm=ALGORITHM, access_expire_time=TEST_ACCESS_EXPIRE_TIME,
                          refresh_expire_time=TEST_REFRESH_EXPIRE_TIME)
+
 
 @pytest.fixture(scope="module")
 def token_data():

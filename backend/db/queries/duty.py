@@ -45,6 +45,12 @@ class DutyQueriesMixin:
         db.delete(duty)
         return duty
 
+    @staticmethod
+    async def get_duties_by_user_id(user_id: int, db: Session):
+        stmt = select(Duty).where(Duty.user_id == user_id)
+        duties = db.exec(stmt).all()
+        return duties
+
 class Queries(DutyQueriesMixin):
     pass
 

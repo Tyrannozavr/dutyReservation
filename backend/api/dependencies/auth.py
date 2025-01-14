@@ -1,22 +1,21 @@
 import hashlib
 import hmac
-import json
 from operator import itemgetter
 from typing import Annotated
 from urllib.parse import parse_qsl
+
 from fastapi import Body, HTTPException
 from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
 from fastapi import status
+from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
-from pydantic import BaseModel
 
 from api.dependencies.database import SessionDep
 from core.config import Settings, get_settings
 from db.queries.auth import user_queries
-from models.pydantic.auth import TelegramUserData, UserInDb, UserDataIn, UserOriginTypes, TelegramInitData
+from models.pydantic.auth import UserDataIn, TelegramInitData
 from models.sqlmodels.auth import User
-from services.samples import token_services
+from services.auth_samples import token_services
 
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
 
@@ -73,7 +72,6 @@ oauth2_scheme = OAuth2PasswordBearer(
     description="IMPORTANT! use initData from telegram webapp as username and string \"telegram\" "
                 "as password",
 )
-
 
 
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], settings: SettingsDep, db: SessionDep) -> User:
