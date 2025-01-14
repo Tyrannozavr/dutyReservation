@@ -1,3 +1,4 @@
+duty_data = "Duty already exists"
 
-
-DutyOccupied = ValueError("Duty already exists")
+class DutyOccupied(ValueError):
+    pass
