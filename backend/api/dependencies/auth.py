@@ -9,12 +9,14 @@ from fastapi import Depends
 from fastapi import status
 from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
+from passlib.context import CryptContext
 
 from api.dependencies.database import SessionDep
 from core.config import Settings, get_settings
-from db.queries.auth import user_queries
-from models.pydantic.auth import UserDataIn, TelegramInitData
+from db.queries.auth import UserQueries
+from models.pydantic.auth import UserDataIn, TelegramInitData, TokenData
 from models.sqlmodels.auth import User
+from services.auth import UserServices
 from services.auth_samples import token_services
 
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
@@ -58,9 +60,6 @@ def validated_telegram_init_data(init_data: InitDataStringDep,
     if not data_verified:
         return None
     parsed_data = dict(parse_qsl(init_data))
-    # user_data = json.loads(parsed_data.pop("user"))
-    # user = UserInDb(**user_data, origin=UserOriginTypes.telegram)
-    # init_data = TelegramInitData(**parsed_data, **user_data, user=user)
     init_data = TelegramInitData(**parsed_data)
     return init_data
 
@@ -74,7 +73,9 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], settings: SettingsDep, db: SessionDep) -> User:
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: SessionDep) -> User:
+    """Makes request to DB"""
+    user_queries = UserQueries(db=db)
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -82,14 +83,26 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], settings: Se
     )
     try:
         payload_data = token_services.decode_token(token)
-        user = user_queries.get_user_by_id(user_id=payload_data.user_id, db=db)
-        user = User(**payload_data)
+        user = await user_queries.get_user_by_id(user_id=payload_data.user_id)
     except InvalidTokenError:
         raise credentials_exception
     if not user:
         raise credentials_exception
     return user
 
+def get_token_data(token: Annotated[str, Depends(oauth2_scheme)]) -> TokenData:
+    """Have no requests to DB"""
+    payload_data = token_services.decode_token(token=token)
+    return TokenData(**payload_data)
+
+def get_pwd_context():
+    return CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def get_user_services(db: SessionDep, pwd_context: Annotated[CryptContext, Depends(get_pwd_context)]) -> UserServices:
+    return UserServices(pwd_context=pwd_context, db=db)
 
 AuthorizedUserType = Annotated[User, Depends(get_current_user)]
 UserDataCreateDep = Annotated[UserDataIn, Body()]
+TokenDataDep = Annotated[TokenData, Depends(get_token_data)]
+UserServicesDep = Annotated[UserServices, Depends(get_user_services)]

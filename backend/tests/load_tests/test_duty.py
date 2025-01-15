@@ -57,7 +57,6 @@ async def test_load_set_duty_user(db_session, duty_queries, setup_data):
             duty_queries.create_duty(room_id=room.id, date=datetime.date.today())
             for _ in range(free_duties_per_day)
         ]
-        # duty_queries.create_duty(room_id=room.id, date=datetime.date.today())
     )
     db_session.commit()  # Commit the duties creation
 

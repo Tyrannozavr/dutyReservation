@@ -80,7 +80,6 @@ class TelegramUserDataIn(BaseModel):
 
 
 class UserDataIn(BaseModel):
-    origin: UserOriginTypes
     username: str
     first_name: str | None = None
     last_name: str | None = None

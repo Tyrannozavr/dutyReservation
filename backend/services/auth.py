@@ -1,11 +1,12 @@
 from datetime import datetime, timezone, timedelta
+from typing import Any
 
 import jwt
 from passlib.context import CryptContext
 from sqlmodel import Session
 
-from db.queries.auth import user_queries
-from models.pydantic.auth import Token, TokenData, UserDbCreate, UserDataIn
+from db.queries.auth import UserQueries
+from models.pydantic.auth import Token, TokenData, UserDbCreate, UserDataIn, UserOriginTypes, TelegramInitData
 
 
 class TokenServices:
@@ -17,7 +18,7 @@ class TokenServices:
         self.refresh_token_expire_minutes = refresh_expire_time
         self.token_type = token_type
 
-    def _create_token(self, data: TokenData, expire_time: float):
+    async def _create_token(self, data: TokenData, expire_time: float):
         if expire_time <= 0:
             raise Exception("expire time must be grater than zero")
         expires_delta = timedelta(minutes=expire_time)
@@ -27,45 +28,50 @@ class TokenServices:
         encoded_jwt = jwt.encode(to_encode.model_dump(), self.secret_key, algorithm=self.algorithm)
         return encoded_jwt
 
-    def _create_access_token(self, data: TokenData):
+    async def _create_access_token(self, data: TokenData):
         expire_time = float(self.access_token_expire_minutes)
-        access_token = self._create_token(data=data, expire_time=expire_time)
+        access_token = await self._create_token(data=data, expire_time=expire_time)
         return access_token
 
-    def _create_refresh_token(self, data: TokenData):
+    async def _create_refresh_token(self, data: TokenData):
         expire_time = float(self.refresh_token_expire_minutes)
-        refresh_token = self._create_token(data=data, expire_time=expire_time)
+        refresh_token = await self._create_token(data=data, expire_time=expire_time)
         return refresh_token
 
-    def get_tokens(self, data: TokenData):
-        access_token = self._create_access_token(data=data)
-        refresh_token = self._create_refresh_token(data=data)
+    async def get_tokens(self, data: TokenData):
+        access_token = await self._create_access_token(data=data)
+        refresh_token = await self._create_refresh_token(data=data)
         return Token(access_token=access_token, refresh_token=refresh_token, token_type=self.token_type)
 
-    def decode_token(self, token: str) -> TokenData:
+    async def decode_token(self, token: str) -> TokenData:
         data = jwt.decode(token, self.secret_key, self.algorithm)
         return TokenData(**data)
 
 
 class UserServices:
-    def __init__(self, pwd_context: CryptContext):
+    def __init__(self, pwd_context: CryptContext, db: Session, user_queries: Any = None):
         self.pwd_context = pwd_context
+        self.queries = UserQueries(db=db) if not user_queries else user_queries
 
-    def _get_hashed_password(self, plaintext_password: str) -> str:
+    async def _get_hashed_password(self, plaintext_password: str) -> str:
         return self.pwd_context.hash(plaintext_password)
 
-    def verify_password(self, plaintext_password: str, hashed_password: str) -> bool:
+    async def verify_password(self, plaintext_password: str, hashed_password: str) -> bool:
         return self.pwd_context.verify(plaintext_password, hashed_password)
 
-    def authenticate_user(self, internal_username: str, password: str, db: Session):
-        user = user_queries.get_user_by_internal_username(internal_username=internal_username, db=db)
+    async def authenticate_user(self, internal_username: str, password: str):
+        user = await self.queries.get_user_by_internal_username(internal_username=internal_username)
         if not user:
             return False
         if not self.verify_password(plaintext_password=password, hashed_password=user.hashed_password):
             return False
         return user
 
-    async def create_user(self, user_data: UserDataIn, db: Session):
-        user_db = UserDbCreate(**user_data.model_dump(), hashed_password=self._get_hashed_password(user_data.password))
-        user = await user_queries.create_user(user_data=user_db, db=db)
+    async def get_or_create_tg_user(self, init_data: TelegramInitData):
+        return self.queries.get_or_create_tg_user(init_data=init_data)
+
+    async def create_user(self, user_data: UserDataIn, origin: UserOriginTypes):
+        user_db = UserDbCreate(**user_data.model_dump(), hashed_password=await self._get_hashed_password(user_data.password),
+                               origin=origin)
+        user = await self.queries.create_user(user_data=user_db)
         return user

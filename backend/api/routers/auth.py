@@ -4,20 +4,19 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
 
 from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, validated_telegram_init_data, \
-    UserDataCreateDep
+    UserDataCreateDep, UserServicesDep
 from api.dependencies.database import SessionDep
 from api.errors.auth import IncorrectUsernameOrPassword
-from db.queries.auth import user_queries
 from models.pydantic.auth import Token, UserOut, UserInDb, TokenData, UserOriginTypes, UserDbCreate
 from models.sqlmodels.auth import User, TelegramUserData
-from services.auth_samples import user_services, token_services
+from services.auth_samples import token_services
 from tests.queries.test_auth import telegram_user_data
 
 router = APIRouter()
 
 
 @router.post("/login", include_in_schema=False)
-def login(settings: SettingsDep, db: SessionDep, form_data: OAuth2PasswordRequestForm = Depends()):
+def login(settings: SettingsDep, db: SessionDep, user_services: UserServicesDep, form_data: OAuth2PasswordRequestForm = Depends()):
     """Takes initData from telegram webapp as username and "telegram" as a password to get tokens with telegram
     initData"""
     if form_data.password == "telegram":
@@ -25,7 +24,7 @@ def login(settings: SettingsDep, db: SessionDep, form_data: OAuth2PasswordReques
         return telegram_auth(init_data=init_data, db=db)
     else:
         internal_username = User.get_internal_username(form_data.username, origin=UserOriginTypes.web)
-        user = user_services.authenticate_user(username=internal_username, password=form_data.password, db=db)
+        user = user_services.authenticate_user(username=internal_username, password=form_data.password)
         if not user:
             raise IncorrectUsernameOrPassword
         token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
@@ -42,21 +41,12 @@ def login(settings: SettingsDep, db: SessionDep, form_data: OAuth2PasswordReques
         404: {"description": "InitData isn't appropriate"},
     }
 )
-def telegram_auth(init_data: InitDataDep, db: SessionDep):
+def telegram_auth(init_data: InitDataDep, user_services: UserServicesDep):
     """allows to get access to this platform using telegram's webapp initData"""
     if not init_data:
         raise HTTPException(status_code=404, detail="InitData isn't appropriate")
 
-    # user_tg_data = user_queries.get_or_create_tg_user(init_data, db)
-    # user_data = UserDbCreate()
-    user = user_queries.create_user()
-    # telegram_user_data = TelegramUserData(
-    #     language_code=init_data.language_code,
-    #     allows_write_to_pm=init_data.allows_write_to_pm,
-    #     photo_url=init_data.photo_url,
-    #     user=user
-    # )
-    user_tg_data = user_queries.get_tg_user(init_data, db)
+    user_tg_data = user_services.get_tg_user(init_data)
     user = user_tg_data.user
     token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
                            last_name=user.last_name, origin=user.origin)
@@ -72,10 +62,10 @@ def telegram_auth(init_data: InitDataDep, db: SessionDep):
     }
 )
 async def create_user(
-        db:  SessionDep,
+        user_services:  UserServicesDep,
         user_data: UserDataCreateDep,
 ):
-    user = await user_services.create_user(user_data=user_data, db=db)
+    user = await user_services.create_user(user_data=user_data, origin=UserOriginTypes.web)
     token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
                            last_name=user.last_name, origin=UserOriginTypes.web)
     return token_services.get_tokens(data=token_data)

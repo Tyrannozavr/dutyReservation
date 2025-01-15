@@ -6,10 +6,12 @@ from models.sqlmodels.auth import TelegramUserData as TelegramUserDataDb, User, 
 
 
 class UserQueriesMixin:
-    @staticmethod
-    def get_or_create_tg_user(init_data: TelegramUserDataIn, db: Session) -> TelegramUserDataDb:
+    def __init__(self, db: Session):
+        self.db = db
+
+    async def get_or_create_tg_user(self, init_data: TelegramUserDataIn) -> TelegramUserDataDb:
         telegram_id = init_data.id
-        user_tg_data = db.get(TelegramUserDataDb, telegram_id)
+        user_tg_data = self.db.get(TelegramUserDataDb, telegram_id)
         if not user_tg_data:
             user_data_db_create = UserDbCreate(
                 username=f"{TELEGRAM_PREFIX}{init_data.username}",
@@ -17,7 +19,7 @@ class UserQueriesMixin:
                 last_name=init_data.last_name,
                 origin=UserOriginTypes.telegram
             )
-            user = user_queries.create_user(user_data_db_create, db)
+            user = await self.create_user(user_data_db_create)
             user_tg_data = TelegramUserDataDb(
                 telegram_id=telegram_id,
                 language_code=init_data.language_code,
@@ -25,27 +27,24 @@ class UserQueriesMixin:
                 photo_url=init_data.photo_url,
                 user=user
             )
-            db.add(user_tg_data)
+            self.db.add(user_tg_data)
         return user_tg_data
 
-    @staticmethod
-    def create_user(user_data: UserDbCreate, db: Session) -> User:
+    async def create_user(self, user_data: UserDbCreate) -> User:
         user_data = user_data.model_dump()
         user = User(**user_data)
-        db.add(user)
+        self.db.add(user)
         return user
 
-    @staticmethod
-    def get_user_by_id(user_id: int, db: Session) -> User | None:
-        return db.get(User, user_id)
+    async def get_user_by_id(self, user_id: int) -> User | None:
+        return self.db.get(User, user_id)
 
-    @staticmethod
-    def get_user_by_internal_username(internal_username: str, db: Session) -> User | None:
+    async def get_user_by_internal_username(self, internal_username: str) -> User | None:
         stmt = select(User).where(User.internal_username == internal_username)
-        user = db.exec(stmt).first()
+        user = self.db.exec(stmt).first()
         return user
 
-class Queries(UserQueriesMixin):
+
+class UserQueries(UserQueriesMixin):
     pass
 
-user_queries = Queries()

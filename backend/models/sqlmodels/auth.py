@@ -72,7 +72,7 @@ class TelegramUserData(SQLModel, table=True):
     allows_write_to_pm: bool | None = Field(default=None)
     photo_url: str | None = Field(default=None)
 
-    user_id: int = Field(foreign_key="user.id")
+    user_id: int | None = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="tg_data")
 
     model_config = ConfigDict(from_attributes=True)
