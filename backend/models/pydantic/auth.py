@@ -10,9 +10,9 @@ class UserOriginTypes(str, Enum):
 
 
 class BaseUser(BaseModel):
-    first_name: str
+    first_name: str | None
     last_name: str | None
-    username: str | None
+    username: str
 
 
 class UserInDb(BaseUser):
@@ -33,11 +33,11 @@ class TelegramInitData(BaseModel):
     # Unique identifier for the telegram user
     id: int
     first_name: str
-    last_name: str | None
-    username: str | None
-    language_code: str | None
-    allows_write_to_pm: bool | None
-    photo_url: str | None
+    last_name: str | None = None
+    username: str | None = None
+    language_code: str | None = None
+    allows_write_to_pm: bool | None = None
+    photo_url: str | None = None
 
 
 

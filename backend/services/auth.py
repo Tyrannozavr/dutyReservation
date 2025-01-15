@@ -63,12 +63,12 @@ class UserServices:
         user = await self.queries.get_user_by_internal_username(internal_username=internal_username)
         if not user:
             return False
-        if not self.verify_password(plaintext_password=password, hashed_password=user.hashed_password):
+        if not await self.verify_password(plaintext_password=password, hashed_password=user.hashed_password):
             return False
         return user
 
     async def get_or_create_tg_user(self, init_data: TelegramInitData):
-        return self.queries.get_or_create_tg_user(init_data=init_data)
+        return await self.queries.get_or_create_tg_user(init_data=init_data)
 
     async def create_user(self, user_data: UserDataIn, origin: UserOriginTypes):
         user_db = UserDbCreate(**user_data.model_dump(), hashed_password=await self._get_hashed_password(user_data.password),
