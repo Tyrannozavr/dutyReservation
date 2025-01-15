@@ -60,7 +60,8 @@ class TokenServices:
             raise Exception("Invalid token")
 
 class UserServices:
-    def __init__(self, pwd_context: CryptContext, db: Session, user_queries: Any = None):
+    def __init__(self, db: Session, pwd_context: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto"),
+                 user_queries: Any = None):
         self.pwd_context = pwd_context
         self.queries = UserQueries(db=db) if not user_queries else user_queries
 

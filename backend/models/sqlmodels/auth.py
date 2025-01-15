@@ -16,7 +16,7 @@ def generate_user_link(username: str, origin: UserOriginTypes):
 class User(SQLModel, table=True):
     """internal username is for allow users to register directly from telegram and do not cause unique constraint with
     web registered users with their unique username"""
-    id: int = Field(primary_key=True)
+    id: int | None = Field(primary_key=True)
     first_name: str | None = Field(default=None)
     last_name: str | None = Field(default=None)
     internal_username: str = Field(unique=True)

@@ -1,8 +1,8 @@
 import hashlib
 import hmac
 from operator import itemgetter
-from typing import Annotated
-from urllib.parse import parse_qsl
+from typing import Annotated, Dict
+from urllib.parse import parse_qsl, urlencode, quote_plus
 
 from fastapi import Body, HTTPException
 from fastapi import Depends
@@ -21,7 +21,7 @@ from services.auth import UserServices, TokenServices
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
 
 
-def check_webapp_signature(init_data: InitDataStringDep, token: str) -> bool:
+def check_webapp_signature(init_data: InitDataStringDep, telegram_bot_token: str) -> bool:
     """
     Check incoming WebApp init data signature
 
@@ -41,7 +41,7 @@ def check_webapp_signature(init_data: InitDataStringDep, token: str) -> bool:
         f"{k}={v}" for k, v in sorted(parsed_data.items(), key=itemgetter(0))
     )
     secret_key = hmac.new(
-        key=b"WebAppData", msg=token.encode(), digestmod=hashlib.sha256
+        key=b"WebAppData", msg=telegram_bot_token.encode(), digestmod=hashlib.sha256
     )
     calculated_hash = hmac.new(
         key=secret_key.digest(), msg=data_check_string.encode(), digestmod=hashlib.sha256
@@ -53,15 +53,47 @@ SettingsDep = Annotated[Settings, Depends(get_settings)]
 
 
 def validated_telegram_init_data(init_data: InitDataStringDep,
-                                 settings: SettingsDep) -> TelegramInitData | None:
-    bot_token = settings.telegram_bot_token
-    data_verified = check_webapp_signature(init_data=init_data, token=bot_token)
+                                 telegram_bot_token: str) -> TelegramInitData | None:
+    bot_token = telegram_bot_token
+    data_verified = check_webapp_signature(init_data=init_data, telegram_bot_token=bot_token)
     if not data_verified:
         return None
     parsed_data = dict(parse_qsl(init_data))
     init_data = TelegramInitData(**parsed_data)
     return init_data
 
+
+def generate_webapp_signature_data(data: Dict[str, str], token: str) -> str:
+    """
+    Generate a query string that will pass the web app signature check.
+
+    Args:
+        data (Dict[str, str]): The data to include in the query string.
+        token (str): The bot token used for hashing.
+
+    Returns:
+        str: A query string with a valid signature hash.
+    """
+    # Sort the data and create the data check string
+    sorted_items = sorted(data.items())
+    data_check_string = "\n".join(f"{k}={v}" for k, v in sorted_items)
+
+    # Create the secret key
+    secret_key = hmac.new(
+        key=b"WebAppData", msg=token.encode(), digestmod=hashlib.sha256
+    )
+
+    # Calculate the hash
+    calculated_hash = hmac.new(
+        key=secret_key.digest(), msg=data_check_string.encode(), digestmod=hashlib.sha256
+    ).hexdigest()
+
+    # Add the hash to the data
+    data['hash'] = calculated_hash
+
+    # Create the final query string
+    query_string = urlencode(data, quote_via=quote_plus)
+    return query_string
 
 InitDataDep = Annotated[TelegramInitData, Depends(validated_telegram_init_data)]
 

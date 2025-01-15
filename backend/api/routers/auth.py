@@ -7,20 +7,19 @@ from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, 
     UserDataCreateDep, UserServicesDep, TokenServicesDep, RefreshTokenDep
 from api.dependencies.database import SessionDep
 from api.errors.auth import IncorrectUsernameOrPassword
-from models.pydantic.auth import Token, UserOut, UserInDb, TokenData, UserOriginTypes, UserDbCreate
-from models.sqlmodels.auth import User, TelegramUserData
-from tests.queries.test_auth import telegram_user_data
+from models.pydantic.auth import Token, UserOut, TokenData, UserOriginTypes
+from models.sqlmodels.auth import User
 
 router = APIRouter()
 
 
 @router.post("/token", include_in_schema=False)
 def login_for_access_token(settings: SettingsDep, db: SessionDep, user_services: UserServicesDep,
-          token_services: TokenServicesDep, form_data: OAuth2PasswordRequestForm = Depends()):
+                           token_services: TokenServicesDep, form_data: OAuth2PasswordRequestForm = Depends()):
     """Takes initData from telegram webapp as username and "telegram" as a password to get tokens with telegram
     initData"""
     if form_data.password == "telegram":
-        init_data = validated_telegram_init_data(form_data.username, settings=settings)
+        init_data = validated_telegram_init_data(form_data.username, telegram_bot_token=settings.telegram_bot_token)
         return telegram_auth(init_data=init_data, db=db)
     else:
         internal_username = User.get_internal_username(form_data.username, origin=UserOriginTypes.web)
@@ -39,7 +38,8 @@ def login_for_access_token(settings: SettingsDep, db: SessionDep, user_services:
 )
 async def refresh_access_token(token_services: TokenServicesDep, refresh_token: RefreshTokenDep):
     refresh_token_data = await token_services.decode_token(refresh_token)
-    # if refresh_token_data.exp
+    return token_services.get_tokens(data=refresh_token_data)
+
 
 @router.post(
     "/telegram",
@@ -80,7 +80,6 @@ async def create_user(
     token_data = TokenData(sub=str(user.id), username=user.username, first_name=user.first_name,
                            last_name=user.last_name, origin=UserOriginTypes.web)
     return token_services.get_tokens(data=token_data)
-
 
 
 @router.get(
