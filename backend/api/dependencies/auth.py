@@ -16,8 +16,7 @@ from core.config import Settings, get_settings
 from db.queries.auth import UserQueries
 from models.pydantic.auth import UserDataIn, TelegramInitData, TokenData
 from models.sqlmodels.auth import User
-from services.auth import UserServices
-from services.auth_samples import token_services
+from services.auth import UserServices, TokenServices
 
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
 
@@ -72,8 +71,15 @@ oauth2_scheme = OAuth2PasswordBearer(
                 "as password",
 )
 
+def get_token_services(settings: SettingsDep):
+    return TokenServices(secret_key=settings.secret_key, algorithm=settings.auth_algorithm,
+                               access_expire_time=float(settings.access_token_expire_minutes),
+                               refresh_expire_time=float(settings.refresh_token_expire_minutes),
+                               token_type="bearer")
+TokenServicesDep = Annotated[TokenServices, Depends(get_token_services)]
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: SessionDep) -> User:
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: SessionDep,
+                           token_services: TokenServicesDep) -> User:
     """Makes request to DB"""
     user_queries = UserQueries(db=db)
     credentials_exception = HTTPException(
@@ -90,10 +96,11 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
         raise credentials_exception
     return user
 
-def get_token_data(token: Annotated[str, Depends(oauth2_scheme)]) -> TokenData:
+
+
+async def get_token_data(token: Annotated[str, Depends(oauth2_scheme)], token_services: TokenServicesDep) -> TokenData:
     """Have no requests to DB"""
-    payload_data = token_services.decode_token(token=token)
-    return TokenData(**payload_data)
+    return await token_services.decode_token(token=token)
 
 def get_pwd_context():
     return CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -101,6 +108,8 @@ def get_pwd_context():
 
 def get_user_services(db: SessionDep, pwd_context: Annotated[CryptContext, Depends(get_pwd_context)]) -> UserServices:
     return UserServices(pwd_context=pwd_context, db=db)
+
+
 
 AuthorizedUserType = Annotated[User, Depends(get_current_user)]
 UserDataCreateDep = Annotated[UserDataIn, Body()]

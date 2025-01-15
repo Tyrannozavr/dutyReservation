@@ -4,19 +4,19 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
 
 from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, validated_telegram_init_data, \
-    UserDataCreateDep, UserServicesDep
+    UserDataCreateDep, UserServicesDep, TokenServicesDep
 from api.dependencies.database import SessionDep
 from api.errors.auth import IncorrectUsernameOrPassword
 from models.pydantic.auth import Token, UserOut, UserInDb, TokenData, UserOriginTypes, UserDbCreate
 from models.sqlmodels.auth import User, TelegramUserData
-from services.auth_samples import token_services
 from tests.queries.test_auth import telegram_user_data
 
 router = APIRouter()
 
 
 @router.post("/login", include_in_schema=False)
-def login(settings: SettingsDep, db: SessionDep, user_services: UserServicesDep, form_data: OAuth2PasswordRequestForm = Depends()):
+def login(settings: SettingsDep, db: SessionDep, user_services: UserServicesDep,
+          token_services: TokenServicesDep, form_data: OAuth2PasswordRequestForm = Depends()):
     """Takes initData from telegram webapp as username and "telegram" as a password to get tokens with telegram
     initData"""
     if form_data.password == "telegram":
@@ -41,7 +41,7 @@ def login(settings: SettingsDep, db: SessionDep, user_services: UserServicesDep,
         404: {"description": "InitData isn't appropriate"},
     }
 )
-def telegram_auth(init_data: InitDataDep, user_services: UserServicesDep):
+def telegram_auth(init_data: InitDataDep, user_services: UserServicesDep, token_services: TokenServicesDep):
     """allows to get access to this platform using telegram's webapp initData"""
     if not init_data:
         raise HTTPException(status_code=404, detail="InitData isn't appropriate")
@@ -51,6 +51,7 @@ def telegram_auth(init_data: InitDataDep, user_services: UserServicesDep):
     token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
                            last_name=user.last_name, origin=user.origin)
     return token_services.get_tokens(data=token_data)
+
 
 @router.post(
     "/register",
@@ -62,8 +63,9 @@ def telegram_auth(init_data: InitDataDep, user_services: UserServicesDep):
     }
 )
 async def create_user(
-        user_services:  UserServicesDep,
+        user_services: UserServicesDep,
         user_data: UserDataCreateDep,
+        token_services: TokenServicesDep
 ):
     user = await user_services.create_user(user_data=user_data, origin=UserOriginTypes.web)
     token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
@@ -92,4 +94,3 @@ def get_user(user: AuthorizedUserType, db: SessionDep):
     stmt = select(User).where(User.id == user_id).join(User.tg_data)
     user_in_db = db.exec(stmt).first()
     return user_in_db
-
