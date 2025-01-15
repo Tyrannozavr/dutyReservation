@@ -17,6 +17,10 @@ class DutiesServices:
     def get_all_duties_in_room(self, room_id: int):
         return self.queries.get_all_duties_in_room(room_id)
 
+    def get_all_duties(self):
+        return self.queries.get_all_duties()
+
+
     async def set_duty_user(self, user_id: int, room_id: int, date: datetime.date) -> Duty | None:
         duty = await self.queries.set_duty_user(user_id=user_id, room_id=room_id, date=date)
         return duty

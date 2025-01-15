@@ -21,7 +21,6 @@ class DutiesRoom(SQLModel, table=True):
 
 
 class Duty(SQLModel, table=True):
-    # __table_args__ = (UniqueConstraint("room_id", "date", "user_id", name="uq_date_room"),)
     id: int | None = Field(primary_key=True)
     user_id: int | None = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="duties")

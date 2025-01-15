@@ -1,4 +1,5 @@
 import datetime
+from typing import Sequence
 
 from sqlalchemy import update
 from sqlmodel import Session, select
@@ -13,6 +14,11 @@ class DutyQueriesMixin:
 
     async def get_all_duties_in_room(self, room_id: int) -> list[Duty]:
         stmt = select(Duty).where(Duty.room_id == room_id)
+        duties = self.db.exec(stmt).all()
+        return duties
+
+    async def get_all_duties(self) -> Sequence[Duty]:
+        stmt = select(Duty)
         duties = self.db.exec(stmt).all()
         return duties
 

@@ -1,8 +1,11 @@
 import uuid
+from datetime import timedelta
+
 import pytest
 from sqlmodel import SQLModel, create_engine, Session
 
 from api.dependencies.duty import RoomQueriesDep
+from db.queries.duty import DutyQueries
 from db.queries.room import RoomQueries
 from models.sqlmodels.auth import *
 from models.sqlmodels.duty import *
@@ -26,13 +29,17 @@ def db_session():
 def room_queries(db_session):
     return RoomQueries(db_session)
 
+@pytest.fixture(scope="function")
+def duty_queries(db_session):
+    return DutyQueries(db_session)
+
 
 
 @pytest.fixture(scope="function")
 def setup_rooms(db_session):
     # Create some test rooms
-    room1 = DutiesRoom(owner_id=1, month=5, year=2023)
-    room2 = DutiesRoom(owner_id=1, month=6, year=2023)
+    room1 = DutiesRoom(owner_id=1)
+    room2 = DutiesRoom(owner_id=1)
     db_session.add(room1)
     db_session.add(room2)
     # db_session.commit()
@@ -55,6 +62,19 @@ async def test_create_room(db_session, room_queries):
     assert room.owner_id == owner_id
     assert room.name == "testings"
 
+@pytest.mark.asyncio
+async def test_create_duties_for_room(db_session, room_queries, duty_queries):
+    room_id = 15
+    year = 2023
+    month = 10
+    duties_per_day = 2
+    days_in_month = (datetime.date(year=year, month=month+1, day=1) - timedelta(days=1)).day
+    expected_duties = days_in_month * duties_per_day
+    duties = await room_queries.create_duties_for_room(room_id=room_id, month=month, year=year, duties_per_day=duties_per_day)
+    assert expected_duties == len(duties)
+    duties_in_db = await duty_queries.get_all_duties_in_room(room_id=room_id)
+    assert len(duties_in_db) == len(duties)
+    print(duties_in_db)
 
 @pytest.mark.asyncio
 async def test_get_all_user_rooms(db_session, setup_rooms, room_queries):

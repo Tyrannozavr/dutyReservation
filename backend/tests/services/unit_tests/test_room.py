@@ -1,0 +1,62 @@
+import pytest
+from unittest.mock import AsyncMock, MagicMock
+from services.room import RoomServices
+from db.queries.room import RoomQueries
+
+
+@pytest.fixture(scope="function")
+def mock_db():
+    return MagicMock()
+
+
+@pytest.fixture
+def room_queries_mock(mock_db):
+    queries = RoomQueries(mock_db)
+    queries.create_room = AsyncMock()
+    queries.create_duties_for_room = AsyncMock()
+    return queries
+
+
+@pytest.fixture
+def room_services(room_queries_mock, mock_db):
+    return RoomServices(db=mock_db, queries=room_queries_mock)
+
+
+@pytest.mark.asyncio
+async def test_create_room(room_services, room_queries_mock):
+    name = "Test Room"
+    owner_id = 1
+    year = 2023
+    month = 10
+    duties_per_day = 1
+
+    # Создаем мок комнаты
+    mock_room = MagicMock()
+    mock_room.id = 1
+    room_queries_mock.create_room.return_value = mock_room
+
+    # Вызов метода
+    result = await room_services.create_room(
+        name=name,
+        owner_id=owner_id,
+        year=year,
+        month=month,
+        duties_per_day=duties_per_day
+    )
+
+    # Проверка, что методы были вызваны с правильными аргументами
+    room_queries_mock.create_room.assert_awaited_once_with(
+        name=name,
+        owner_id=owner_id,
+        duties_per_day=duties_per_day
+    )
+
+    room_queries_mock.create_duties_for_room.assert_awaited_once_with(
+        room_id=mock_room.id,
+        year=year,
+        month=month,
+        duties_per_day=duties_per_day
+    )
+
+    # Проверка, что результат совпадает с ожидаемым
+    assert result == mock_room
