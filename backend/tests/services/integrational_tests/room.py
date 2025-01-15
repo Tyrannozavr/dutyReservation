@@ -56,7 +56,38 @@ async def test_create_room_integration(room_services, duty_services):
     expected_duties = days_in_month * duties_per_day
 
     duties = await duty_services.get_all_duties()
-    print("expected_", len(duties))
+    assert len(duties) == expected_duties
+
+@pytest.mark.asyncio
+async def test_create_room_integration(room_services, duty_services):
+    name = "New integration room test"
+    owner_id = 1
+    year = 2023
+    month = 10
+    duties_per_day = 3
+
+    # Вызов метода для создания комнаты
+    room = await room_services.create_room(
+        name=name,
+        owner_id=owner_id,
+        year=year,
+        month=month,
+        duties_per_day=duties_per_day
+    )
+
+    # Проверка, что комната была создана и сохранена в базе данных
+    assert room.name == name
+    assert room.owner_id == owner_id
+
+    # Проверка, что комната действительно существует в базе данных
+    rooms_in_db = await RoomQueries(room_services.db).get_rooms()  # Предполагается, что есть метод для получения всех комнат
+    assert len(rooms_in_db) == 1
+    assert rooms_in_db[0].name == name
+
+    days_in_month = (datetime.date(year=year, month=month+1, day=1) - timedelta(days=1)).day
+    expected_duties = days_in_month * duties_per_day
+
+    duties = await duty_services.get_all_duties_in_room(room_id=room.id)
     assert len(duties) == expected_duties
 
 

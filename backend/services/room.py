@@ -20,16 +20,12 @@ class RoomServices:
             duties_per_day=duties_per_day
         )
         self.db.commit()
-        self.db.refresh(room)
-        duty_queries = DutyQueries(db=self.db)
-        # print()
-        # print(1, len(await duty_queries.get_all_duties()))
-        duties = await self.queries.create_duties_for_room(
+        await self.queries.create_duties_for_room(
             room_id=room.id,
             year=year,
             month=month,
             duties_per_day=duties_per_day
         )
         self.db.commit()
-        # print(2, len(await duty_queries.get_all_duties()))
+        self.db.refresh(room)
         return room
