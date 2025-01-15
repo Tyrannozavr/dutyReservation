@@ -3,7 +3,6 @@ import datetime
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
 
-from api.dependencies.database import SessionDep
 from db.errors.duty import DutyOccupied
 from db.queries.duty import DutyQueries
 from models.pydantic.duty import DutyCreate, DutyChange
@@ -11,12 +10,16 @@ from models.sqlmodels.duty import Duty
 
 
 class DutiesServices:
-    def __init__(self, db: SessionDep):
+    def __init__(self, db: Session):
         self.queries = DutyQueries(db=db)
         self.db = db
 
     def get_all_duties_in_room(self, room_id: int):
         return self.queries.get_all_duties_in_room(room_id)
+
+    async def set_duty_user(self, user_id: int, room_id: int, date: datetime.date) -> Duty | None:
+        duty = await self.queries.set_duty_user(user_id=user_id, room_id=room_id, date=date)
+        return duty
 
     def get_duty(self, duty_id):
         return self.queries.get_duty_by_id(duty_id)

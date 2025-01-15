@@ -50,12 +50,12 @@ def telegram_auth(init_data: InitDataDep, db: SessionDep):
     # user_tg_data = user_queries.get_or_create_tg_user(init_data, db)
     # user_data = UserDbCreate()
     user = user_queries.create_user()
-    telegram_user_data = TelegramUserData(
-        language_code=init_data.language_code,
-        allows_write_to_pm=init_data.allows_write_to_pm,
-        photo_url=init_data.photo_url,
-        user=user
-    )
+    # telegram_user_data = TelegramUserData(
+    #     language_code=init_data.language_code,
+    #     allows_write_to_pm=init_data.allows_write_to_pm,
+    #     photo_url=init_data.photo_url,
+    #     user=user
+    # )
     user_tg_data = user_queries.get_tg_user(init_data, db)
     user = user_tg_data.user
     token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,

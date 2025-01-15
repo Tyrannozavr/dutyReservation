@@ -50,11 +50,10 @@ async def test_get_room_by_identifier(db_session, setup_rooms, room_queries):
 @pytest.mark.asyncio
 async def test_create_room(db_session, room_queries):
     owner_id = 1
-    room = await room_queries.create_room(owner_id=owner_id, month=7, year=2023)
+    room = await room_queries.create_room(owner_id=owner_id, name="testings")
     assert room is not None
     assert room.owner_id == owner_id
-    assert room.month == 7
-    assert room.year == 2023
+    assert room.name == "testings"
 
 
 @pytest.mark.asyncio

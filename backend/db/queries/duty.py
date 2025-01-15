@@ -1,5 +1,6 @@
 import datetime
 
+from sqlalchemy import update
 from sqlmodel import Session, select
 
 from models.pydantic.duty import DutyChange
@@ -21,10 +22,29 @@ class DutyQueriesMixin:
         duty = self.db.exec(stmt).first()
         return duty
 
-    async def create_duty(self, user_id: int, room_id: int, date: datetime.date):
+    async def create_duty(self, room_id: int, date: datetime.date, user_id: int | None = None):
         duty = Duty(user_id=user_id, room_id=room_id, date=date)
         self.db.add(duty)
         return duty
+
+    async def set_duty_user(self, user_id: int, room_id: int, date: datetime.date) -> Duty | None:
+        """allows to set user for date if it is still free and is not occupied by third db_session"""
+        stmt = (select(Duty)
+                  .where(Duty.room_id == room_id)
+                  .where(Duty.date == date)
+                  .where(Duty.user_id.is_(None))
+                  .limit(1)
+                  .with_for_update()
+                  )
+        record = self.db.exec(stmt).first()
+        if record:
+            update_stmt = (update(Duty)
+                           .where(Duty.id == record.id)
+                           .where(Duty.user_id.is_(None))
+                           .values(user_id=user_id))
+            self.db.exec(update_stmt)
+            self.db.refresh(record)
+            return record
 
     async def update_duty(self, duty_id, duty_change: DutyChange):
         duty_data = duty_change.model_dump(exclude_unset=True)

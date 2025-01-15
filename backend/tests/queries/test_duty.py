@@ -26,6 +26,7 @@ def db_session():
         yield session
         session.rollback()
 
+
 @pytest.fixture(scope="function")
 def duty_queries(db_session):
     """Create a new database session for a test."""
@@ -66,14 +67,34 @@ async def test_get_duty_by_id(db_session, duty_queries, setup_data):
 
 
 @pytest.mark.asyncio
-async def test_get_all_duties_in_room(duty_queries, db_session, setup_data):
+async def test_set_duty_user(db_session, duty_queries, setup_data):
     user, room = setup_data
-    await duty_queries.create_duty(user_id=user.id, room_id=room.id, date=datetime.date.today())
+    # create 2 duties
+    [
+        await duty_queries.create_duty(room_id=room.id, date=datetime.date.today())
+        for _ in range(2)
+    ]
+    db_session.commit()
+    duty_date = datetime.date.today()
+    first_user = await duty_queries.set_duty_user(user_id=1, room_id=room.id, date=duty_date)
+    assert first_user.date == duty_date
+    second_user = await duty_queries.set_duty_user(user_id=2, room_id=room.id, date=datetime.date.today())
+    assert second_user.date == duty_date
+    # try to occupy date which is already taken (there was 2 free duty on this date)
+    third_user = await duty_queries.set_duty_user(user_id=3, room_id=room.id, date=datetime.date.today())
+    assert third_user is None
+
+
+@pytest.mark.asyncio
+async def test_get_all_duties_in_room(duty_queries, db_session):
+    local_room_id=13
+    local_user_id=13
+    await duty_queries.create_duty(user_id=local_user_id, room_id=local_room_id, date=datetime.date.today())
     try:
-        duties = await duty_queries.get_all_duties_in_room(room.id)
+        duties = await duty_queries.get_all_duties_in_room(local_room_id)
     except IntegrityError:
         db_session.rollback()
-        duties = await duty_queries.get_all_duties_in_room(room.id)
+        duties = await duty_queries.get_all_duties_in_room(local_room_id)
     assert len(duties) == 1
 
 
@@ -90,9 +111,10 @@ async def test_change_duty_date(db_session, duty_queries, setup_data):
     updated_duty = await duty_queries.update_duty(duty_id=duty.id, duty_change=duty_change)
     assert updated_duty.date == new_date
 
+
 @pytest.mark.asyncio
 async def test_get_duties_for_user(db_session, duty_queries, setup_data):
-    local_user_id=12
+    local_user_id = 12
     user, room = setup_data
     date_first = datetime.date.today() + timedelta(days=3)
     date_second = datetime.date.today() + timedelta(days=4)

@@ -1,8 +1,9 @@
 import datetime
-from sqlalchemy.exc import IntegrityError
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock
+from sqlalchemy.exc import IntegrityError
+
 from db.errors.duty import DutyOccupied
 from models.pydantic.duty import DutyCreate, DutyChange
 from services.duty import DutiesServices
@@ -63,6 +64,7 @@ async def test_create_duty(duties_services, mock_db_session):
 
 
 
+
 @pytest.mark.asyncio
 async def test_create_duty_integrity_error(duties_services, mock_db_session):
     duty_data = DutyCreate(user_id=1, room_id=1, date=datetime.date.today())
@@ -73,6 +75,28 @@ async def test_create_duty_integrity_error(duties_services, mock_db_session):
     # Check that the DutyOccupied exception is raised when creating a duty
     with pytest.raises(DutyOccupied):
         await duties_services.create_duty(duty_data)
+
+
+@pytest.mark.asyncio
+async def test_set_duty_user(duties_services):
+    user_id = 1
+    room_id = 101
+    duty_date = datetime.date(2023, 10, 1)
+
+    # Настройка возврата мока
+    expected_duty = MagicMock()  # Здесь можно создать экземпляр Duty или просто мок
+    # expected_duty = MagicMock()  # Здесь можно создать экземпляр Duty или просто мок
+    duties_services.queries.set_duty_user.return_value = expected_duty
+
+    # Вызов метода
+    result = await duties_services.set_duty_user(user_id=user_id, room_id=room_id, date=duty_date)
+
+    # Проверка, что метод был вызван с правильными аргументами
+    duties_services.queries.set_duty_user.assert_awaited_once_with(user_id=user_id, room_id=room_id, date=duty_date)
+
+    # Проверка, что результат совпадает с ожидаемым
+    assert result == expected_duty
+
 
 @pytest.mark.asyncio
 async def test_update_duty(duties_services, duty_queries_mock):
