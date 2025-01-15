@@ -88,8 +88,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload_data = token_services.decode_token(token)
-        user = await user_queries.get_user_by_id(user_id=payload_data.user_id)
+        payload_data = await token_services.decode_token(token)
+        user = await user_queries.get_user_by_id(user_id=int(payload_data.sub))
     except InvalidTokenError:
         raise credentials_exception
     if not user:
@@ -115,3 +115,4 @@ AuthorizedUserType = Annotated[User, Depends(get_current_user)]
 UserDataCreateDep = Annotated[UserDataIn, Body()]
 TokenDataDep = Annotated[TokenData, Depends(get_token_data)]
 UserServicesDep = Annotated[UserServices, Depends(get_user_services)]
+RefreshTokenDep = Annotated[str, Body()]

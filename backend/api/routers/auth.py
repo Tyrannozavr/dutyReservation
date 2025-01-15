@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
 
 from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, validated_telegram_init_data, \
-    UserDataCreateDep, UserServicesDep, TokenServicesDep
+    UserDataCreateDep, UserServicesDep, TokenServicesDep, RefreshTokenDep
 from api.dependencies.database import SessionDep
 from api.errors.auth import IncorrectUsernameOrPassword
 from models.pydantic.auth import Token, UserOut, UserInDb, TokenData, UserOriginTypes, UserDbCreate
@@ -14,8 +14,8 @@ from tests.queries.test_auth import telegram_user_data
 router = APIRouter()
 
 
-@router.post("/login", include_in_schema=False)
-def login(settings: SettingsDep, db: SessionDep, user_services: UserServicesDep,
+@router.post("/token", include_in_schema=False)
+def login_for_access_token(settings: SettingsDep, db: SessionDep, user_services: UserServicesDep,
           token_services: TokenServicesDep, form_data: OAuth2PasswordRequestForm = Depends()):
     """Takes initData from telegram webapp as username and "telegram" as a password to get tokens with telegram
     initData"""
@@ -27,10 +27,19 @@ def login(settings: SettingsDep, db: SessionDep, user_services: UserServicesDep,
         user = user_services.authenticate_user(username=internal_username, password=form_data.password)
         if not user:
             raise IncorrectUsernameOrPassword
-        token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
+        token_data = TokenData(sub=str(user.id), username=user.username, first_name=user.first_name,
                                last_name=user.last_name, origin=UserOriginTypes.web)
         return token_services.get_tokens(data=token_data)
 
+
+@router.post(
+    "/token/refresh",
+    status_code=200,
+    response_model=Token
+)
+async def refresh_access_token(token_services: TokenServicesDep, refresh_token: RefreshTokenDep):
+    refresh_token_data = await token_services.decode_token(refresh_token)
+    # if refresh_token_data.exp
 
 @router.post(
     "/telegram",
@@ -48,7 +57,7 @@ def telegram_auth(init_data: InitDataDep, user_services: UserServicesDep, token_
 
     user_tg_data = user_services.get_tg_user(init_data)
     user = user_tg_data.user
-    token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
+    token_data = TokenData(sub=str(user.id), username=user.username, first_name=user.first_name,
                            last_name=user.last_name, origin=user.origin)
     return token_services.get_tokens(data=token_data)
 
@@ -68,21 +77,11 @@ async def create_user(
         token_services: TokenServicesDep
 ):
     user = await user_services.create_user(user_data=user_data, origin=UserOriginTypes.web)
-    token_data = TokenData(id=user.id, username=user.username, first_name=user.first_name,
+    token_data = TokenData(sub=str(user.id), username=user.username, first_name=user.first_name,
                            last_name=user.last_name, origin=UserOriginTypes.web)
     return token_services.get_tokens(data=token_data)
 
 
-# @router.get(
-#     "/refresh",
-#     status_code=200,
-#     response_model=Token
-# )
-# def refresh_token(user: AuthorizedUserType, settings: SettingsDep):
-#     token_data = user.model_dump()
-#     access_token = create_access_token(data=token_data, settings=settings)
-#     refresh_token = create_refresh_token(data=token_data, settings=settings)
-#     return Token(access_token=access_token, refresh_token=refresh_token, token_type='bearer')
 
 @router.get(
     "/me",

@@ -61,12 +61,12 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    id: int
-    username: str
+    sub: str  # here will be a id
+    username: str | None = None
     exp: datetime | None = None
     first_name: str | None = None
     last_name: str | None = None
-    origin: UserOriginTypes
+    origin: UserOriginTypes | None = None
 
 
 class TelegramUserDataIn(BaseModel):

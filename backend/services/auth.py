@@ -43,10 +43,21 @@ class TokenServices:
         refresh_token = await self._create_refresh_token(data=data)
         return Token(access_token=access_token, refresh_token=refresh_token, token_type=self.token_type)
 
+    # async def decode_token(self, token: str) -> TokenData:
+    #     data = jwt.decode(token, self.secret_key, self.algorithm)
+    #     return TokenData(**data)
     async def decode_token(self, token: str) -> TokenData:
-        data = jwt.decode(token, self.secret_key, self.algorithm)
-        return TokenData(**data)
-
+        try:
+            data = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            # Check if the token is expired
+            if 'exp' in data and datetime.fromtimestamp(data['exp'], timezone.utc) < datetime.now(timezone.utc):
+                print("is expired")
+                raise Exception("Token has expired")
+            return TokenData(**data)
+        except jwt.ExpiredSignatureError:
+            raise Exception("Token has expired")
+        except jwt.InvalidTokenError:
+            raise Exception("Invalid token")
 
 class UserServices:
     def __init__(self, pwd_context: CryptContext, db: Session, user_queries: Any = None):
