@@ -36,7 +36,7 @@ def duty_queries(db_session):
 @pytest.fixture(scope="module")
 def setup_data():
     """Set up initial data for tests."""
-    user = User(first_name="Test", last_name="User", internal_username="testuser",
+    user = User(first_name="Test", last_name="User", username="testuser",
                 origin=UserOriginTypes.telegram, hashed_password="XXXXXXXXXXXXXX",
                 id=1)  # Adjust fields according to your User model
     with Session(engine) as db_session:

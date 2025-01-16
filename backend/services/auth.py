@@ -69,8 +69,8 @@ class UserServices:
     async def verify_password(self, plaintext_password: str, hashed_password: str) -> bool:
         return self.pwd_context.verify(plaintext_password, hashed_password)
 
-    async def authenticate_user(self, internal_username: str, password: str):
-        user = await self.repositories.get_user_by_internal_username(internal_username=internal_username)
+    async def authenticate_user(self, username: str, password: str):
+        user = await self.repositories.get_user_by_username(username=username)
         if not user:
             return False
         if not await self.verify_password(plaintext_password=password, hashed_password=user.hashed_password):

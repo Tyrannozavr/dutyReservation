@@ -49,39 +49,39 @@ async def test_verify_password(user_services):
 
 @pytest.mark.asyncio
 async def test_authenticate_user_success(user_services, mock_user_repositories):
-    internal_username = "testuser"
+    username = "testuser"
     password = "mysecretpassword"
     user_mock = Mock(hashed_password=await user_services._get_hashed_password(password))
 
-    mock_user_repositories.get_user_by_internal_username = AsyncMock(return_value=user_mock)
+    mock_user_repositories.get_user_by_username = AsyncMock(return_value=user_mock)
 
-    authenticated_user = await user_services.authenticate_user(internal_username, password)
+    authenticated_user = await user_services.authenticate_user(username, password)
 
     assert authenticated_user is user_mock
 
 
 @pytest.mark.asyncio
 async def test_authenticate_user_failure_no_user(user_services, mock_user_repositories):
-    internal_username = "nonexistentuser"
+    username = "nonexistentuser"
     password = "mysecretpassword"
 
-    mock_user_repositories.get_user_by_internal_username = AsyncMock(return_value=None)
+    mock_user_repositories.get_user_by_username = AsyncMock(return_value=None)
 
-    authenticated_user = await user_services.authenticate_user(internal_username, password)
+    authenticated_user = await user_services.authenticate_user(username, password)
 
     assert authenticated_user is False
 
 
 @pytest.mark.asyncio
 async def test_authenticate_user_failure_wrong_password(user_services, mock_user_repositories):
-    internal_username = "testuser"
+    username = "testuser"
     correct_password = "mysecretpassword"
     wrong_password = "wrongpassword"
 
     user_mock = Mock(hashed_password=await user_services._get_hashed_password(correct_password))
-    mock_user_repositories.get_user_by_internal_username = AsyncMock(return_value=user_mock)
+    mock_user_repositories.get_user_by_username = AsyncMock(return_value=user_mock)
 
-    authenticated_user = await user_services.authenticate_user(internal_username, wrong_password)
+    authenticated_user = await user_services.authenticate_user(username, wrong_password)
 
     assert authenticated_user is False
 

@@ -22,8 +22,8 @@ def login_for_access_token(settings: SettingsDep, db: SessionDep, user_services:
         init_data = validated_telegram_init_data(form_data.username, telegram_bot_token=settings.telegram_bot_token)
         return telegram_auth(init_data=init_data, db=db)
     else:
-        internal_username = User.get_internal_username(form_data.username, origin=UserOriginTypes.web)
-        user = user_services.authenticate_user(username=internal_username, password=form_data.password)
+        username = User.get_username(form_data.username, origin=UserOriginTypes.web)
+        user = user_services.authenticate_user(username=username, password=form_data.password)
         if not user:
             raise IncorrectUsernameOrPassword
         token_data = TokenData(sub=str(user.id), username=user.username, first_name=user.first_name,
