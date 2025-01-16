@@ -2,13 +2,10 @@ import pytest
 from unittest.mock import AsyncMock, Mock, MagicMock
 from passlib.context import CryptContext
 
-from db.queries.auth import UserQueries
+from db.repositories.auth import UserRepositories
 from models.pydantic.auth import UserDataIn, UserOriginTypes, TelegramInitData
 from services.auth import UserServices
 
-
-# Assume UserServices and other required classes are imported here
-# from your_module import UserServices, UserQueries, UserDataIn, UserOriginTypes, TelegramInitData
 
 @pytest.fixture
 def pwd_context():
@@ -20,7 +17,7 @@ def mock_db_session():
 
 @pytest.fixture
 def mock_user_queries():
-    return Mock(spec=UserQueries)
+    return Mock(spec=UserRepositories)
 
 
 @pytest.fixture

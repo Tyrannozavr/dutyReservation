@@ -7,14 +7,14 @@ from api.dependencies.auth import AuthorizedUserType
 from api.dependencies.database import SessionDep
 from api.dependencies.duty import DutiesRoomDp, DutyIdDp
 from api.errors.duty import UserHasNoPermission
-from db.queries.duty import DutyQueries
+from db.repositories.duty import DutyRepositories
 
 router = APIRouter(prefix="/{room_identifier}")
 
 
 @router.get("/")
 async def get_all_duties_in_room(room: DutiesRoomDp, db: SessionDep):
-    duty_queries = DutyQueries(db=db)
+    duty_queries = DutyRepositories(db=db)
     duties_list = await duty_queries.get_all_duties_in_room(room_id=room.id, db=db)
     return duties_list
 
@@ -26,7 +26,7 @@ async def reserve_duty(
         date: Annotated[datetime.date, Body()],
         room: DutiesRoomDp
 ):
-    duty_queries = DutyQueries(db=db)
+    duty_queries = DutyRepositories(db=db)
     duty = await duty_queries.create_duty(user_id=user.id, room_id=room.id, date=date)
     return duty
 
@@ -38,7 +38,7 @@ async def change_duty(
         date: Annotated[datetime.date, Body()],
         db: SessionDep,
 ):
-    duty_queries = DutyQueries(db=db)
+    duty_queries = DutyRepositories(db=db)
     duty = await duty_queries.get_duty_by_id(duty_id=duty_id)
     if duty.user_id != user.id:
         raise UserHasNoPermission
@@ -52,7 +52,7 @@ async def delete_duty(
         user: AuthorizedUserType,
         db: SessionDep,
 ):
-    duty_queries = DutyQueries(db=db)
+    duty_queries = DutyRepositories(db=db)
     duty = await duty_queries.get_duty_by_id(duty_id=duty_id, db=db)
     if duty.user_id != user.id:
         raise UserHasNoPermission

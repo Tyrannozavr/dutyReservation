@@ -4,14 +4,14 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
 
 from db.errors.duty import DutyOccupied
-from db.queries.duty import DutyQueries
+from db.repositories.duty import DutyRepositories
 from models.pydantic.duty import DutyCreate, DutyChange
 from models.sqlmodels.duty import Duty
 
 
 class DutiesServices:
     def __init__(self, db: Session):
-        self.queries = DutyQueries(db=db)
+        self.queries = DutyRepositories(db=db)
         self.db = db
 
     def get_all_duties_in_room(self, room_id: int):

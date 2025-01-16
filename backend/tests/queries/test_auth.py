@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlmodel import Session
 
-from db.queries.auth import UserQueries
+from db.repositories.auth import UserRepositories
 from models.pydantic.auth import UserDbCreate, UserInDb, \
     TelegramUserDataIn
 from models.sqlmodels.auth import *
@@ -49,7 +49,7 @@ def telegram_user_data():
     )
 @pytest.fixture(scope="function")
 def user_queries(db_session):
-    return UserQueries(db=db_session)
+    return UserRepositories(db=db_session)
 
 @pytest.mark.asyncio
 async def test_get_or_create_tg_user(telegram_user_data, user_queries):

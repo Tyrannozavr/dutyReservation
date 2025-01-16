@@ -5,7 +5,7 @@ from models.pydantic.auth import TelegramUserData as TelegramUserDataPydantic, U
 from models.sqlmodels.auth import TelegramUserData as TelegramUserDataDb, User, TELEGRAM_PREFIX
 
 
-class UserQueriesMixin:
+class UserRepositoriesMixin:
     def __init__(self, db: Session):
         self.db = db
 
@@ -45,6 +45,6 @@ class UserQueriesMixin:
         return user
 
 
-class UserQueries(UserQueriesMixin):
+class UserRepositories(UserRepositoriesMixin):
     pass
 

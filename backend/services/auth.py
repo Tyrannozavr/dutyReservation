@@ -5,7 +5,7 @@ import jwt
 from passlib.context import CryptContext
 from sqlmodel import Session
 
-from db.queries.auth import UserQueries
+from db.repositories.auth import UserRepositories
 from models.pydantic.auth import Token, TokenData, UserDbCreate, UserDataIn, UserOriginTypes, TelegramInitData
 
 
@@ -63,7 +63,7 @@ class UserServices:
     def __init__(self, db: Session, pwd_context: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto"),
                  user_queries: Any = None):
         self.pwd_context = pwd_context
-        self.queries = UserQueries(db=db) if not user_queries else user_queries
+        self.queries = UserRepositories(db=db) if not user_queries else user_queries
 
     async def _get_hashed_password(self, plaintext_password: str) -> str:
         return self.pwd_context.hash(plaintext_password)

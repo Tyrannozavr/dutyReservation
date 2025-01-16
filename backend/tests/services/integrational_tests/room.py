@@ -4,7 +4,7 @@ import pytest
 from sqlmodel import create_engine, Session, SQLModel
 from services.room import RoomServices
 from services.duty import DutiesServices
-from db.queries.room import RoomQueries  # Замените на ваш модуль
+from db.repositories.room import RoomRepositories  # Замените на ваш модуль
 from models.sqlmodels.duty import DutiesRoom  # Замените на ваши модели
 from models.sqlmodels.auth import *
 from models.sqlmodels.duty import *
@@ -48,7 +48,7 @@ async def test_create_room_integration(room_services, duty_services):
     assert result.owner_id == owner_id
 
     # Проверка, что комната действительно существует в базе данных
-    rooms_in_db = await RoomQueries(room_services.db).get_rooms()  # Предполагается, что есть метод для получения всех комнат
+    rooms_in_db = await RoomRepositories(room_services.db).get_rooms()  # Предполагается, что есть метод для получения всех комнат
     assert len(rooms_in_db) == 1
     assert rooms_in_db[0].name == name
 
@@ -80,7 +80,7 @@ async def test_create_room_integration(room_services, duty_services):
     assert room.owner_id == owner_id
 
     # Проверка, что комната действительно существует в базе данных
-    rooms_in_db = await RoomQueries(room_services.db).get_rooms()  # Предполагается, что есть метод для получения всех комнат
+    rooms_in_db = await RoomRepositories(room_services.db).get_rooms()  # Предполагается, что есть метод для получения всех комнат
     assert len(rooms_in_db) == 1
     assert rooms_in_db[0].name == name
 

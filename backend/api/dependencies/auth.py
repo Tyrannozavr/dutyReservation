@@ -13,7 +13,7 @@ from passlib.context import CryptContext
 
 from api.dependencies.database import SessionDep
 from core.config import Settings, get_settings
-from db.queries.auth import UserQueries
+from db.repositories.auth import UserRepositories
 from models.pydantic.auth import UserDataIn, TelegramInitData, TokenData
 from models.sqlmodels.auth import User
 from services.auth import UserServices, TokenServices
@@ -113,7 +113,7 @@ TokenServicesDep = Annotated[TokenServices, Depends(get_token_services)]
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: SessionDep,
                            token_services: TokenServicesDep) -> User:
     """Makes request to DB"""
-    user_queries = UserQueries(db=db)
+    user_queries = UserRepositories(db=db)
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

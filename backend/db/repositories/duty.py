@@ -8,7 +8,7 @@ from models.pydantic.duty import DutyChange
 from models.sqlmodels.duty import Duty
 
 
-class DutyQueriesMixin:
+class DutyRepositoriesMixin:
     def __init__(self, db: Session):
         self.db = db
 
@@ -71,7 +71,7 @@ class DutyQueriesMixin:
         duties = self.db.exec(stmt).all()
         return duties
 
-class DutyQueries(DutyQueriesMixin):
+class DutyRepositories(DutyRepositoriesMixin):
     pass
 
 

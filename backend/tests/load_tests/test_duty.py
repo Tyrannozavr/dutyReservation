@@ -5,7 +5,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlmodel import SQLModel, Session
 
-from db.queries.duty import DutyQueries
+from db.repositories.duty import DutyRepositories
 from models.pydantic.auth import UserOriginTypes
 from models.sqlmodels.auth import User  # Assuming you have this model defined
 from models.sqlmodels.duty import DutiesRoom
@@ -28,7 +28,7 @@ def db_session():
 @pytest.fixture(scope="function")
 def duty_queries(db_session):
     """Create a new database session for a test."""
-    return DutyQueries(db_session)
+    return DutyRepositories(db_session)
 
 
 @pytest.fixture(scope="module")

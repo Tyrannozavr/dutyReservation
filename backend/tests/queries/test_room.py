@@ -4,9 +4,9 @@ from datetime import timedelta
 import pytest
 from sqlmodel import SQLModel, create_engine, Session
 
-from api.dependencies.duty import RoomQueriesDep
-from db.queries.duty import DutyQueries
-from db.queries.room import RoomQueries
+from api.dependencies.duty import RoomRepositoriesDep
+from db.repositories.duty import DutyRepositories
+from db.repositories.room import RoomRepositories
 from models.sqlmodels.auth import *
 from models.sqlmodels.duty import *
 
@@ -27,11 +27,11 @@ def db_session():
 
 @pytest.fixture(scope="function")
 def room_queries(db_session):
-    return RoomQueries(db_session)
+    return RoomRepositories(db_session)
 
 @pytest.fixture(scope="function")
 def duty_queries(db_session):
-    return DutyQueries(db_session)
+    return DutyRepositories(db_session)
 
 
 

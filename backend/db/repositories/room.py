@@ -3,11 +3,11 @@ import uuid
 
 from sqlmodel import Session, select
 
-from db.queries.duty import DutyQueries
+from db.repositories.duty import DutyRepositories
 from models.sqlmodels.duty import DutiesRoom, Duty
 
 
-class RoomQueriesMixin:
+class RoomRepositoriesMixin:
     def __init__(self, db: Session):
         self.db = db
 
@@ -54,7 +54,7 @@ class RoomQueriesMixin:
         return room
 
 
-class RoomQueries(RoomQueriesMixin):
+class RoomRepositories(RoomRepositoriesMixin):
     pass
 
 # room_queries = Queries()

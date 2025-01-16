@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import SQLModel, Session
 
-from db.queries.duty import DutyQueries
+from db.repositories.duty import DutyRepositories
 from models.pydantic.auth import UserOriginTypes
 from models.pydantic.duty import DutyChange
 from models.sqlmodels.auth import User  # Assuming you have this model defined
@@ -30,7 +30,7 @@ def db_session():
 @pytest.fixture(scope="function")
 def duty_queries(db_session):
     """Create a new database session for a test."""
-    return DutyQueries(db_session)
+    return DutyRepositories(db_session)
 
 
 @pytest.fixture(scope="module")

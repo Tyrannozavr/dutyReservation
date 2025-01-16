@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 from services.room import RoomServices
-from db.queries.room import RoomQueries
+from db.repositories.room import RoomRepositories
 
 
 @pytest.fixture(scope="function")
@@ -11,7 +11,7 @@ def mock_db():
 
 @pytest.fixture
 def room_queries_mock(mock_db):
-    queries = RoomQueries(mock_db)
+    queries = RoomRepositories(mock_db)
     queries.create_room = AsyncMock()
     queries.create_duties_for_room = AsyncMock()
     return queries
