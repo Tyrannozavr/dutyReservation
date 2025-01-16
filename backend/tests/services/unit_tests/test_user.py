@@ -1,9 +1,12 @@
-import pytest
 from unittest.mock import AsyncMock, Mock, MagicMock
+
+import pytest
 from passlib.context import CryptContext
 
 from db.repositories.auth import UserRepositories
-from models.pydantic.auth import UserDataIn, UserOriginTypes, TelegramInitData
+from models.pydantic.auth import UserDataIn, UserOriginTypes, TelegramInitData, UserInDb, UserDataCreate, \
+    TelegramUserDataIn
+from models.sqlmodels.auth import TelegramUserData, User
 from services.auth import UserServices
 
 
@@ -101,14 +104,30 @@ async def test_create_user(user_services, mock_user_repositories):
 
 
 @pytest.mark.asyncio
-async def test_get_or_create_tg_user(user_services, mock_user_repositories):
-    init_data = TelegramInitData(
-        id=1,
-        first_name="first_name"
-    )  # Populate with necessary fields
-    tg_user_mock = Mock()
-    mock_user_repositories.get_or_create_tg_user = AsyncMock(return_value=tg_user_mock)
+async def test_get_or_create_tg_user_existing_user(user_services, mock_user_repositories):
+    # Arrange: Set up the test data
+    tg_user_id = 12345
+    user_data = UserDataCreate(
+        username="testuser",
+        first_name="Test",
+        last_name="User",
+        password="securepassword"
+    )
+    print("Hellworold")
+    # Mock the repository to return an existing user
+    existing_user = User(id=1, username=user_data.username, first_name=user_data.first_name,
+                         last_name=user_data.last_name, origin=UserOriginTypes.telegram)
+    mock_user_repositories.get_by_tg_user_id.return_value = existing_user
+    print("Middle words")
 
-    tg_user = await user_services.get_or_create_tg_user(init_data=init_data)
+    # Act: Call the get_or_create_tg_user method
+    init_data = TelegramUserDataIn(
+        id=tg_user_id,
+        first_name="Test",
+        last_name="User",
+    )
+    user = await user_services.get_or_create_tg_user(init_data=init_data)
 
-    assert tg_user is tg_user_mock
+    # Assert: Check that the existing user is returned
+    assert user == existing_user
+    mock_user_repositories.get_by_tg_user_id.assert_called_once_with(tg_user_id)

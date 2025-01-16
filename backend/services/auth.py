@@ -5,8 +5,11 @@ import jwt
 from passlib.context import CryptContext
 from sqlmodel import Session
 
+from db.repositories.auth import TelegramUserRepositoriesMixin
 from db.repositories.auth import UserRepositories
-from models.pydantic.auth import Token, TokenData, UserDbCreate, UserDataIn, UserOriginTypes, TelegramInitData
+from models.pydantic.auth import Token, TokenData, UserDbCreate, UserDataIn, UserOriginTypes, TelegramInitData, \
+    UserDataCreate, TelegramUserDataIn, TelegramUserDataCreate
+from models.sqlmodels.auth import User, TelegramUserData
 
 
 class TokenServices:
@@ -59,11 +62,15 @@ class TokenServices:
 
 class UserServices:
     def __init__(self, db: Session, pwd_context: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto"),
-                 repositories: Any = None):
+                 repositories: "UserRepositories" = None):
+        self.db = db
         self.pwd_context = pwd_context
         self.repositories = UserRepositories(db=db) if not repositories else repositories
+        
 
     async def _get_hashed_password(self, plaintext_password: str) -> str:
+        if plaintext_password is None:
+            raise ValueError("The password can not be None")
         return self.pwd_context.hash(plaintext_password)
 
     async def verify_password(self, plaintext_password: str, hashed_password: str) -> bool:
@@ -77,12 +84,25 @@ class UserServices:
             return False
         return user
 
-    async def get_or_create_tg_user(self, init_data: TelegramInitData):
-        return await self.repositories.get_or_create_tg_user(init_data=init_data)
+    async def get_or_create_tg_user(self, init_data: TelegramUserDataIn) -> TelegramUserData:
+        username = init_data.username
+        if self.repositories.is_username_already_taken(username):
+            username = None
+        user_data = UserDataCreate(
+            username=username,
+            first_name=init_data.first_name,
+            last_name=init_data.last_name,
+        )
+        user = await self.create_user(origin=UserOriginTypes.telegram, user_data=user_data)
+        tg_data = TelegramUserDataCreate(**init_data.model_dump(), user=user)
+        await self.repositories.create_tg_user(init_data=tg_data)
+        self.db.commit()
+        self.db.refresh(tg_data)
+        return tg_data
 
-    async def create_user(self, user_data: UserDataIn, origin: UserOriginTypes):
+    async def create_user(self, user_data: UserDataCreate, origin: UserOriginTypes) -> User:
         user_db = UserDbCreate(**user_data.model_dump(),
-                               hashed_password=await self._get_hashed_password(user_data.password),
+                               hashed_password=await self._get_hashed_password(user_data.password) if user_data.password else None,
                                origin=origin)
         user = await self.repositories.create_user(user_data=user_db)
         return user

@@ -4,6 +4,16 @@ from pydantic import ConfigDict
 from sqlmodel import SQLModel, Field, Relationship
 
 from models.pydantic.auth import UserOriginTypes
+# from models.sqlmodels.duty import Duty, DutiesRoom
+import datetime
+import uuid
+
+from sqlmodel import SQLModel, Field, Relationship
+
+# from models.sqlmodels.auth import User
+
+
+
 
 
 def generate_user_link(username: str, origin: UserOriginTypes):
@@ -42,3 +52,24 @@ class TelegramUserData(SQLModel, table=True):
     user: User = Relationship(back_populates="tg_data")
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DutiesRoom(SQLModel, table=True):
+    id: int | None = Field(primary_key=True, default=None)
+    name: str = Field(default="")
+    identifier: uuid.UUID = Field(default_factory=uuid.uuid4, unique=True)
+    owner_id: int = Field(foreign_key="user.id")
+    owner: User = Relationship(back_populates="rooms")
+    is_multiple_selection: bool = Field(default=False)
+    duties_per_day: int = Field(default=1)
+    duties: list["Duty"] = Relationship(back_populates="room")
+
+
+class Duty(SQLModel, table=True):
+    id: int | None = Field(primary_key=True)
+    user_id: int | None = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="duties")
+    room_id: int = Field(foreign_key="dutiesroom.id")
+    room: DutiesRoom = Relationship(back_populates="duties")
+
+    date: datetime.date = Field(default=None)

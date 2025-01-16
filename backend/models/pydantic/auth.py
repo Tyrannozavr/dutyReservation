@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class UserOriginTypes(str, Enum):
@@ -72,16 +72,33 @@ class TokenData(BaseModel):
 class TelegramUserDataIn(BaseModel):
     id: int
     first_name: str
+    last_name: str | None = None
+    username: str | None = None
+    language_code: str | None = None
+    allows_write_to_pm: bool | None = None
+    photo_url: str | None = None
+
+class TelegramUserDataCreate(BaseModel):
+    id: int
+    first_name: str
     last_name: str | None
     username: str | None
     language_code: str | None
     allows_write_to_pm: bool | None
     photo_url: str | None
+    user: UserInDb
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserDataIn(BaseModel):
     username: str
     first_name: str | None = None
     last_name: str | None = None
-    language_code: str | None = None
     password: str
+
+class UserDataCreate(BaseModel):
+    username: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    password: str | None = None
