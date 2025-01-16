@@ -2,14 +2,13 @@ from typing import Any
 
 from sqlmodel import Session
 
-from db.repositories.duty import DutyRepositories
 from db.repositories.room import RoomRepositories
 
 
 class RoomServices:
-    def __init__(self, db: Session, queries: Any = None):
+    def __init__(self, db: Session, repositories: Any = None):
         """first of all I've added queries for testing (mock queries instance)"""
-        self.repositories = RoomRepositories(db=db) if not queries else queries
+        self.repositories = RoomRepositories(db=db) if not repositories else repositories
         self.db = db
 
     async def create_room(self, name: str, owner_id: int, year: int, month: int,

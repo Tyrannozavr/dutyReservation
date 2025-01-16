@@ -43,9 +43,6 @@ class TokenServices:
         refresh_token = await self._create_refresh_token(data=data)
         return Token(access_token=access_token, refresh_token=refresh_token, token_type=self.token_type)
 
-    # async def decode_token(self, token: str) -> TokenData:
-    #     data = jwt.decode(token, self.secret_key, self.algorithm)
-    #     return TokenData(**data)
     async def decode_token(self, token: str) -> TokenData:
         try:
             data = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
@@ -58,6 +55,7 @@ class TokenServices:
             raise Exception("Token has expired")
         except jwt.InvalidTokenError:
             raise Exception("Invalid token")
+
 
 class UserServices:
     def __init__(self, db: Session, pwd_context: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto"),
@@ -83,7 +81,8 @@ class UserServices:
         return await self.repositories.get_or_create_tg_user(init_data=init_data)
 
     async def create_user(self, user_data: UserDataIn, origin: UserOriginTypes):
-        user_db = UserDbCreate(**user_data.model_dump(), hashed_password=await self._get_hashed_password(user_data.password),
+        user_db = UserDbCreate(**user_data.model_dump(),
+                               hashed_password=await self._get_hashed_password(user_data.password),
                                origin=origin)
         user = await self.repositories.create_user(user_data=user_db)
         return user
