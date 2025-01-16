@@ -61,9 +61,9 @@ class TokenServices:
 
 class UserServices:
     def __init__(self, db: Session, pwd_context: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto"),
-                 user_queries: Any = None):
+                 repositories: Any = None):
         self.pwd_context = pwd_context
-        self.queries = UserRepositories(db=db) if not user_queries else user_queries
+        self.repositories = UserRepositories(db=db) if not repositories else repositories
 
     async def _get_hashed_password(self, plaintext_password: str) -> str:
         return self.pwd_context.hash(plaintext_password)
@@ -72,7 +72,7 @@ class UserServices:
         return self.pwd_context.verify(plaintext_password, hashed_password)
 
     async def authenticate_user(self, internal_username: str, password: str):
-        user = await self.queries.get_user_by_internal_username(internal_username=internal_username)
+        user = await self.repositories.get_user_by_internal_username(internal_username=internal_username)
         if not user:
             return False
         if not await self.verify_password(plaintext_password=password, hashed_password=user.hashed_password):
@@ -80,10 +80,10 @@ class UserServices:
         return user
 
     async def get_or_create_tg_user(self, init_data: TelegramInitData):
-        return await self.queries.get_or_create_tg_user(init_data=init_data)
+        return await self.repositories.get_or_create_tg_user(init_data=init_data)
 
     async def create_user(self, user_data: UserDataIn, origin: UserOriginTypes):
         user_db = UserDbCreate(**user_data.model_dump(), hashed_password=await self._get_hashed_password(user_data.password),
                                origin=origin)
-        user = await self.queries.create_user(user_data=user_db)
+        user = await self.repositories.create_user(user_data=user_db)
         return user

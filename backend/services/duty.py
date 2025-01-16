@@ -11,26 +11,26 @@ from models.sqlmodels.duty import Duty
 
 class DutiesServices:
     def __init__(self, db: Session):
-        self.queries = DutyRepositories(db=db)
+        self.repositories = DutyRepositories(db=db)
         self.db = db
 
     def get_all_duties_in_room(self, room_id: int):
-        return self.queries.get_all_duties_in_room(room_id)
+        return self.repositories.get_all_duties_in_room(room_id)
 
     def get_all_duties(self):
-        return self.queries.get_all_duties()
+        return self.repositories.get_all_duties()
 
 
     async def set_duty_user(self, user_id: int, room_id: int, date: datetime.date) -> Duty | None:
-        duty = await self.queries.set_duty_user(user_id=user_id, room_id=room_id, date=date)
+        duty = await self.repositories.set_duty_user(user_id=user_id, room_id=room_id, date=date)
         return duty
 
     def get_duty(self, duty_id):
-        return self.queries.get_duty_by_id(duty_id)
+        return self.repositories.get_duty_by_id(duty_id)
 
     async def create_duty(self, duty: DutyCreate) -> Duty | None:
         try:
-            new_duty = await self.queries.create_duty(
+            new_duty = await self.repositories.create_duty(
                 user_id=duty.user_id,
                 room_id=duty.room_id,
                 date=duty.date,
@@ -42,9 +42,9 @@ class DutiesServices:
             raise DutyOccupied("Duty already exists for this user in this room on this date.")
 
     def update_duty(self, duty_id: int, duty_change: DutyChange):
-        return self.queries.update_duty(duty_id=duty_id, duty_change=duty_change)
+        return self.repositories.update_duty(duty_id=duty_id, duty_change=duty_change)
 
     def delete_duty(self, duty_id):
-        return self.queries.delete_duty(duty_id)
+        return self.repositories.delete_duty(duty_id)
 
 
