@@ -3,10 +3,9 @@ from enum import Enum
 
 from pydantic import BaseModel, ConfigDict
 
+from models.pydantic.types import UserOriginTypes
+from models.sqlmodels.auth import User
 
-class UserOriginTypes(str, Enum):
-    telegram = "telegram"
-    web = "web"
 
 
 class BaseUser(BaseModel):
@@ -86,8 +85,7 @@ class TelegramUserDataCreate(BaseModel):
     language_code: str | None
     allows_write_to_pm: bool | None
     photo_url: str | None
-    user: UserInDb
-
+    user_id: int | None = None
     model_config = ConfigDict(from_attributes=True)
 
 

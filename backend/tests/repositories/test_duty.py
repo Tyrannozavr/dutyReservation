@@ -7,10 +7,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import SQLModel, Session
 
 from db.repositories.duty import DutyRepositories
-from models.pydantic.auth import UserOriginTypes
+from models.pydantic.types import UserOriginTypes
+
 from models.pydantic.duty import DutyChange
 from models.sqlmodels.auth import User  # Assuming you have this model defined
-from models.sqlmodels.duty import DutiesRoom
+from models.sqlmodels.auth import DutiesRoom
 
 DATABASE_URL = "sqlite:///:memory:"
 engine = create_engine(DATABASE_URL)

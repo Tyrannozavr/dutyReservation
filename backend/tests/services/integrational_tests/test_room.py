@@ -5,9 +5,9 @@ from sqlmodel import create_engine, Session, SQLModel
 from services.room import RoomServices
 from services.duty import DutiesServices
 from db.repositories.room import RoomRepositories  # Замените на ваш модуль
-from models.sqlmodels.duty import DutiesRoom  # Замените на ваши модели
+from models.sqlmodels.auth import DutiesRoom  # Замените на ваши модели
 from models.sqlmodels.auth import *
-from models.sqlmodels.duty import *
+from models.sqlmodels.auth import *
 
 @pytest.fixture(scope="module")
 def test_db():

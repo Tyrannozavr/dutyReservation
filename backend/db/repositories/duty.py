@@ -5,7 +5,7 @@ from sqlalchemy import update
 from sqlmodel import Session, select
 
 from models.pydantic.duty import DutyChange
-from models.sqlmodels.duty import Duty
+from models.sqlmodels.auth import Duty
 
 
 class DutyRepositoriesMixin:

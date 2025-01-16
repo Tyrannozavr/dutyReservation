@@ -6,7 +6,7 @@ from db.repositories.duty import DutyRepositories
 from fastapi import Depends, HTTPException, Path
 
 from db.repositories.room import RoomRepositories
-from models.sqlmodels.duty import DutiesRoom
+from models.sqlmodels.auth import DutiesRoom
 
 
 async def get_room_by_identifier(room_identifier: Annotated[str, Path()], db: SessionDep) -> DutiesRoom:

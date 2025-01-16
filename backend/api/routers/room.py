@@ -8,7 +8,7 @@ from api.dependencies.database import SessionDep
 from api.dependencies.duty import DutiesRoomDp, DutyRepositoriesDep, RoomRepositoriesDep
 from api.errors.duty import UserHasNoPermission
 from db.repositories.room import RoomRepositoriesMixin, RoomRepositories
-from models.sqlmodels.duty import Duty
+from models.sqlmodels.auth import Duty
 
 router = APIRouter(tags=["room"])
 

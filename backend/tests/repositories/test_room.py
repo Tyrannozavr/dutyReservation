@@ -8,7 +8,7 @@ from api.dependencies.duty import RoomRepositoriesDep
 from db.repositories.duty import DutyRepositories
 from db.repositories.room import RoomRepositories
 from models.sqlmodels.auth import *
-from models.sqlmodels.duty import *
+from models.sqlmodels.auth import *
 
 # Set up an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"

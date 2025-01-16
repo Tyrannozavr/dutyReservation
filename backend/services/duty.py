@@ -6,7 +6,7 @@ from sqlmodel import Session
 from db.errors.duty import DutyOccupied
 from db.repositories.duty import DutyRepositories
 from models.pydantic.duty import DutyCreate, DutyChange
-from models.sqlmodels.duty import Duty
+from models.sqlmodels.auth import Duty
 
 
 class DutiesServices:

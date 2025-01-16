@@ -2,7 +2,6 @@ from sqlalchemy import create_engine
 from sqlmodel import Session
 
 from models.sqlmodels.auth import *
-from models.sqlmodels.duty import *
 
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"

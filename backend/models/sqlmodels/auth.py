@@ -1,18 +1,11 @@
-from typing import Optional, Any
+import datetime
+import uuid
+from typing import Optional
 
 from pydantic import ConfigDict
 from sqlmodel import SQLModel, Field, Relationship
 
-from models.pydantic.auth import UserOriginTypes
-# from models.sqlmodels.duty import Duty, DutiesRoom
-import datetime
-import uuid
-
-from sqlmodel import SQLModel, Field, Relationship
-
-# from models.sqlmodels.auth import User
-
-
+from models.pydantic.types import UserOriginTypes
 
 
 

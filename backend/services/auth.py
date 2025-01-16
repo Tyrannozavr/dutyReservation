@@ -84,9 +84,12 @@ class UserServices:
             return False
         return user
 
+    async def is_username_already_taken(self, username: str) -> bool:
+        return await self.repositories.is_username_already_taken(username=username)
+
     async def get_or_create_tg_user(self, init_data: TelegramUserDataIn) -> TelegramUserData:
         username = init_data.username
-        if self.repositories.is_username_already_taken(username):
+        if await self.repositories.is_username_already_taken(username):
             username = None
         user_data = UserDataCreate(
             username=username,
@@ -94,8 +97,8 @@ class UserServices:
             last_name=init_data.last_name,
         )
         user = await self.create_user(origin=UserOriginTypes.telegram, user_data=user_data)
-        tg_data = TelegramUserDataCreate(**init_data.model_dump(), user=user)
-        await self.repositories.create_tg_user(init_data=tg_data)
+        tg_data = await self.repositories.create_tg_user(init_data=init_data)
+        tg_data.user = user
         self.db.commit()
         self.db.refresh(tg_data)
         return tg_data
@@ -106,3 +109,6 @@ class UserServices:
                                origin=origin)
         user = await self.repositories.create_user(user_data=user_db)
         return user
+
+    async def get_all_users(self):
+        return await self.repositories.get_all_users()

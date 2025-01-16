@@ -3,7 +3,7 @@ from sqlmodel import SQLModel, create_engine, Session, select
 from db.repositories.auth import UserRepositoriesMixin
 from models.pydantic.auth import UserDbCreate
 from models.sqlmodels.auth import *
-from models.sqlmodels.duty import *
+from models.sqlmodels.auth import *
 
 # Define a test database URL for SQLite in-memory
 TEST_DATABASE_URL = "sqlite:///:memory:"

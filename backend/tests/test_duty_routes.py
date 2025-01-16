@@ -2,7 +2,7 @@
 # from fastapi.testclient import TestClient
 # from main import app  # Adjust this import based on your project structure
 # from models.sqlmodels.auth import User
-# from models.sqlmodels.duty import Duty, DutiesRoom as Room
+# from models.sqlmodels.auth import Duty, DutiesRoom as Room
 # from api.dependencies.auth import AuthorizedUserType
 # from datetime import date
 #

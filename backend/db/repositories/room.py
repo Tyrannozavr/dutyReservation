@@ -4,7 +4,7 @@ import uuid
 from sqlmodel import Session, select
 
 from db.repositories.duty import DutyRepositories
-from models.sqlmodels.duty import DutiesRoom, Duty
+from models.sqlmodels.auth import DutiesRoom, Duty
 
 
 class RoomRepositoriesMixin:
