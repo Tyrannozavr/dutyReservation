@@ -3,7 +3,7 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
 
-from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, validated_telegram_init_data, \
+from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, \
     UserDataCreateDep, UserServicesDep, TokenServicesDep, RefreshTokenDep
 from api.dependencies.database import SessionDep
 from api.errors.auth import IncorrectUsernameOrPassword
