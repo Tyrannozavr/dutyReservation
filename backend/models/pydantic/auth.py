@@ -10,9 +10,9 @@ class UserOriginTypes(str, Enum):
 
 
 class BaseUser(BaseModel):
-    first_name: str | None
-    last_name: str | None
-    username: str
+    first_name: str | None = None
+    last_name: str | None = None
+    username: str | None = None
 
 
 class UserInDb(BaseUser):

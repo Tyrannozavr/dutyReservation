@@ -48,14 +48,18 @@ class UserRepositoriesMixin:
 
     async def get_user_by_username(self, username: str) -> User | None:
         stmt = select(User).where(User.username == username)
-        user = self.db.exec(stmt).first()
-        return user
+        user = self.db.exec(stmt)
+        return user.first()
 
     async def is_username_already_taken(self, username: str) -> bool:
         stmt = select(User).where(User.username == username)
-        user = self.db.exec(stmt).first()
-        return user is None
+        user = self.db.exec(stmt)
+        return user.first() is not None
 
+    async def get_all_users(self):
+        stmt = select(User)
+        users = self.db.exec(stmt)
+        return users.all()
 
 class UserRepositories(UserRepositoriesMixin):
     pass
