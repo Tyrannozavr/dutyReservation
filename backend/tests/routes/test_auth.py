@@ -9,7 +9,7 @@ from api.errors.auth import UserAlreadyExist
 from core.config import get_settings
 from db.database import DATABASE_URL, DATABASE_FILENAME
 from main import app  # Assuming your FastAPI app is defined in main.py
-from models.pydantic.auth import UserDataIn
+from models.pydantic.auth import UserDataIn, TelegramInitData
 from models.sqlmodels.auth import *
 from services.auth import UserServices
 from services.telegram import TelegramInitDataService
@@ -77,30 +77,39 @@ def telegram_services(settings):
 @pytest.mark.asyncio
 async def test_init_data_generation(telegram_services):
     username = "example_user"
-    example_data = {
+    tg_user = {
         "id": "123456789",
         "username": username,
         "first_name": "John",
-        "chat_id": "987654321",
-        "auth_date": "1633036800",  # Example timestamp
     }
 
     # Generate the query string with a valid signature
-    query_string = await telegram_services.generate_webapp_signature_data(example_data)
+    init_data_dict = {
+        "user": tg_user,
+        "chat_instance": "987654321",
+        "auth_date": "1633036800",  # Example timestamp
+    }
+    init_data = TelegramInitData(
+        **init_data_dict
+    )
+    query_string = await telegram_services.generate_webapp_signature_data(init_data)
     data = await telegram_services.validated_telegram_init_data(query_string)
-    assert data.username == username
+    assert data.user.username == username
     return query_string
 
 
 @pytest.mark.asyncio
 async def test_login_telegram(client, telegram_services):
-    data = {
+    user = {
         "id": telegram_id,
         "username": telegram_username,
         "first_name": telegram_first_name,
     }
-    init_data_string = await telegram_services.generate_webapp_signature_data(data=data)
-
+    init_data_dict = {
+        "user": user
+    }
+    init_data = TelegramInitData(**init_data_dict)
+    init_data_string = await telegram_services.generate_webapp_signature_data(init_data)
     response = client.post("/auth/telegram", json=init_data_string)
     assert response.status_code == 200
     assert "access_token" in response.json()

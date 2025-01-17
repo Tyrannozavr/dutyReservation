@@ -5,7 +5,7 @@ import pytest
 from passlib.context import CryptContext
 
 from db.repositories.auth import UserRepositories
-from models.pydantic.auth import UserDataIn, UserOriginTypes, TelegramInitData, UserInDb, UserDataCreate, \
+from models.pydantic.auth import UserDataIn, UserOriginTypes, TelegramUserInitData, UserInDb, UserDataCreate, \
     TelegramUserDataIn
 from models.sqlmodels.auth import TelegramUserData, User
 from services.auth import UserServices

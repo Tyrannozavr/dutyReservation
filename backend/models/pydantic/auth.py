@@ -1,7 +1,9 @@
 from datetime import datetime
 from enum import Enum
+from typing import Literal, Any
 
 from pydantic import BaseModel, ConfigDict
+from pydantic.main import IncEx
 
 from models.pydantic.types import UserOriginTypes
 from models.sqlmodels.auth import User
@@ -28,7 +30,10 @@ class UserDbCreate(BaseUser):
 class UserOut(BaseUser):
     link: str | None
 
-class TelegramInitData(BaseModel):
+
+
+
+class TelegramUserInitData(BaseModel):
     # Unique identifier for the telegram user
     id: int
     first_name: str
@@ -39,6 +44,11 @@ class TelegramInitData(BaseModel):
     photo_url: str | None = None
 
 
+class TelegramInitData(BaseModel):
+    user: TelegramUserInitData
+    chat_instance: int | None = None
+    chat_type: str | None = None
+    auth_date: int | None = None
 
 
 class TelegramUserData(BaseModel):

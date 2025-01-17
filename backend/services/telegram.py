@@ -1,11 +1,12 @@
 import hashlib
 import hmac
+import json
 from operator import itemgetter
 from typing import Dict
 from urllib.parse import parse_qsl, urlencode, quote_plus
 
 from api.errors.auth import TelegramInitDataIncorrect
-from models.pydantic.auth import TelegramInitData
+from models.pydantic.auth import TelegramUserInitData, TelegramInitData
 
 
 class TelegramInitDataService:
@@ -17,6 +18,8 @@ class TelegramInitDataService:
         if not data_verified:
             raise TelegramInitDataIncorrect
         parsed_data = dict(parse_qsl(init_data))
+        parsed_data["user"] = json.loads(parsed_data.get("user"))
+        # user_data = TelegramUserInitData(**user_data)
         init_data = TelegramInitData(**parsed_data)
         return init_data
 
@@ -47,7 +50,11 @@ class TelegramInitDataService:
         ).hexdigest()
         return calculated_hash == hash_
 
-    async def generate_webapp_signature_data(self, data: Dict[str, str]) -> str:
+    async def generate_webapp_signature_data(self, data: TelegramInitData) -> str:
+        data = data.model_dump()
+        data = {k: v for k, v in data.items() if v}
+        data["user"] = {k: v for k, v in data["user"].items() if v}
+        data["user"] = json.dumps(data.get("user"))
         """
         Generate a query string that will pass the web app signature check.
 

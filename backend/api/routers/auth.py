@@ -1,27 +1,23 @@
 from fastapi import HTTPException, Depends
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import select
 
-from api.dependencies.auth import InitDataDep, SettingsDep, AuthorizedUserType, \
+from api.dependencies.auth import InitDataDep, AuthorizedUserType, \
     UserDataCreateDep, UserServicesDep, TokenServicesDep, RefreshTokenDep, TelegramInitDataServiceDep
-from api.dependencies.database import SessionDep
 from api.errors.auth import IncorrectUsernameOrPassword, TelegramInitDataIncorrect
 from models.pydantic.auth import Token, UserOut, TokenData, UserOriginTypes
-from models.sqlmodels.auth import User
-from services.telegram import TelegramInitDataService
 
 router = APIRouter()
 
 
-@router.post("/token", include_in_schema=False)
+@router.post("/token")
 async def login_for_access_token(user_services: UserServicesDep,
                                  token_services: TokenServicesDep,
                                  telegram_services: TelegramInitDataServiceDep,
                                  form_data: OAuth2PasswordRequestForm = Depends(),
                                  ):
-    """Takes initData from telegram webapp as username and "telegram" as a password to get tokens with telegram
-    initData"""
+    # """Takes initData from telegram webapp as username and "telegram" as a password to get tokens with telegram
+    # initData"""
     if form_data.password == "telegram":
         try:
             init_data = await telegram_services.validated_telegram_init_data(form_data.username)
@@ -63,7 +59,7 @@ async def telegram_auth(init_data: InitDataDep, user_services: UserServicesDep, 
     """allows to get access to this platform using telegram's webapp initData"""
     if not init_data:
         raise HTTPException(status_code=404, detail="InitData isn't appropriate")
-    user_tg_data = await user_services.get_or_create_tg_user(init_data)
+    user_tg_data = await user_services.get_or_create_tg_user(init_data.user)
     user = user_tg_data.user
     token_data = TokenData(sub=str(user.id), username=user.username, first_name=user.first_name,
                            last_name=user.last_name, origin=user.origin)

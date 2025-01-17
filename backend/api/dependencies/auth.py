@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from api.dependencies.database import SessionDep
 from core.config import Settings, get_settings
 from db.repositories.auth import UserRepositories
-from models.pydantic.auth import UserDataIn, TelegramInitData, TokenData
+from models.pydantic.auth import UserDataIn, TelegramUserInitData, TokenData, TelegramInitData
 from models.sqlmodels.auth import User
 from services.auth import UserServices, TokenServices
 from services.telegram import TelegramInitDataService
@@ -30,7 +30,7 @@ def get_token_services(settings: SettingsDep):
 TokenServicesDep = Annotated[TokenServices, Depends(get_token_services)]
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="auth/login",
+    tokenUrl="auth/token",
     description="IMPORTANT! use initData from telegram webapp as username and string \"telegram\" "
                 "as password",
 )
@@ -76,7 +76,8 @@ def get_telegram_services(settings: SettingsDep):
 
 
 async def get_telegram_init_data(init_data: InitDataStringDep,
-                                 telegram_services: Annotated[TelegramInitDataService, Depends(get_telegram_services)]):
+                                 telegram_services: Annotated[TelegramInitDataService, Depends(get_telegram_services)]
+                                 ) -> TelegramInitData:
     return await telegram_services.validated_telegram_init_data(init_data=init_data)
 
 
