@@ -48,11 +48,13 @@ def get_pwd_context():
 def get_user_services(db: SessionDep, pwd_context: Annotated[CryptContext, Depends(get_pwd_context)]) -> UserServices:
     return UserServices(pwd_context=pwd_context, db=db)
 
+UserServicesDep = Annotated[UserServices, Depends(get_user_services)]
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: SessionDep,
-                           token_services: TokenServicesDep) -> User:
+
+async def get_current_user(
+        token: Annotated[str, Depends(oauth2_scheme)], user_services: UserServicesDep,
+        token_services: TokenServicesDep) -> User:
     """Makes request to DB"""
-    user_queries = UserRepositories(db=db)
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -60,7 +62,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
     )
     try:
         payload_data = await token_services.decode_token(token)
-        user = await user_queries.get_user_by_id(user_id=int(payload_data.sub))
+        user = await user_services.get_user_by_id(user_id=int(payload_data.sub))
     except InvalidTokenError:
         raise credentials_exception
     if not user:
@@ -73,9 +75,9 @@ def get_telegram_services(settings: SettingsDep):
     return TelegramInitDataService(bot_token=telegram_bot_token)
 
 
-def get_telegram_init_data(init_data: InitDataStringDep,
-                           telegram_services: Annotated[TelegramInitDataService, Depends(get_telegram_services)]):
-    return telegram_services.validated_telegram_init_data(init_data=init_data)
+async def get_telegram_init_data(init_data: InitDataStringDep,
+                                 telegram_services: Annotated[TelegramInitDataService, Depends(get_telegram_services)]):
+    return await telegram_services.validated_telegram_init_data(init_data=init_data)
 
 
 InitDataDep = Annotated[TelegramInitData, Depends(get_telegram_init_data)]
@@ -83,5 +85,5 @@ InitDataDep = Annotated[TelegramInitData, Depends(get_telegram_init_data)]
 AuthorizedUserType = Annotated[User, Depends(get_current_user)]
 UserDataCreateDep = Annotated[UserDataIn, Body()]
 TokenDataDep = Annotated[TokenData, Depends(get_token_data)]
-UserServicesDep = Annotated[UserServices, Depends(get_user_services)]
 RefreshTokenDep = Annotated[str, Body()]
+TelegramInitDataServiceDep = Annotated[TelegramInitDataService, Depends(get_telegram_services)]

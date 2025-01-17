@@ -5,6 +5,7 @@ import jwt
 from passlib.context import CryptContext
 from sqlmodel import Session
 
+from api.errors.auth import IncorrectUsernameOrPassword, UserAlreadyExist
 from db.repositories.auth import TelegramUserRepositoriesMixin
 from db.repositories.auth import UserRepositories
 from models.pydantic.auth import Token, TokenData, UserDbCreate, UserDataIn, UserOriginTypes, TelegramInitData, \
@@ -79,15 +80,23 @@ class UserServices:
     async def authenticate_user(self, username: str, password: str):
         user = await self.repositories.get_user_by_username(username=username)
         if not user:
-            return False
+            raise IncorrectUsernameOrPassword
         if not await self.verify_password(plaintext_password=password, hashed_password=user.hashed_password):
-            return False
+            raise IncorrectUsernameOrPassword
         return user
 
     async def is_username_already_taken(self, username: str) -> bool:
         return await self.repositories.is_username_already_taken(username=username)
 
+    async def validate_if_username_is_already_taken(self, username: str):
+        user = await self.is_username_already_taken(username=username)
+        if user:
+            raise UserAlreadyExist
+
     async def get_or_create_tg_user(self, init_data: TelegramUserDataIn) -> TelegramUserData:
+        tg_user = await self.repositories.get_tg_user_by_id(init_data.id)
+        if tg_user:
+            return tg_user
         username = init_data.username
         if await self.repositories.is_username_already_taken(username):
             username = None
@@ -104,11 +113,21 @@ class UserServices:
         return tg_data
 
     async def create_user(self, user_data: UserDataCreate, origin: UserOriginTypes) -> User:
+        print("repo is", self.repositories)
+        await self.validate_if_username_is_already_taken(username=user_data.username)
         user_db = UserDbCreate(**user_data.model_dump(),
                                hashed_password=await self._get_hashed_password(user_data.password) if user_data.password else None,
                                origin=origin)
         user = await self.repositories.create_user(user_data=user_db)
+        self.db.commit()
+        self.db.refresh(user)
         return user
 
     async def get_all_users(self):
         return await self.repositories.get_all_users()
+
+    async def get_user_by_username(self, username):
+        return await self.repositories.get_user_by_username(username)
+
+    async def get_user_by_id(self, user_id: int):
+        return await self.repositories.get_user_by_id(user_id=user_id)
