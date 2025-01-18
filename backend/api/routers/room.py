@@ -13,27 +13,22 @@ router = APIRouter(tags=["room"])
 
 @router.get("/")
 async def get_rooms_by_user(
-        user: AuthorizedUserType,
-        db: SessionDep,
-) -> list[Duty]:
-    room_queries = RoomRepositories(db=db)
-    room = await room_queries.get_all_user_rooms(user_id=user.id)
+        token_data: TokenDataDep,
+        room_services: RoomServicesDep,
+) -> list[RoomRead]:
+    room = await room_services.get_user_rooms(user_id=token_data.user_id)
     return room
 
 
 @router.post("/", response_model=RoomRead)
 async def create_room(
-        user: AuthorizedUserType,
+        token: TokenDataDep,
         room_data: RoomParamsDep,
         room_services: RoomServicesDep
 ):
     room = await room_services.create_room(
-        name=room_data.name,
-        owner_id=user.id,
-        duties_per_day=room_data.duties_per_day,
-        year=room_data.date.year,
-        month=room_data.date.month,
-        is_multiple_selection=room_data.is_multiple_selection
+        owner_id=token.user_id,
+        room_data=room_data
     )
     return room
 

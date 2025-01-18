@@ -80,7 +80,7 @@ async def test_create_duties_for_room(db_session, room_queries, duty_queries):
 @pytest.mark.asyncio
 async def test_get_all_user_rooms(db_session, setup_rooms, room_queries):
     room1, room2 = setup_rooms
-    rooms = await room_queries.get_all_user_rooms(user_id=1)
+    rooms = await room_queries.get_all_users_rooms(user_id=1)
     assert len(rooms) == 2
     assert room1 in rooms
     assert room2 in rooms
@@ -96,5 +96,5 @@ async def test_delete_room(db_session, setup_rooms, room_queries):
     assert deleted_room.id == room1.id
 
     # Verify that the room is no longer in the database
-    remaining_rooms = await room_queries.get_all_user_rooms(user_id=1)
+    remaining_rooms = await room_queries.get_all_users_rooms(user_id=1)
     assert len(remaining_rooms) == 1  # Only one room should remain after deletion

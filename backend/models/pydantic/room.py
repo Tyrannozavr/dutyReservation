@@ -17,9 +17,12 @@ class RoomCreate(BaseModel):
 
 
 class RoomRead(BaseModel):
+    id: int
     identifier: uuid.UUID
     is_multiple_selection: bool
     duties_per_day: int
+    month: int
+    year: int
 
 
 class RoomUpdateSettings(BaseModel):

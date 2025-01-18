@@ -60,8 +60,10 @@ class DutiesRoom(SQLModel, table=True):
     owner_id: int = Field(foreign_key="user.id")
     owner: User = Relationship(back_populates="rooms")
     is_multiple_selection: bool = Field(default=False)
+    month: int = Field(gt=0, lt=13)
+    year: int = Field(ge=0)
     duties_per_day: int = Field(default=1)
-    duties: list["Duty"] = Relationship(back_populates="room")
+    duties: list["Duty"] = Relationship(back_populates="room", sa_relationship_kwargs={"cascade": "delete"})
 
 
 class Duty(SQLModel, table=True):
