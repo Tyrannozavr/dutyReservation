@@ -1,5 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+from models.pydantic.room import DateParam, RoomCreate
 from services.room import RoomServices
 from db.repositories.room import RoomRepositories
 
@@ -36,19 +38,26 @@ async def test_create_room(room_services, room_repositories_mock):
     room_repositories_mock.create_room.return_value = mock_room
 
     # Вызов метода
-    result = await room_services.create_room(
-        name=name,
-        owner_id=owner_id,
+    room_date = DateParam(
         year=year,
-        month=month,
-        duties_per_day=duties_per_day
+        month=month
+    )
+    room_data = RoomCreate(
+        name=name,
+        date=room_date,
+        duties_per_day=duties_per_day,
+    )
+    result = await room_services.create_room(
+        owner_id=owner_id,
+        room_data=room_data
     )
 
     # Проверка, что методы были вызваны с правильными аргументами
     room_repositories_mock.create_room.assert_awaited_once_with(
         name=name,
         owner_id=owner_id,
-        duties_per_day=duties_per_day
+        duties_per_day=duties_per_day,
+        is_multiple_selection=False
     )
 
     room_repositories_mock.create_duties_for_room.assert_awaited_once_with(

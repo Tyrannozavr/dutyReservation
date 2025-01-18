@@ -3,6 +3,7 @@ import uuid
 
 from sqlmodel import Session, select
 
+from api.errors.room import RoomNotFound
 from db.repositories.duty import DutyRepositories
 from models.sqlmodels.auth import DutiesRoom, Duty
 
@@ -26,8 +27,15 @@ class RoomRepositoriesMixin:
         room = self.db.exec(stmt).first()
         return room
 
-    async def create_room(self, owner_id: int, name: str = "", duties_per_day: int = 1):
-        room = DutiesRoom(owner_id=owner_id, duties_per_day=duties_per_day, name=name)
+    async def get_room_by_id(self, room_id: int) -> DutiesRoom:
+        stmt = select(DutiesRoom).where(DutiesRoom.id == room_id)
+        room = self.db.exec(stmt).first()
+        return room
+
+    async def create_room(self, owner_id: int, name: str = "", duties_per_day: int = 1,
+                          is_multiple_selection: bool = False) -> DutiesRoom:
+        room = DutiesRoom(owner_id=owner_id, duties_per_day=duties_per_day, name=name,
+                          is_multiple_selection=is_multiple_selection)
         self.db.add(room)
         return room
 

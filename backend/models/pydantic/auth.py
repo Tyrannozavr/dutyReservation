@@ -77,6 +77,10 @@ class TokenData(BaseModel):
     last_name: str | None = None
     origin: UserOriginTypes | None = None
 
+    @property
+    def user_id(self):
+        return int(self.sub)
+
 
 class TelegramUserDataIn(BaseModel):
     id: int

@@ -5,7 +5,8 @@ from fastapi import APIRouter, Body, Path
 
 from api.dependencies.auth import AuthorizedUserType
 from api.dependencies.database import SessionDep
-from api.dependencies.duty import DutiesRoomDp, DutyIdDp
+from api.dependencies.duty import DutyIdDp
+from api.dependencies.room import DutiesRoomIdentifierDp
 from api.errors.duty import UserHasNoPermission
 from db.repositories.duty import DutyRepositories
 
@@ -13,9 +14,9 @@ router = APIRouter(prefix="/{room_identifier}")
 
 
 @router.get("/")
-async def get_all_duties_in_room(room: DutiesRoomDp, db: SessionDep):
+async def get_all_duties_in_room(room: DutiesRoomIdentifierDp, db: SessionDep):
     duty_queries = DutyRepositories(db=db)
-    duties_list = await duty_queries.get_all_duties_in_room(room_id=room.id, db=db)
+    duties_list = await duty_queries.get_all_duties_in_room(room_id=room.id)
     return duties_list
 
 
@@ -24,7 +25,7 @@ async def reserve_duty(
         user: AuthorizedUserType,
         db: SessionDep,
         date: Annotated[datetime.date, Body()],
-        room: DutiesRoomDp
+        room: DutiesRoomIdentifierDp
 ):
     duty_queries = DutyRepositories(db=db)
     duty = await duty_queries.create_duty(user_id=user.id, room_id=room.id, date=date)

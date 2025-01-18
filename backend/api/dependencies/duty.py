@@ -25,7 +25,9 @@ async def get_room_queries(db: SessionDep) -> RoomRepositories:
 
 
 
-DutiesRoomDp = Annotated[DutiesRoom, Depends()]
+
+
+
 DutyIdDp = Annotated[int, Path()]
 DutyRepositoriesDep = Annotated[DutyRepositories, Depends(get_duty_queries)]
 RoomRepositoriesDep = Annotated[RoomRepositories, Depends(get_room_queries)]
