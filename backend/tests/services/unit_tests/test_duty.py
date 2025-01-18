@@ -23,7 +23,7 @@ def duty_repositories_mock(mock_db_session):
 def duties_services(mock_db_session, duty_repositories_mock):
     # Create an instance of DutiesServices with the mocked dependencies
     services = DutyServices(db=mock_db_session)
-    services.repositories = duty_repositories_mock  # Inject the mock queries
+    services.duty_repository = duty_repositories_mock  # Inject the mock queries
     return services
 
 
@@ -50,13 +50,13 @@ async def test_create_duty(duties_services, mock_db_session):
     duty_data = DutyCreate(user_id=1, room_id=1, date=datetime.date.today())
 
     # Mock the create_duty method
-    duties_services.repositories.create_duty = AsyncMock(return_value=None)
+    duties_services.duty_repository.create_duty = AsyncMock(return_value=None)
 
     # Call the service method
     await duties_services.create_duty(duty_data)
 
     # Assert that create_duty was called with correct parameters
-    duties_services.repositories.create_duty.assert_awaited_once_with(
+    duties_services.duty_repository.create_duty.assert_awaited_once_with(
         user_id=duty_data.user_id,
         room_id=duty_data.room_id,
         date=duty_data.date,
@@ -68,7 +68,7 @@ async def test_create_duty_integrity_error(duties_services, mock_db_session):
     duty_data = DutyCreate(user_id=1, room_id=1, date=datetime.date.today())
 
     # Mock the create_duty method to raise IntegrityError
-    duties_services.repositories.create_duty = AsyncMock(side_effect=IntegrityError("", "", ""))
+    duties_services.duty_repository.create_duty = AsyncMock(side_effect=IntegrityError("", "", ""))
 
     # Check that the DutyOccupied exception is raised when creating a duty
     with pytest.raises(DutyOccupied):
@@ -84,14 +84,14 @@ async def test_set_duty_user(duties_services):
     # Настройка возврата мока
     expected_duty = MagicMock()  # Здесь можно создать экземпляр Duty или просто мок
     # expected_duty = MagicMock()  # Здесь можно создать экземпляр Duty или просто мок
-    duties_services.repositories.set_duty_user.return_value = expected_duty
+    duties_services.duty_repository.set_duty_user.return_value = expected_duty
 
     # Вызов метода
     result = await duties_services.set_duty_user(user_id=user_id, room_id=room_id, date=duty_date)
 
     # Проверка, что метод был вызван с правильными аргументами
-    duties_services.repositories.set_duty_user.assert_awaited_once_with(user_id=user_id, room_id=room_id,
-                                                                        date=duty_date)
+    duties_services.duty_repository.set_duty_user.assert_awaited_once_with(user_id=user_id, room_id=room_id,
+                                                                           date=duty_date)
 
     # Проверка, что результат совпадает с ожидаемым
     assert result == expected_duty

@@ -4,6 +4,7 @@ from typing import Sequence
 from sqlalchemy import update
 from sqlmodel import Session, select
 
+from api.errors.duty import DutyIsAlreadyTaken
 from models.pydantic.duty import DutyChange
 from models.sqlmodels.auth import Duty, User
 
@@ -38,6 +39,11 @@ class DutyRepositoriesMixin:
         duty = self.db.exec(stmt).first()
         return duty
 
+    async def get_all_users_duty_in_the_room(self, user_id: int, room_id: int) -> list[Duty]:
+        stmt = select(Duty).where(user_id == user_id).where(room_id == room_id)
+        duties = self.db.exec(stmt)
+        return duties.all()
+
     async def create_duty(self, room_id: int, date: datetime.date, user_id: int | None = None):
         duty = Duty(user_id=user_id, room_id=room_id, date=date)
         self.db.add(duty)
@@ -61,6 +67,8 @@ class DutyRepositoriesMixin:
             self.db.exec(update_stmt)
             self.db.refresh(record)
             return record
+        else:
+            raise DutyIsAlreadyTaken
 
     async def update_duty(self, duty_id, duty_change: DutyChange):
         duty_data = duty_change.model_dump(exclude_unset=True)

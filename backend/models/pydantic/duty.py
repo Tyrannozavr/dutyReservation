@@ -23,8 +23,14 @@ class FreeDuty(BaseModel):
     id: int
     date: date
 
+class DutyTaken(BaseModel):
+    id: int
+    date: date
+
+
 class DutiesWithUsersResponse(BaseModel):
     duties: list[DutyWithUser]
 
 class FreeDutiesResponse(BaseModel):
     duties: list[FreeDuty]
+

@@ -7,3 +7,11 @@ from fastapi import status
 class UserHasNoPermission(HTTPException):
     def __init__(self):
         super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail="The user doesn't have enough permissions")
+
+class DutyIsAlreadyTaken(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail="The date is already taken")
+
+class UserAlreadyTookAllDuties(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail="The user already have took all duties")

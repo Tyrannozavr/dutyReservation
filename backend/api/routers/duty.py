@@ -3,13 +3,15 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Path, Query
 
-from api.dependencies.auth import AuthorizedUserType
+from api.dependencies.auth import AuthorizedUserType, TokenDataDep
 from api.dependencies.database import SessionDep
 from api.dependencies.duty import DutyIdDp, DutyServicesDep
 from api.dependencies.room import DutiesRoomIdentifierDep
 from api.errors.duty import UserHasNoPermission
 from db.repositories.duty import DutyRepositories
-from models.pydantic.duty import DutiesWithUsersResponse, FreeDutiesResponse, FreeDuty, DutyWithUser
+from models.pydantic.auth import UserRead
+from models.pydantic.duty import DutiesWithUsersResponse, FreeDutiesResponse, FreeDuty, DutyWithUser, DutyTaken
+from tests.services.integrational_tests.test_room import duty_services
 
 router = APIRouter(prefix="/{room_identifier}")
 
@@ -24,19 +26,30 @@ async def get_all_duties_in_room(
         free_duties = await duty_services.get_all_free_duties_in_the_room(room_id=room.id)
         return FreeDutiesResponse(duties=[FreeDuty(**duty.model_dump()) for duty in free_duties])
     else:
-        duties =  await duty_services.get_all_duties_with_users_in_the_room(room_id=room.id)
-        return DutiesWithUsersResponse(duties=[DutyWithUser(**duty.model_dump()) for duty in duties])
+        duties = await duty_services.get_all_duties_with_users_in_the_room(room_id=room.id)
+        return DutiesWithUsersResponse(
+            duties=[
+                DutyWithUser(
+                    **duty.model_dump(),
+                    user=UserRead(**duty.user.model_dump())
+                ) if duty.user else DutyWithUser(**duty.model_dump())
+                for duty in duties
+            ]
+        )
 
 
-@router.post("/")
+@router.post("/", response_model=DutyTaken)
 async def reserve_duty(
-        user: AuthorizedUserType,
-        db: SessionDep,
+        token_data: TokenDataDep,
         date: Annotated[datetime.date, Body()],
-        room: DutiesRoomIdentifierDep
+        room: DutiesRoomIdentifierDep,
+        duty_services: DutyServicesDep,
 ):
-    duty_queries = DutyRepositories(db=db)
-    duty = await duty_queries.create_duty(user_id=user.id, room_id=room.id, date=date)
+    duty = await duty_services.set_duty_user(
+        user_id=token_data.user_id,
+        room_id=room.id,
+        date=date
+    )
     return duty
 
 
