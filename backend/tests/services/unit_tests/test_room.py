@@ -58,7 +58,9 @@ async def test_create_room(room_services, room_repositories_mock):
         name=name,
         owner_id=owner_id,
         duties_per_day=duties_per_day,
-        is_multiple_selection=False
+        is_multiple_selection=False,
+        year=2023,
+        month=10
     )
 
     room_repositories_mock.create_duties_for_room.assert_awaited_once_with(

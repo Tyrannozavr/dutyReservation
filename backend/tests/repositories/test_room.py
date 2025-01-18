@@ -36,8 +36,8 @@ def duty_queries(db_session):
 @pytest.fixture(scope="function")
 def setup_rooms(db_session):
     # Create some test rooms
-    room1 = DutiesRoom(owner_id=1)
-    room2 = DutiesRoom(owner_id=1)
+    room1 = DutiesRoom(owner_id=1, month=1, year=3000)
+    room2 = DutiesRoom(owner_id=1, month=12, year=3000)
     db_session.add(room1)
     db_session.add(room2)
     # db_session.commit()
@@ -55,7 +55,7 @@ async def test_get_room_by_identifier(db_session, setup_rooms, room_queries):
 @pytest.mark.asyncio
 async def test_create_room(db_session, room_queries):
     owner_id = 1
-    room = await room_queries.create_room(owner_id=owner_id, name="testings")
+    room = await room_queries.create_room(owner_id=owner_id, name="testings", month=1, year=1)
     assert room is not None
     assert room.owner_id == owner_id
     assert room.name == "testings"

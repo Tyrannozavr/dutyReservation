@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from models.pydantic.types import UserOriginTypes
 
@@ -69,6 +69,7 @@ class TokenData(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     origin: UserOriginTypes | None = None
+    type: str = Field(default="access")
 
     @property
     def user_id(self):

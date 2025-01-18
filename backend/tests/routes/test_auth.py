@@ -2,6 +2,7 @@ import os
 
 import pytest
 from fastapi.testclient import TestClient
+from jwt import InvalidTokenError
 from sqlalchemy import create_engine
 from sqlmodel import Session
 
@@ -144,6 +145,19 @@ async def test_refresh_access_token(client, create_user):
     response = client.post("/auth/token/refresh", json=refresh_token)
     assert response.status_code == 200
     assert "access_token" in response.json()
+
+@pytest.mark.asyncio
+async def test_invalid_refresh_access_token(client, create_user):
+    # First, log in to get a refresh token
+    try:
+        await create_user("test_user", "test_password")
+    except UserAlreadyExist:
+        pass
+
+    login_response = client.post("/auth/token", data={"username": "test_user", "password": "test_password"})
+    access_token = login_response.json().get("access_token")
+    with pytest.raises(InvalidTokenError):
+        response = client.post("/auth/token/refresh", json=access_token)
 
 
 @pytest.mark.asyncio

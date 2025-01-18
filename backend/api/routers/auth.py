@@ -1,6 +1,7 @@
 from fastapi import HTTPException, Depends
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
+from jwt import InvalidTokenError
 
 from api.dependencies.auth import InitDataDep, AuthorizedUserType, \
     UserDataCreateDep, UserServicesDep, TokenServicesDep, RefreshTokenDep, TelegramInitDataServiceDep
@@ -43,7 +44,10 @@ async def login_for_access_token(user_services: UserServicesDep,
 )
 async def refresh_access_token(token_services: TokenServicesDep, refresh_token: RefreshTokenDep):
     refresh_token_data = await token_services.decode_token(refresh_token)
-    return await token_services.get_tokens(data=refresh_token_data)
+    if refresh_token_data.type == "refresh":
+        return await token_services.get_tokens(data=refresh_token_data)
+    else:
+        raise InvalidTokenError
 
 
 @router.post(

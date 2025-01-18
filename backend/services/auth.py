@@ -36,6 +36,7 @@ class TokenServices:
 
     async def _create_refresh_token(self, data: TokenData):
         expire_time = float(self.refresh_token_expire_minutes)
+        data.type = "refresh"
         refresh_token = await self._create_token(data=data, expire_time=expire_time)
         return refresh_token
 
