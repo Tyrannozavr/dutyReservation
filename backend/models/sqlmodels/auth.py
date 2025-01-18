@@ -1,15 +1,11 @@
 import datetime
 import uuid
-from typing import Optional, Union, Dict, Any
-
-from sqlmodel.main import IncEx
-from typing_extensions import Literal
+from typing import Optional
 
 from pydantic import ConfigDict
 from sqlmodel import SQLModel, Field, Relationship
 
 from models.pydantic.types import UserOriginTypes
-
 
 
 def generate_user_link(username: str, origin: UserOriginTypes):
@@ -42,6 +38,7 @@ class User(SQLModel, table=True):
         result = super().model_dump(*args, **kwargs)
         result["link"] = self.link
         return result
+
 
 class TelegramUserData(SQLModel, table=True):
     id: int = Field(primary_key=True, description="This is exactly telegram id")

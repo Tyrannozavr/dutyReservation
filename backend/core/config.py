@@ -1,6 +1,7 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     telegram_bot_token: str = Field(alias='TELEGRAM_BOT_TOKEN')
     secret_key: str = Field(alias='SECRET_KEY')
@@ -15,6 +16,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
 
 def get_settings() -> Settings:
     return settings

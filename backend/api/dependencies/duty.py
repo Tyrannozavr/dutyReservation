@@ -1,10 +1,9 @@
 from typing import Annotated
 
-from api.dependencies.database import SessionDep
-from db.repositories.duty import DutyRepositories
-
 from fastapi import Depends, HTTPException, Path
 
+from api.dependencies.database import SessionDep
+from db.repositories.duty import DutyRepositories
 from db.repositories.room import RoomRepositories
 from models.sqlmodels.auth import DutiesRoom
 
@@ -20,12 +19,9 @@ async def get_room_by_identifier(room_identifier: Annotated[str, Path()], db: Se
 async def get_duty_queries(db: SessionDep) -> DutyRepositories:
     return DutyRepositories(db=db)
 
+
 async def get_room_queries(db: SessionDep) -> RoomRepositories:
     return RoomRepositories(db=db)
-
-
-
-
 
 
 DutyIdDp = Annotated[int, Path()]

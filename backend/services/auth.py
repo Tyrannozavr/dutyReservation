@@ -1,15 +1,12 @@
 from datetime import datetime, timezone, timedelta
-from typing import Any
 
 import jwt
 from passlib.context import CryptContext
 from sqlmodel import Session
 
 from api.errors.auth import IncorrectUsernameOrPassword, UserAlreadyExist
-from db.repositories.auth import TelegramUserRepositoriesMixin
 from db.repositories.auth import UserRepositories
-from models.pydantic.auth import Token, TokenData, UserDbCreate, UserDataIn, UserOriginTypes, TelegramUserInitData, \
-    UserDataCreate, TelegramUserDataIn, TelegramUserDataCreate
+from models.pydantic.auth import Token, TokenData, UserDbCreate, UserOriginTypes, UserDataCreate, TelegramUserDataIn
 from models.sqlmodels.auth import User, TelegramUserData
 
 
@@ -67,7 +64,6 @@ class UserServices:
         self.db = db
         self.pwd_context = pwd_context
         self.repositories = UserRepositories(db=db) if not repositories else repositories
-        
 
     async def _get_hashed_password(self, plaintext_password: str) -> str:
         if plaintext_password is None:
@@ -116,7 +112,8 @@ class UserServices:
         print("repo is", self.repositories)
         await self.validate_if_username_is_already_taken(username=user_data.username)
         user_db = UserDbCreate(**user_data.model_dump(),
-                               hashed_password=await self._get_hashed_password(user_data.password) if user_data.password else None,
+                               hashed_password=await self._get_hashed_password(
+                                   user_data.password) if user_data.password else None,
                                origin=origin)
         user = await self.repositories.create_user(user_data=user_db)
         self.db.commit()

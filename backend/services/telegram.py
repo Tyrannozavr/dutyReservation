@@ -2,11 +2,10 @@ import hashlib
 import hmac
 import json
 from operator import itemgetter
-from typing import Dict
 from urllib.parse import parse_qsl, urlencode, quote_plus
 
 from api.errors.auth import TelegramInitDataIncorrect
-from models.pydantic.auth import TelegramUserInitData, TelegramInitData
+from models.pydantic.auth import TelegramInitData
 
 
 class TelegramInitDataService:

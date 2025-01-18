@@ -3,8 +3,6 @@ import uuid
 
 from sqlmodel import Session, select
 
-from api.errors.room import RoomNotFound
-from db.repositories.duty import DutyRepositories
 from models.sqlmodels.auth import DutiesRoom, Duty
 
 

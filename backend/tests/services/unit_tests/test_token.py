@@ -27,6 +27,7 @@ def token_data():
         origin=UserOriginTypes.web
     )
 
+
 @pytest.mark.asyncio
 async def test_create_access_token(token_service, token_data):
     data = token_data
@@ -36,6 +37,7 @@ async def test_create_access_token(token_service, token_data):
     decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     assert decoded_data['sub'] == "1"
 
+
 @pytest.mark.asyncio
 async def test_create_refresh_token(token_service, token_data):
     data = token_data
@@ -44,6 +46,7 @@ async def test_create_refresh_token(token_service, token_data):
     # Decode the token to verify its contents
     decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     assert decoded_data['sub'] == "1"
+
 
 @pytest.mark.asyncio
 async def test_get_tokens(token_service, token_data):
@@ -67,7 +70,6 @@ async def test_create_token_expire_time_zero(token_service, token_data):
         await token_service._create_token(token_data, expire_time=0)
 
 
-
 # Assuming TokenServices and TokenData are defined in the same module
 # from your_module import TokenServices, TokenData
 
@@ -82,6 +84,7 @@ class TestTokenServices(unittest.IsolatedAsyncioTestCase):
             refresh_expire_time=TEST_REFRESH_EXPIRE_TIME
         )
         self.user_id = "12"
+
     def create_token(self, exp_time):
         payload = {
             "sub": self.user_id,

@@ -1,8 +1,9 @@
 import unittest
-from sqlmodel import SQLModel, create_engine, Session, select
+
+from sqlmodel import create_engine, Session
+
 from db.repositories.auth import UserRepositoriesMixin
 from models.pydantic.auth import UserDbCreate
-from models.sqlmodels.auth import *
 from models.sqlmodels.auth import *
 
 # Define a test database URL for SQLite in-memory
@@ -19,7 +20,6 @@ class TestUserRepositoriesMixin(unittest.IsolatedAsyncioTestCase):
         # Create a new session for each test
         self.session = Session(self.engine)
         self.repository = UserRepositoriesMixin(db=self.session)
-
 
     async def test_create_user(self):
         user_data = UserDbCreate(username="testuser", hashed_password="password", origin=UserOriginTypes.web)

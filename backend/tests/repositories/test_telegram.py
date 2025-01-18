@@ -5,9 +5,9 @@ from sqlmodel import Session
 
 from db.repositories.auth import TelegramUserRepositoriesMixin
 from models.sqlmodels.auth import *
-from models.sqlmodels.auth import *
 
 TEST_DATABASE_URL = "sqlite:///:memory:"
+
 
 class TestTelegramUserRepositoriesMixin(unittest.IsolatedAsyncioTestCase):
 
@@ -18,8 +18,8 @@ class TestTelegramUserRepositoriesMixin(unittest.IsolatedAsyncioTestCase):
         # Create a new session for each test
         self.db = Session(self.engine)
         self.repository = TelegramUserRepositoriesMixin(db=self.db)
-        self.telegram_id=123
-        self.telegram_username="testuser"
+        self.telegram_id = 123
+        self.telegram_username = "testuser"
 
     async def test_create_tg_user(self):
         init_data = TelegramUserData(
@@ -56,8 +56,6 @@ class TestTelegramUserRepositoriesMixin(unittest.IsolatedAsyncioTestCase):
         user = await self.repository.get_tg_user_by_username(telegram_username)
         # Verify that the correct query was executed
         self.assertIsNone(user)
-
-
 
 
 if __name__ == "__main__":

@@ -7,11 +7,10 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import SQLModel, Session
 
 from db.repositories.duty import DutyRepositories
-from models.pydantic.types import UserOriginTypes
-
 from models.pydantic.duty import DutyChange
-from models.sqlmodels.auth import User  # Assuming you have this model defined
+from models.pydantic.types import UserOriginTypes
 from models.sqlmodels.auth import DutiesRoom
+from models.sqlmodels.auth import User  # Assuming you have this model defined
 
 DATABASE_URL = "sqlite:///:memory:"
 engine = create_engine(DATABASE_URL)
@@ -88,8 +87,8 @@ async def test_set_duty_user(db_session, duty_queries, setup_data):
 
 @pytest.mark.asyncio
 async def test_get_all_duties_in_room(duty_queries, db_session):
-    local_room_id=13
-    local_user_id=13
+    local_room_id = 13
+    local_user_id = 13
     await duty_queries.create_duty(user_id=local_user_id, room_id=local_room_id, date=datetime.date.today())
     try:
         duties = await duty_queries.get_all_duties_in_room(local_room_id)

@@ -1,12 +1,8 @@
-import asyncio
-
 from fastapi import FastAPI
 
 from db.database import create_db_and_tables
 
 app = FastAPI()
-
-
 
 from api.routers.api import router
 

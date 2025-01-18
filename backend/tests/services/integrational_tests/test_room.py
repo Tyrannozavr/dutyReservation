@@ -1,5 +1,5 @@
 from datetime import timedelta
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 import pytest
 from sqlmodel import create_engine, Session
@@ -99,6 +99,7 @@ async def test_create_room_with_invalid_data(room_services):
             room_data=room_data
         )
 
+
 @pytest.mark.asyncio
 async def test_get_room_by_identifier_not_found(room_services):
     # Arrange
@@ -106,6 +107,8 @@ async def test_get_room_by_identifier_not_found(room_services):
     # Act & Assert
     with pytest.raises(Exception, match="Room not found"):
         await room_services.get_room_by_identifier(identifier)
+
+
 #
 @pytest.mark.asyncio
 async def test_delete_room_not_found(room_services):
@@ -115,6 +118,7 @@ async def test_delete_room_not_found(room_services):
     # Act & Assert
     with pytest.raises(Exception, match="Room not found"):
         await room_services.delete_room(user_id, room_id)
+
 
 @pytest.mark.asyncio
 async def test_update_room(room_services):
@@ -145,6 +149,7 @@ async def test_update_room(room_services):
     assert room.is_multiple_selection == True
     assert room.name == "Hello, world"
 
+
 @pytest.mark.asyncio
 async def test_update_room_invalid_data(room_services):
     user_id = 1
@@ -172,6 +177,7 @@ async def test_update_room_invalid_data(room_services):
         update_data = RoomUpdateSettings(is_multiple_selection=True, duties_per_day=-5)  # Invalid value
         await room_services.update_room(user_id, room.id, update_data)
 
+
 @pytest.mark.asyncio
 async def test_update_room_invalid_user(room_services):
     user_id = 1
@@ -197,7 +203,7 @@ async def test_update_room_invalid_user(room_services):
     # Act & Assert
     with pytest.raises(UserHasNoPermission):
         update_data = RoomUpdateSettings(is_multiple_selection=True, duties_per_day=5)  # Invalid value
-        await room_services.update_room(user_id+1, room.id, update_data)
+        await room_services.update_room(user_id + 1, room.id, update_data)
 
 
 @pytest.mark.asyncio

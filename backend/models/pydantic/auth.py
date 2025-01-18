@@ -1,13 +1,8 @@
 from datetime import datetime
-from enum import Enum
-from typing import Literal, Any
 
 from pydantic import BaseModel, ConfigDict
-from pydantic.main import IncEx
 
 from models.pydantic.types import UserOriginTypes
-from models.sqlmodels.auth import User
-
 
 
 class BaseUser(BaseModel):
@@ -29,8 +24,6 @@ class UserDbCreate(BaseUser):
 
 class UserOut(BaseUser):
     link: str | None
-
-
 
 
 class TelegramUserInitData(BaseModel):
@@ -91,6 +84,7 @@ class TelegramUserDataIn(BaseModel):
     allows_write_to_pm: bool | None = None
     photo_url: str | None = None
 
+
 class TelegramUserDataCreate(BaseModel):
     id: int
     first_name: str
@@ -108,6 +102,7 @@ class UserDataIn(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     password: str
+
 
 class UserDataCreate(BaseModel):
     username: str | None = None

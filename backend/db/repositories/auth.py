@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 
 from models.pydantic.auth import UserDbCreate, \
-    TelegramUserDataCreate, TelegramUserDataIn
+    TelegramUserDataIn
 from models.sqlmodels.auth import User, TelegramUserData
 
 
@@ -60,6 +60,7 @@ class UserRepositoriesMixin:
         stmt = select(User)
         users = self.db.exec(stmt)
         return users.all()
+
 
 class UserRepositories(UserRepositoriesMixin, TelegramUserRepositoriesMixin):
     pass

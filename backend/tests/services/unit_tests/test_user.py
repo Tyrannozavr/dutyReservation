@@ -1,13 +1,11 @@
-from fastapi import HTTPException
 from unittest.mock import AsyncMock, Mock, MagicMock
 
 import pytest
+from fastapi import HTTPException
 from passlib.context import CryptContext
 
 from db.repositories.auth import UserRepositories
-from models.pydantic.auth import UserDataIn, UserOriginTypes, TelegramUserInitData, UserInDb, UserDataCreate, \
-    TelegramUserDataIn
-from models.sqlmodels.auth import TelegramUserData, User
+from models.pydantic.auth import UserDataIn, UserOriginTypes
 from services.auth import UserServices
 
 
@@ -74,7 +72,7 @@ async def test_authenticate_user_failure_no_user(user_services, mock_user_reposi
     mock_user_repositories.get_user_by_username = AsyncMock(return_value=None)
 
     with pytest.raises(HTTPException):
-         await user_services.authenticate_user(username, password)
+        await user_services.authenticate_user(username, password)
 
 
 @pytest.mark.asyncio
@@ -103,4 +101,3 @@ async def test_create_user(user_services, mock_user_repositories):
 
     assert created_user is user_mock
     mock_user_repositories.create_user.assert_called_once()
-

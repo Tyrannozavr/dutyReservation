@@ -4,7 +4,7 @@ from typing import Any
 from sqlmodel import Session
 
 from api.errors.duty import UserHasNoPermission
-from api.errors.room import RoomNotFound, InvalidRoomData
+from api.errors.room import RoomNotFound
 from db.repositories.room import RoomRepositories
 from models.pydantic.room import RoomUpdateSettings, RoomCreate
 from models.sqlmodels.auth import DutiesRoom
@@ -15,7 +15,6 @@ class RoomServices:
         """first of all I've added queries for testing (mock queries instance)"""
         self.repositories = RoomRepositories(db=db) if not repositories else repositories
         self.db = db
-
 
     # async def create_room(self, name: str, owner_id: int, year: int, month: int,
     #                       duties_per_day: int = 1, is_multiple_selection: bool = False):

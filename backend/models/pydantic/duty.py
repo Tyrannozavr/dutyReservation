@@ -1,6 +1,6 @@
 from datetime import date
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class DutyCreate(BaseModel):
@@ -11,5 +11,3 @@ class DutyCreate(BaseModel):
 
 class DutyChange(BaseModel):
     date: date
-
-

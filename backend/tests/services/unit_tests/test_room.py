@@ -1,9 +1,10 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
+
+from db.repositories.room import RoomRepositories
 from models.pydantic.room import DateParam, RoomCreate
 from services.room import RoomServices
-from db.repositories.room import RoomRepositories
 
 
 @pytest.fixture(scope="function")

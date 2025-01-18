@@ -63,8 +63,6 @@ async def test_create_duty(duties_services, mock_db_session):
     )
 
 
-
-
 @pytest.mark.asyncio
 async def test_create_duty_integrity_error(duties_services, mock_db_session):
     duty_data = DutyCreate(user_id=1, room_id=1, date=datetime.date.today())
@@ -92,7 +90,8 @@ async def test_set_duty_user(duties_services):
     result = await duties_services.set_duty_user(user_id=user_id, room_id=room_id, date=duty_date)
 
     # Проверка, что метод был вызван с правильными аргументами
-    duties_services.repositories.set_duty_user.assert_awaited_once_with(user_id=user_id, room_id=room_id, date=duty_date)
+    duties_services.repositories.set_duty_user.assert_awaited_once_with(user_id=user_id, room_id=room_id,
+                                                                        date=duty_date)
 
     # Проверка, что результат совпадает с ожидаемым
     assert result == expected_duty
@@ -125,4 +124,3 @@ async def test_delete_duty(duties_services, duty_repositories_mock):
 
     # Assert that delete_duty was called with the correct parameter
     duty_repositories_mock.delete_duty.assert_awaited_once_with(duty_id)
-

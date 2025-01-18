@@ -1,5 +1,4 @@
 import unittest
-from unittest.mock import MagicMock
 
 from fastapi import HTTPException
 from sqlmodel import Session, create_engine
@@ -46,10 +45,8 @@ class TestUserServices(unittest.IsolatedAsyncioTestCase):
         username = "invaliduser"
         password = "securepassword"
 
-
         with self.assertRaises(HTTPException):
             await self.user_services.authenticate_user(username, password)
-
 
     async def test_authenticate_user_invalid_password(self):
         username = "testuser1"
@@ -58,10 +55,10 @@ class TestUserServices(unittest.IsolatedAsyncioTestCase):
 
         hashed_password = await self.user_services._get_hashed_password(password)
         user_data = UserInDb(
-                            id=1,
-                             username=username,
-                             hashed_password=hashed_password,
-                             origin=UserOriginTypes.web)
+            id=1,
+            username=username,
+            hashed_password=hashed_password,
+            origin=UserOriginTypes.web)
 
         user = User.model_validate(user_data)
         user.hashed_password = await self.user_services._get_hashed_password(password)
@@ -69,10 +66,8 @@ class TestUserServices(unittest.IsolatedAsyncioTestCase):
         self.session.add(user)
         self.session.commit()
 
-
         with self.assertRaises(HTTPException):
             await self.user_services.authenticate_user(username, wrong_password)
-
 
     async def test_is_username_already_taken(self):
         # await self.test_user_creation()
@@ -89,9 +84,9 @@ class TestUserServices(unittest.IsolatedAsyncioTestCase):
 
         self.assertFalse(is_taken)
 
-
     async def test_get_or_create_tg_user_success(self):
-        init_data = TelegramUserDataIn(username="tg_testuser", first_name="Telegram", last_name="User", id=self.telegram_id)
+        init_data = TelegramUserDataIn(username="tg_testuser", first_name="Telegram", last_name="User",
+                                       id=self.telegram_id)
 
         tg_user_data = await self.user_services.get_or_create_tg_user(init_data)
 
@@ -100,7 +95,8 @@ class TestUserServices(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(tg_user_data.user.last_name, init_data.last_name)
 
     async def test_get_or_create_tg_user_success_double(self):
-        init_data = TelegramUserDataIn(username="tg_testuser", first_name="Telegram", last_name="User", id=self.telegram_id)
+        init_data = TelegramUserDataIn(username="tg_testuser", first_name="Telegram", last_name="User",
+                                       id=self.telegram_id)
 
         tg_user_data = await self.user_services.get_or_create_tg_user(init_data)
 
@@ -115,8 +111,8 @@ class TestUserServices(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(tg_user_data_again.user.last_name, init_data.last_name)
 
     async def test_get_or_create_tg_user_username_taken(self):
-        username="tg_takenuser11"
-        telegram_id=3432
+        username = "tg_takenuser11"
+        telegram_id = 3432
         init_data = TelegramUserDataIn(id=telegram_id, username=username, first_name="Taken",
                                        last_name="User")
 

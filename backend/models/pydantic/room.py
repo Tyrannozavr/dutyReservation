@@ -1,7 +1,6 @@
 import uuid
-from typing import Any
 
-from pydantic import BaseModel, model_validator, Field
+from pydantic import BaseModel, Field
 
 
 class DateParam(BaseModel):
@@ -16,10 +15,12 @@ class RoomCreate(BaseModel):
     is_multiple_selection: bool = Field(default=False,
                                         description="Может ли один человек выбрать несколько дежурств в один месяц")
 
+
 class RoomRead(BaseModel):
     identifier: uuid.UUID
     is_multiple_selection: bool
     duties_per_day: int
+
 
 class RoomUpdateSettings(BaseModel):
     is_multiple_selection: bool

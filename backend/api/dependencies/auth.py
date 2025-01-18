@@ -9,8 +9,7 @@ from passlib.context import CryptContext
 
 from api.dependencies.database import SessionDep
 from core.config import Settings, get_settings
-from db.repositories.auth import UserRepositories
-from models.pydantic.auth import UserDataIn, TelegramUserInitData, TokenData, TelegramInitData
+from models.pydantic.auth import UserDataIn, TokenData, TelegramInitData
 from models.sqlmodels.auth import User
 from services.auth import UserServices, TokenServices
 from services.telegram import TelegramInitDataService
@@ -47,6 +46,7 @@ def get_pwd_context():
 
 def get_user_services(db: SessionDep, pwd_context: Annotated[CryptContext, Depends(get_pwd_context)]) -> UserServices:
     return UserServices(pwd_context=pwd_context, db=db)
+
 
 UserServicesDep = Annotated[UserServices, Depends(get_user_services)]
 

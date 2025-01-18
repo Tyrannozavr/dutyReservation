@@ -1,12 +1,10 @@
 import unittest
-from unittest.mock import patch
-from urllib.parse import urlencode, parse_qsl
+from urllib.parse import urlencode
 
 import pytest
 from fastapi import HTTPException
 
-from models.pydantic.auth import TelegramUserInitData, \
-    TelegramInitData  # Ensure this import is correct based on your project structure
+from models.pydantic.auth import TelegramInitData  # Ensure this import is correct based on your project structure
 from services.telegram import TelegramInitDataService  # Replace 'your_module' with the actual module name
 
 
@@ -41,8 +39,6 @@ class TestTelegramInitDataService(unittest.IsolatedAsyncioTestCase):
         # Check the signature
         is_valid = self.service.check_webapp_signature(query_string)
         self.assertTrue(is_valid)
-
-
 
     async def test_check_webapp_signature_invalid(self):
         # Simulate invalid data by tampering with the hash
@@ -110,4 +106,3 @@ class TestTelegramInitDataService(unittest.IsolatedAsyncioTestCase):
 
         with pytest.raises(HTTPException):
             await self.service.validated_telegram_init_data(query_string)
-

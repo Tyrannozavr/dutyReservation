@@ -36,12 +36,12 @@ class DutyRepositoriesMixin:
     async def set_duty_user(self, user_id: int, room_id: int, date: datetime.date) -> Duty | None:
         """allows to set user for date if it is still free and is not occupied by third db_session"""
         stmt = (select(Duty)
-                  .where(Duty.room_id == room_id)
-                  .where(Duty.date == date)
-                  .where(Duty.user_id.is_(None))
-                  .limit(1)
-                  .with_for_update()
-                  )
+                .where(Duty.room_id == room_id)
+                .where(Duty.date == date)
+                .where(Duty.user_id.is_(None))
+                .limit(1)
+                .with_for_update()
+                )
         record = self.db.exec(stmt).first()
         if record:
             update_stmt = (update(Duty)
@@ -71,8 +71,8 @@ class DutyRepositoriesMixin:
         duties = self.db.exec(stmt).all()
         return duties
 
+
 class DutyRepositories(DutyRepositoriesMixin):
     pass
-
 
 # duty_queries = Queries()

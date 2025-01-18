@@ -7,9 +7,8 @@ from sqlmodel import SQLModel, Session
 
 from db.repositories.duty import DutyRepositories
 from models.pydantic.types import UserOriginTypes
-
-from models.sqlmodels.auth import User  # Assuming you have this model defined
 from models.sqlmodels.auth import DutiesRoom
+from models.sqlmodels.auth import User  # Assuming you have this model defined
 
 DATABASE_URL = "sqlite:///:memory:"
 engine = create_engine(DATABASE_URL)
@@ -67,7 +66,7 @@ async def test_load_set_duty_user(db_session, duty_queries, setup_data):
         return await duty_queries.set_duty_user(user_id=user_id, room_id=room.id, date=duty_date)
 
     # Simulate 5 concurrent requests for user reservations
-    user_ids = [user_id for user_id in range(1, users_request_per_time+1)]  # Assuming user IDs are 1 through 5
+    user_ids = [user_id for user_id in range(1, users_request_per_time + 1)]  # Assuming user IDs are 1 through 5
     results = await asyncio.gather(*(try_set_duty_user(user_id) for user_id in user_ids))
 
     # Check results
@@ -81,7 +80,7 @@ async def test_load_set_duty_user(db_session, duty_queries, setup_data):
     # assert successful_reservations[0].user_id in [1, 2]
     # assert successful_reservations[1].user_id in [1, 2]
     for user_assume_reserved in range(free_duties_per_day):
-        assert successful_reservations[user_assume_reserved].user_id in list(range(1, free_duties_per_day+1))
+        assert successful_reservations[user_assume_reserved].user_id in list(range(1, free_duties_per_day + 1))
 
     # Ensure remaining attempts are None
     for i in range(free_duties_per_day, len(results)):

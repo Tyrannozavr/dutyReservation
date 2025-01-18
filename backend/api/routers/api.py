@@ -1,4 +1,5 @@
 from fastapi.routing import APIRouter
+
 from . import auth, duty, room
 
 router = APIRouter()
