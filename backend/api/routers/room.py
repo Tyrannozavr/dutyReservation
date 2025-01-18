@@ -1,12 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 
-from api.dependencies.auth import AuthorizedUserType, TokenDataDep
-from api.dependencies.database import SessionDep
+from api.dependencies.auth import TokenDataDep
 from api.dependencies.room import RoomServicesDep, RoomParamsDep, DutiesRoomUpdateParams, \
     DutiesRoomIdDp
-from db.repositories.room import RoomRepositories
 from models.pydantic.room import RoomRead
-from models.sqlmodels.auth import Duty
 
 router = APIRouter(tags=["room"])
 
@@ -20,7 +17,7 @@ async def get_rooms_by_user(
     return room
 
 
-@router.post("/", response_model=RoomRead)
+@router.post("/", response_model=RoomRead, status_code=status.HTTP_201_CREATED)
 async def create_room(
         token: TokenDataDep,
         room_data: RoomParamsDep,

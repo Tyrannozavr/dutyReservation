@@ -11,8 +11,8 @@ from models.sqlmodels.auth import User, TelegramUserData
 
 
 class TokenServices:
-    def __init__(self, secret_key: str, algorithm: str, access_expire_time: float, refresh_expire_time: float,
-                 token_type: str = "bearer"):
+    def __init__(self, secret_key: str, algorithm: str, access_expire_time: float = 60,
+                 refresh_expire_time: float = 20160, token_type: str = "bearer"):
         self.secret_key = secret_key
         self.algorithm = algorithm
         self.access_token_expire_minutes = access_expire_time
@@ -109,7 +109,6 @@ class UserServices:
         return tg_data
 
     async def create_user(self, user_data: UserDataCreate, origin: UserOriginTypes) -> User:
-        print("repo is", self.repositories)
         await self.validate_if_username_is_already_taken(username=user_data.username)
         user_db = UserDbCreate(**user_data.model_dump(),
                                hashed_password=await self._get_hashed_password(
