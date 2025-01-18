@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from db.errors.duty import DutyOccupied
 from models.pydantic.duty import DutyCreate, DutyChange
-from services.duty import DutiesServices
+from services.duty import DutyServices
 
 
 @pytest.fixture
@@ -22,7 +22,7 @@ def duty_repositories_mock(mock_db_session):
 @pytest.fixture
 def duties_services(mock_db_session, duty_repositories_mock):
     # Create an instance of DutiesServices with the mocked dependencies
-    services = DutiesServices(db=mock_db_session)
+    services = DutyServices(db=mock_db_session)
     services.repositories = duty_repositories_mock  # Inject the mock queries
     return services
 

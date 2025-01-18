@@ -9,13 +9,19 @@ from models.pydantic.duty import DutyCreate, DutyChange
 from models.sqlmodels.auth import Duty
 
 
-class DutiesServices:
+class DutyServices:
     def __init__(self, db: Session):
         self.repositories = DutyRepositories(db=db)
         self.db = db
 
     async def get_all_duties_in_room(self, room_id: int):
         return await self.repositories.get_all_duties_in_room(room_id)
+
+    async def get_all_duties_with_users_in_the_room(self, room_id: int) -> list[Duty]:
+        return await self.repositories.get_all_duties_with_users_in_the_room(room_id=room_id)
+
+    async def get_all_free_duties_in_the_room(self, room_id: int) -> list[Duty]:
+        return await self.repositories.get_all_free_duties_in_the_room(room_id=room_id)
 
     async def get_all_duties(self):
         return await self.repositories.get_all_duties()

@@ -5,7 +5,7 @@ from sqlalchemy import update
 from sqlmodel import Session, select
 
 from models.pydantic.duty import DutyChange
-from models.sqlmodels.auth import Duty
+from models.sqlmodels.auth import Duty, User
 
 
 class DutyRepositoriesMixin:
@@ -15,6 +15,16 @@ class DutyRepositoriesMixin:
     async def get_all_duties_in_room(self, room_id: int) -> list[Duty]:
         stmt = select(Duty).where(Duty.room_id == room_id)
         duties = self.db.exec(stmt).all()
+        return duties
+
+    async def get_all_free_duties_in_the_room(self, room_id: int) -> list[Duty]:
+        stmt = select(Duty).where(Duty.room_id == room_id).where(Duty.user_id.is_(None))
+        duties = self.db.exec(stmt).all()
+        return duties
+
+    async def get_all_duties_with_users_in_the_room(self, room_id: int) -> list[Duty]:
+        stmt = select(Duty, User).join(User, isouter=True).where(Duty.room_id == room_id)
+        duties = self.db.exec(stmt).scalars().all()
         return duties
 
     async def get_all_duties(self) -> Sequence[Duty]:

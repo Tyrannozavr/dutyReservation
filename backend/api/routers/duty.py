@@ -1,23 +1,31 @@
 import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Path
+from fastapi import APIRouter, Body, Path, Query
 
 from api.dependencies.auth import AuthorizedUserType
 from api.dependencies.database import SessionDep
-from api.dependencies.duty import DutyIdDp
-from api.dependencies.room import DutiesRoomIdentifierDp
+from api.dependencies.duty import DutyIdDp, DutyServicesDep
+from api.dependencies.room import DutiesRoomIdentifierDep
 from api.errors.duty import UserHasNoPermission
 from db.repositories.duty import DutyRepositories
+from models.pydantic.duty import DutiesWithUsersResponse, FreeDutiesResponse, FreeDuty, DutyWithUser
 
 router = APIRouter(prefix="/{room_identifier}")
 
 
-@router.get("/")
-async def get_all_duties_in_room(room: DutiesRoomIdentifierDp, db: SessionDep):
-    duty_queries = DutyRepositories(db=db)
-    duties_list = await duty_queries.get_all_duties_in_room(room_id=room.id)
-    return duties_list
+@router.get("/", response_model=DutiesWithUsersResponse | FreeDutiesResponse)
+async def get_all_duties_in_room(
+        room: DutiesRoomIdentifierDep,
+        duty_services: DutyServicesDep,
+        free: bool = Query(default=False, description="Set true to retrieve only free duties")
+):
+    if free:
+        free_duties = await duty_services.get_all_free_duties_in_the_room(room_id=room.id)
+        return FreeDutiesResponse(duties=[FreeDuty(**duty.model_dump()) for duty in free_duties])
+    else:
+        duties =  await duty_services.get_all_duties_with_users_in_the_room(room_id=room.id)
+        return DutiesWithUsersResponse(duties=[DutyWithUser(**duty.model_dump()) for duty in duties])
 
 
 @router.post("/")
@@ -25,7 +33,7 @@ async def reserve_duty(
         user: AuthorizedUserType,
         db: SessionDep,
         date: Annotated[datetime.date, Body()],
-        room: DutiesRoomIdentifierDp
+        room: DutiesRoomIdentifierDep
 ):
     duty_queries = DutyRepositories(db=db)
     duty = await duty_queries.create_duty(user_id=user.id, room_id=room.id, date=date)

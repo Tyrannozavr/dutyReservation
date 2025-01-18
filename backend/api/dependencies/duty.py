@@ -1,19 +1,11 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Path
+from fastapi import Depends, Path
 
 from api.dependencies.database import SessionDep
 from db.repositories.duty import DutyRepositories
 from db.repositories.room import RoomRepositories
-from models.sqlmodels.auth import DutiesRoom
-
-
-async def get_room_by_identifier(room_identifier: Annotated[str, Path()], db: SessionDep) -> DutiesRoom:
-    duty_queries = DutyRepositories(db=db)
-    room = await duty_queries.get_room_by_identifier(room_identifier)
-    if not room:
-        raise HTTPException(status_code=404, detail="Room not found")
-    return room
+from services.duty import DutyServices
 
 
 async def get_duty_queries(db: SessionDep) -> DutyRepositories:
@@ -23,7 +15,10 @@ async def get_duty_queries(db: SessionDep) -> DutyRepositories:
 async def get_room_queries(db: SessionDep) -> RoomRepositories:
     return RoomRepositories(db=db)
 
+async def get_duty_services(db: SessionDep) -> DutyServices:
+    return DutyServices(db=db)
 
 DutyIdDp = Annotated[int, Path()]
 DutyRepositoriesDep = Annotated[DutyRepositories, Depends(get_duty_queries)]
 RoomRepositoriesDep = Annotated[RoomRepositories, Depends(get_room_queries)]
+DutyServicesDep = Annotated[DutyServices, Depends(get_duty_services)]

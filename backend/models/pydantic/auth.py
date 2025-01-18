@@ -110,3 +110,10 @@ class UserDataCreate(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     password: str | None = None
+
+class UserRead(BaseModel):
+    username: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    link: str
+    model_config = ConfigDict(from_attributes=True)

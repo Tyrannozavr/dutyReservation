@@ -8,7 +8,7 @@ from api.errors.duty import UserHasNoPermission
 from db.repositories.room import RoomRepositories  # Замените на ваш модуль
 from models.pydantic.room import RoomUpdateSettings, RoomCreate, DateParam
 from models.sqlmodels.auth import *
-from services.duty import DutiesServices
+from services.duty import DutyServices
 from services.room import RoomServices
 
 
@@ -29,7 +29,7 @@ def room_services(test_db):
 
 @pytest.fixture(scope="function")
 def duty_services(test_db):
-    return DutiesServices(db=test_db)
+    return DutyServices(db=test_db)
 
 
 @pytest.mark.asyncio
