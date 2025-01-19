@@ -10,7 +10,7 @@ class DateParam(BaseModel):
 
 class RoomCreate(BaseModel):
     date: DateParam
-    name: str = Field(description="Название голосования")
+    name: str | None = Field(description="Название голосования", default=None)
     duties_per_day: int = Field(gt=0, default=1, description="Дежурств в день")
     is_multiple_selection: bool = Field(default=False,
                                         description="Может ли один человек выбрать несколько дежурств в один месяц")
