@@ -1,20 +1,15 @@
-import datetime
-from typing import Annotated
+from fastapi import APIRouter, Query
 
-from fastapi import APIRouter, Body, Path, Query
-
-from api.dependencies.auth import AuthorizedUserType, TokenDataDep
-from api.dependencies.database import SessionDep
-from api.dependencies.duty import DutyIdDp, DutyServicesDep, DateDep
+from api.dependencies.auth import TokenDataDep
+from api.dependencies.duty import DutyIdDp, DutyServicesDep, DutyDataDep
 from api.dependencies.room import DutiesRoomIdentifierDep
-from api.errors.duty import UserHasNoPermission
-from db.repositories.duty import DutyRepositories
 from models.pydantic.auth import UserRead
 from models.pydantic.duty import DutiesWithUsersResponse, FreeDutiesResponse, FreeDuty, DutyWithUser, DutyTaken
 from tests.services.integrational_tests.test_room import duty_services
 
 router = APIRouter(prefix="/{room_identifier}")
 router_without_room = APIRouter()
+
 
 @router.get("/", response_model=DutiesWithUsersResponse | FreeDutiesResponse)
 async def get_all_duties_in_room(
@@ -41,26 +36,28 @@ async def get_all_duties_in_room(
 @router.post("/", response_model=DutyTaken)
 async def reserve_duty(
         token_data: TokenDataDep,
-        date: DateDep,
+        duty_data: DutyDataDep,
         room: DutiesRoomIdentifierDep,
         duty_services: DutyServicesDep,
 ):
-    duty = await duty_services.set_duty_user_if_free(
+    duty = await duty_services.set_duty_user(
         user_id=token_data.user_id,
         room_id=room.id,
-        date=date
+        date=duty_data.duty_date
     )
     return duty
+
 
 @router.put("/", response_model=DutyTaken)
 async def reserve_or_change_duty(
         token_data: TokenDataDep,
-        date: DateDep,
+        duty_data: DutyDataDep,
         room: DutiesRoomIdentifierDep,
         duty_services: DutyServicesDep
 ):
     """Reserves a date if the user can set one extra duty or delete last duty and takes a new one with requested date"""
-    duty = await duty_services.set_or_change_duty_user(user_id=token_data.user_id, room_id=room.id, date=date)
+    duty = await duty_services.set_or_change_duty_user(user_id=token_data.user_id, room_id=room.id,
+                                                       date=duty_data.duty_date)
     return duty
 
 
@@ -68,10 +65,10 @@ async def reserve_or_change_duty(
 async def change_duty(
         duty_id: DutyIdDp,
         token_data: TokenDataDep,
-        date: DateDep,
+        duty_data: DutyDataDep,
         duty_services: DutyServicesDep
 ):
-    duty = await duty_services.change_duty_date(duty_id=duty_id, user_id=token_data.user_id, date=date)
+    duty = await duty_services.change_duty_date(duty_id=duty_id, user_id=token_data.user_id, date=duty_data.duty_date)
     return duty
 
 

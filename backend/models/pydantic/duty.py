@@ -34,3 +34,5 @@ class DutiesWithUsersResponse(BaseModel):
 class FreeDutiesResponse(BaseModel):
     duties: list[FreeDuty]
 
+class DutyData(BaseModel):
+    duty_date: date

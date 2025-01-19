@@ -69,8 +69,8 @@ class DutyServices:
         else:
             duties = await self.duty_repository.get_all_users_duty_in_the_room(user_id=user_id, room_id=room_id)
             last_duty = duties[-1]
-            await self.duty_repository.delete_duty(duty=last_duty)
-
+            last_duty.user_id = None
+            self.db.add(last_duty)
             duty = await self.set_duty_user(user_id=user_id, room_id=room_id, date=date)
         try:
             self.db.commit()
