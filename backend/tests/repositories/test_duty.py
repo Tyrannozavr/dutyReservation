@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import SQLModel, Session
 
+from api.errors.duty import DutyIsAlreadyTaken
 from db.repositories.duty import DutyRepositories
 from models.pydantic.duty import DutyChange
 from models.pydantic.types import UserOriginTypes
@@ -81,8 +82,9 @@ async def test_set_duty_user(db_session, duty_queries, setup_data):
     second_user = await duty_queries.set_duty_user_if_free(user_id=2, room_id=room.id, date=datetime.date.today())
     assert second_user.date == duty_date
     # try to occupy date which is already taken (there was 2 free duty on this date)
-    third_user = await duty_queries.set_duty_user_if_free(user_id=3, room_id=room.id, date=datetime.date.today())
-    assert third_user is None
+    with pytest.raises(DutyIsAlreadyTaken):
+        third_user = await duty_queries.set_duty_user_if_free(user_id=3, room_id=room.id, date=datetime.date.today())
+        assert third_user is None
 
 
 @pytest.mark.asyncio

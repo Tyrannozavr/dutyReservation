@@ -5,6 +5,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlmodel import SQLModel, Session
 
+from api.errors.duty import DutyIsAlreadyTaken
 from db.repositories.duty import DutyRepositories
 from models.pydantic.types import UserOriginTypes
 from models.sqlmodels.auth import DutiesRoom
@@ -40,7 +41,7 @@ def setup_data():
     with Session(engine) as db_session:
         db_session.add(user)
         db_session.commit()
-        room = DutiesRoom(id=1, owner_id=user.id)
+        room = DutiesRoom(id=1, owner_id=user.id, year=datetime.date.today().year, month=datetime.date.today().year)
         db_session.add(room)
         return user, room
 
@@ -63,7 +64,10 @@ async def test_load_set_duty_user(db_session, duty_queries, setup_data):
     duty_date = datetime.date.today()
 
     async def try_set_duty_user(user_id):
-        return await duty_queries.set_duty_user_if_free(user_id=user_id, room_id=room.id, date=duty_date)
+        try:
+            return await duty_queries.set_duty_user_if_free(user_id=user_id, room_id=room.id, date=duty_date)
+        except DutyIsAlreadyTaken:
+            pass
 
     # Simulate 5 concurrent requests for user reservations
     user_ids = [user_id for user_id in range(1, users_request_per_time + 1)]  # Assuming user IDs are 1 through 5

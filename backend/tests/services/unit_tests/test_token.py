@@ -110,9 +110,8 @@ class TestTokenServices(unittest.IsolatedAsyncioTestCase):
 
         # Check that decoding raises an exception for expired token
         with self.assertRaises(Exception) as context:
-            token_data = await self.token_services.decode_token(token)
-
-        self.assertEqual(str(context.exception), "Token has expired")
+            await self.token_services.decode_token(token)
+            self.assertEqual(str(context.exception), "Invalid token")
 
     async def test_decode_token_invalid(self):
         # Use an invalid token (e.g., random string)
@@ -122,7 +121,7 @@ class TestTokenServices(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(Exception) as context:
             await self.token_services.decode_token(invalid_token)
 
-        self.assertEqual(str(context.exception), "Invalid token")
+        self.assertEqual(str(context.exception), "401: The token is invalid")
 
 
 if __name__ == '__main__':

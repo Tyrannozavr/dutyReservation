@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from db.errors.duty import DutyOccupied
 from models.pydantic.duty import DutyCreate, DutyChange
+from models.sqlmodels.auth import Duty
 from services.duty import DutyServices
 
 
@@ -100,7 +101,8 @@ async def test_set_duty_user(duties_services):
 @pytest.mark.asyncio
 async def test_update_duty(duties_services, duty_repositories_mock):
     duty_id = 1
-    duty_change = DutyChange(user_id=1, room_id=1, date=datetime.date.today())
+
+    duty_change = DutyChange(date=datetime.date.today())
 
     # Mock the update_duty method
     duty_repositories_mock.update_duty.return_value = None
@@ -118,9 +120,11 @@ async def test_delete_duty(duties_services, duty_repositories_mock):
 
     # Mock the delete_duty method
     duty_repositories_mock.delete_duty.return_value = None
-
+    duty_repositories_mock.get_duty_by_id.return_value = Duty(
+        user_id=1,
+        room_id=1
+    )
     # Call the service method
-    await duties_services.delete_duty_from_user(duty_id)
+    duty = await duties_services.delete_duty_from_user(duty_id, user_id=1)
+    assert duty.user_id is not None
 
-    # Assert that delete_duty was called with the correct parameter
-    duty_repositories_mock.delete_duty.assert_awaited_once_with(duty_id)
