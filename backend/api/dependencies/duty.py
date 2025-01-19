@@ -1,6 +1,7 @@
+import datetime
 from typing import Annotated
 
-from fastapi import Depends, Path
+from fastapi import Depends, Path, Body
 
 from api.dependencies.database import SessionDep
 from db.repositories.duty import DutyRepositories
@@ -22,3 +23,4 @@ DutyIdDp = Annotated[int, Path()]
 DutyRepositoriesDep = Annotated[DutyRepositories, Depends(get_duty_queries)]
 RoomRepositoriesDep = Annotated[RoomRepositories, Depends(get_room_queries)]
 DutyServicesDep = Annotated[DutyServices, Depends(get_duty_services)]
+DateDep = Annotated[datetime.date, Body()]

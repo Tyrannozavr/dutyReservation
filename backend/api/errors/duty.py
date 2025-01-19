@@ -10,8 +10,11 @@ class UserHasNoPermission(HTTPException):
 
 class DutyIsAlreadyTaken(HTTPException):
     def __init__(self):
-        super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail="The date is already taken")
+        super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail="The date is already taken or there is no such"
+                                                                       " a duty in this room")
 
 class UserAlreadyTookAllDuties(HTTPException):
     def __init__(self):
         super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail="The user already have took all duties")
+
+DutyDoesntExist = HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The duty doesn't exist")

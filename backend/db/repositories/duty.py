@@ -39,8 +39,14 @@ class DutyRepositoriesMixin:
         duty = self.db.exec(stmt).first()
         return duty
 
+    async def get_free_duty_by_date(self, date: datetime.date) -> Duty | None:
+        stmt = select(Duty).where(Duty.date == date).where(Duty.user_id.is_(None))
+        duties = self.db.exec(stmt)
+        return duties.first()
+
+
     async def get_all_users_duty_in_the_room(self, user_id: int, room_id: int) -> list[Duty]:
-        stmt = select(Duty).where(user_id == user_id).where(room_id == room_id)
+        stmt = select(Duty).where(Duty.user_id == user_id).where(Duty.room_id == room_id).order_by(Duty.id.asc())
         duties = self.db.exec(stmt)
         return duties.all()
 
@@ -49,7 +55,7 @@ class DutyRepositoriesMixin:
         self.db.add(duty)
         return duty
 
-    async def set_duty_user(self, user_id: int, room_id: int, date: datetime.date) -> Duty | None:
+    async def set_duty_user_if_free(self, user_id: int, room_id: int, date: datetime.date) -> Duty | None:
         """allows to set user for date if it is still free and is not occupied by third db_session"""
         stmt = (select(Duty)
                 .where(Duty.room_id == room_id)

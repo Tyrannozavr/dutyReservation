@@ -76,12 +76,12 @@ async def test_set_duty_user(db_session, duty_queries, setup_data):
     ]
     db_session.commit()
     duty_date = datetime.date.today()
-    first_user = await duty_queries.set_duty_user(user_id=1, room_id=room.id, date=duty_date)
+    first_user = await duty_queries.set_duty_user_if_free(user_id=1, room_id=room.id, date=duty_date)
     assert first_user.date == duty_date
-    second_user = await duty_queries.set_duty_user(user_id=2, room_id=room.id, date=datetime.date.today())
+    second_user = await duty_queries.set_duty_user_if_free(user_id=2, room_id=room.id, date=datetime.date.today())
     assert second_user.date == duty_date
     # try to occupy date which is already taken (there was 2 free duty on this date)
-    third_user = await duty_queries.set_duty_user(user_id=3, room_id=room.id, date=datetime.date.today())
+    third_user = await duty_queries.set_duty_user_if_free(user_id=3, room_id=room.id, date=datetime.date.today())
     assert third_user is None
 
 

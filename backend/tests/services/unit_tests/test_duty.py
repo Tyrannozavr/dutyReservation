@@ -84,14 +84,14 @@ async def test_set_duty_user(duties_services):
     # Настройка возврата мока
     expected_duty = MagicMock()  # Здесь можно создать экземпляр Duty или просто мок
     # expected_duty = MagicMock()  # Здесь можно создать экземпляр Duty или просто мок
-    duties_services.duty_repository.set_duty_user.return_value = expected_duty
+    duties_services.duty_repository.set_duty_user_if_free.return_value = expected_duty
 
     # Вызов метода
     result = await duties_services.set_duty_user(user_id=user_id, room_id=room_id, date=duty_date)
 
     # Проверка, что метод был вызван с правильными аргументами
-    duties_services.duty_repository.set_duty_user.assert_awaited_once_with(user_id=user_id, room_id=room_id,
-                                                                           date=duty_date)
+    duties_services.duty_repository.set_duty_user_if_free.assert_awaited_once_with(user_id=user_id, room_id=room_id,
+                                                                                   date=duty_date)
 
     # Проверка, что результат совпадает с ожидаемым
     assert result == expected_duty
@@ -120,7 +120,7 @@ async def test_delete_duty(duties_services, duty_repositories_mock):
     duty_repositories_mock.delete_duty.return_value = None
 
     # Call the service method
-    await duties_services.delete_duty(duty_id)
+    await duties_services.delete_duty_from_user(duty_id)
 
     # Assert that delete_duty was called with the correct parameter
     duty_repositories_mock.delete_duty.assert_awaited_once_with(duty_id)

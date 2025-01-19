@@ -15,3 +15,6 @@ class UserAlreadyExist(HTTPException):
 
     def __init__(self):
         super().__init__(status_code=status.HTTP_409_CONFLICT, detail="User already exist")
+
+TokenHasExpired = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="The token has expired")
+InvalidToken = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="The token is invalid")

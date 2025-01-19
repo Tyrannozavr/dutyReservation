@@ -1,10 +1,11 @@
 from datetime import datetime, timezone, timedelta
 
 import jwt
+from jwt import InvalidTokenError
 from passlib.context import CryptContext
 from sqlmodel import Session
 
-from api.errors.auth import IncorrectUsernameOrPassword, UserAlreadyExist
+from api.errors.auth import IncorrectUsernameOrPassword, UserAlreadyExist, TokenHasExpired, InvalidToken
 from db.repositories.auth import UserRepositories
 from models.pydantic.auth import Token, TokenData, UserDbCreate, UserOriginTypes, UserDataCreate, TelegramUserDataIn
 from models.sqlmodels.auth import User, TelegramUserData
@@ -51,12 +52,12 @@ class TokenServices:
             # Check if the token is expired
             if 'exp' in data and datetime.fromtimestamp(data['exp'], timezone.utc) < datetime.now(timezone.utc):
                 print("is expired")
-                raise Exception("Token has expired")
+                raise TokenHasExpired
             return TokenData(**data)
         except jwt.ExpiredSignatureError:
-            raise Exception("Token has expired")
+            raise TokenHasExpired
         except jwt.InvalidTokenError:
-            raise Exception("Invalid token")
+            raise InvalidToken
 
 
 class UserServices:
