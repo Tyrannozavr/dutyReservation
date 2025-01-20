@@ -22,6 +22,7 @@ class RoomRead(BaseModel):
     id: int
     identifier: uuid.UUID
     is_multiple_selection: bool
+    name: str
 
 
 class RoomUpdateSettings(BaseModel):
