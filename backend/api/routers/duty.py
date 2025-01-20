@@ -48,8 +48,8 @@ async def reserve_duty(
     return duty
 
 
-@router.put("/", response_model=DutyTaken)
-async def reserve_or_change_duty(
+@router.put("/", response_model=DutyTaken, deprecated=True)
+async def reserve_or_change_duty_date(
         token_data: TokenDataDep,
         duty_data: DutyDataDep,
         room: DutiesRoomIdentifierDep,
