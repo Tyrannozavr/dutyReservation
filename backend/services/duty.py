@@ -3,7 +3,8 @@ import datetime
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
 
-from api.errors.duty import UserAlreadyTookAllDuties, DutyDoesntExist, UserHasNoPermission, DutyIsAlreadyTaken
+from api.errors.duty import UserAlreadyTookAllDuties, DutyDoesntExist, UserHasNoPermission, DutyIsAlreadyTaken, \
+    DutyDoesntMatchRoom
 from db.errors.duty import DutyOccupied
 from db.repositories.duty import DutyRepositories
 from db.repositories.room import RoomRepositories
@@ -66,6 +67,8 @@ class DutyServices:
     async def set_duty_user_by_duty_id(self, duty_id: int, user_id: int, room_id: int) -> Duty:
         await self.validate_user_can_reserve_duty(user_id=user_id, room_id=room_id)
         duty = await self.duty_repository.get_duty_by_id(duty_id=duty_id)
+        if duty.room_id != room_id:
+            raise DutyDoesntMatchRoom
         if duty.user_id is None:
             duty.user_id = user_id
         self.db.add(duty)

@@ -10,7 +10,7 @@ from core.config import get_settings
 from db.database import DATABASE_URL, engine
 from main import app
 from models.pydantic.auth import UserDataCreate, TokenData
-from models.pydantic.room import RoomCreate
+from models.pydantic.room import RoomCreate, DutyCreate
 from models.pydantic.types import UserOriginTypes
 from services.auth import UserServices, TokenServices
 from services.duty import DutyServices
@@ -86,9 +86,15 @@ class TestDutyHandlers(unittest.IsolatedAsyncioTestCase):
     async def create_test_room(self):
         room_data = RoomCreate(
             is_multiple_selection=False,
-            duty_dates=[
-                datetime.date(2025, 2, 2),
-                datetime.date(2025, 2, 12),
+            duty_list=[
+                DutyCreate(
+                    duty_date=datetime.date(2025, 2, 2),
+                    name="Hello, world"
+                ),
+                DutyCreate(
+                    duty_date=datetime.date(2025, 2, 12)
+                ),
+
             ]
         )
         room = await self.room_services.create_room(room_data=room_data, owner_id=self.owner_id)
