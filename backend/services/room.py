@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from typing import Any
 
@@ -16,7 +17,6 @@ class RoomServices:
         self.repositories = RoomRepositories(db=db) if not repositories else repositories
         self.db = db
 
-
     async def get_user_rooms(self, user_id):
         return await self.repositories.get_all_users_rooms(user_id=user_id)
 
@@ -24,18 +24,14 @@ class RoomServices:
         room = await self.repositories.create_room(
             name=room_data.name,
             owner_id=owner_id,
-            duties_per_day=room_data.duties_per_day,
             is_multiple_selection=room_data.is_multiple_selection,
-            year=room_data.date.year,
-            month=room_data.date.month
         )
         self.db.commit()
-        await self.repositories.create_duties_for_room(
-            room_id=room.id,
-            year=room_data.date.year,
-            month=room_data.date.month,
-            duties_per_day=room_data.duties_per_day,
-        )
+        if room_data.duty_dates:
+            await self.repositories.create_duties_for_room(
+                room_id=room.id,
+                dates=room_data.duty_dates
+            )
         self.db.commit()
         self.db.refresh(room)
         return room
@@ -64,13 +60,13 @@ class RoomServices:
     async def update_room(self, user_id, room_id: int, update_data: RoomUpdateSettings) -> DutiesRoom:
         await self.validate_is_user_owner(user_id=user_id, room_id=room_id)
         room = await self.get_room_by_id(room_id=room_id)
-        room = room.sqlmodel_update(update_data)
-        await self.repositories.delete_duties_per_room(room_id=room_id)
+        if update_data.name:
+            room.name = update_data.name
+        if update_data.is_multiple_selection:
+            room.is_multiple_selection = update_data.is_multiple_selection
         await self.repositories.create_duties_for_room(
             room_id=room.id,
-            year=room.year,
-            month=room.month,
-            duties_per_day=update_data.duties_per_day,
+            dates=update_data.extra_duties_dates if update_data.extra_duties_dates else []
         )
         self.db.add(room)
         try:

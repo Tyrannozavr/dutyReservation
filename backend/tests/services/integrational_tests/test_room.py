@@ -5,8 +5,8 @@ import pytest
 from sqlmodel import create_engine, Session
 
 from api.errors.duty import UserHasNoPermission
-from db.repositories.room import RoomRepositories  # Замените на ваш модуль
-from models.pydantic.room import RoomUpdateSettings, RoomCreate, DateParam
+from db.repositories.room import RoomRepositories
+from models.pydantic.room import RoomUpdateSettings, RoomCreate
 from models.sqlmodels.auth import *
 from services.duty import DutyServices
 from services.room import RoomServices
@@ -41,14 +41,8 @@ async def test_create_room_integration(room_services, duty_services):
     duties_per_day = 2
 
     # Вызов метода для создания комнаты
-    room_date = DateParam(
-        year=year,
-        month=month
-    )
     room_data = RoomCreate(
         name=name,
-        date=room_date,
-        duties_per_day=duties_per_day,
     )
     result = await room_services.create_room(
         owner_id=owner_id,
@@ -66,10 +60,6 @@ async def test_create_room_integration(room_services, duty_services):
     assert rooms_in_db[0].name == name
 
     days_in_month = (datetime.date(year=year, month=month + 1, day=1) - timedelta(days=1)).day
-    expected_duties = days_in_month * duties_per_day
-
-    duties = await duty_services.get_all_duties()
-    assert len(duties) == expected_duties
 
 
 @pytest.mark.asyncio
@@ -77,22 +67,13 @@ async def test_create_room_with_invalid_data(room_services):
     # Arrange
     name = ""
     owner_id = 1
-    year = 2023
-    month = 10
-    duties_per_day = -1  # Invalid value
     is_multiple_selection = True
 
     # Act & Assert
     with pytest.raises(ValueError):
-        room_date = DateParam(
-            year=year,
-            month=month
-        )
         room_data = RoomCreate(
             name=name,
-            date=room_date,
-            duties_per_day=duties_per_day,
-            is_multiple_selection=is_multiple_selection
+            is_multiple_selection=12
         )
         await room_services.create_room(
             owner_id=owner_id,
@@ -126,45 +107,26 @@ async def test_update_room(room_services):
     user_id = 1
 
     name = "Hello, world"
-    year = 2023
-    month = 10
-    duties_per_day = 1
-    room_date = DateParam(
-        year=year,
-        month=month
-    )
     room_data = RoomCreate(
         name=name,
-        date=room_date,
-        duties_per_day=duties_per_day,
         is_multiple_selection=False
     )
     room = await room_services.create_room(
         owner_id=user_id,
         room_data=room_data
     )
-    update_data = RoomUpdateSettings(is_multiple_selection=True, duties_per_day=5)  # Invalid value
+    update_data = RoomUpdateSettings(is_multiple_selection=True, name="New name")
     room = await room_services.update_room(room_id=room.id, user_id=user_id, update_data=update_data)
-    assert room.duties_per_day == 5
     assert room.is_multiple_selection == True
-    assert room.name == "Hello, world"
+    assert room.name == "New name"
 
 
 @pytest.mark.asyncio
 async def test_update_room_invalid_data(room_services):
     user_id = 1
     name = "Hello, world"
-    year = 2023
-    month = 10
-    duties_per_day = 1
-    room_date = DateParam(
-        year=year,
-        month=month
-    )
     room_data = RoomCreate(
         name=name,
-        date=room_date,
-        duties_per_day=duties_per_day,
         is_multiple_selection=False
     )
     room = await room_services.create_room(
@@ -174,7 +136,7 @@ async def test_update_room_invalid_data(room_services):
 
     # Act & Assert
     with pytest.raises(ValueError):
-        update_data = RoomUpdateSettings(is_multiple_selection=True, duties_per_day=-5)  # Invalid value
+        update_data = RoomUpdateSettings(is_multiple_selection=45)
         await room_services.update_room(user_id, room.id, update_data)
 
 
@@ -182,17 +144,8 @@ async def test_update_room_invalid_data(room_services):
 async def test_update_room_invalid_user(room_services):
     user_id = 1
     name = "Hello, world"
-    year = 2023
-    month = 10
-    duties_per_day = 1
-    room_date = DateParam(
-        year=year,
-        month=month
-    )
     room_data = RoomCreate(
         name=name,
-        date=room_date,
-        duties_per_day=duties_per_day,
         is_multiple_selection=False
     )
     room = await room_services.create_room(
@@ -202,7 +155,7 @@ async def test_update_room_invalid_user(room_services):
 
     # Act & Assert
     with pytest.raises(UserHasNoPermission):
-        update_data = RoomUpdateSettings(is_multiple_selection=True, duties_per_day=5)  # Invalid value
+        update_data = RoomUpdateSettings(is_multiple_selection=True)  # Invalid value
         await room_services.update_room(user_id + 1, room.id, update_data)
 
 

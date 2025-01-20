@@ -1,30 +1,26 @@
+import datetime
 import uuid
 
 from pydantic import BaseModel, Field
 
 
-class DateParam(BaseModel):
-    month: int = Field(gt=0, lt=13, description="Месяц дежурств")
-    year: int = Field(ge=0, description="Год месяца")
 
 
 class RoomCreate(BaseModel):
-    date: DateParam
     name: str | None = Field(description="Название голосования", default=None)
-    duties_per_day: int = Field(gt=0, default=1, description="Дежурств в день")
     is_multiple_selection: bool = Field(default=False,
                                         description="Может ли один человек выбрать несколько дежурств в один месяц")
+    duty_dates: list[datetime.date] | None = Field(default=None, description="Даты дежурств, которые будут автоматически "
+                                                                             "созданы при создании комнаты")
 
 
 class RoomRead(BaseModel):
     id: int
     identifier: uuid.UUID
     is_multiple_selection: bool
-    duties_per_day: int
-    month: int
-    year: int
 
 
 class RoomUpdateSettings(BaseModel):
+    name: str | None = None
     is_multiple_selection: bool
-    duties_per_day: int = Field(gt=0)
+    extra_duties_dates: list[datetime.date] | None = Field(default=None, description="Duties to add to this room")

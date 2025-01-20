@@ -55,26 +55,11 @@ async def test_get_room_by_identifier(db_session, setup_rooms, room_queries):
 @pytest.mark.asyncio
 async def test_create_room(db_session, room_queries):
     owner_id = 1
-    room = await room_queries.create_room(owner_id=owner_id, name="testings", month=1, year=1)
+    room = await room_queries.create_room(owner_id=owner_id, name="testings")
     assert room is not None
     assert room.owner_id == owner_id
     assert room.name == "testings"
 
-
-@pytest.mark.asyncio
-async def test_create_duties_for_room(db_session, room_queries, duty_queries):
-    room_id = 15
-    year = 2023
-    month = 10
-    duties_per_day = 2
-    days_in_month = (datetime.date(year=year, month=month + 1, day=1) - timedelta(days=1)).day
-    expected_duties = days_in_month * duties_per_day
-    duties = await room_queries.create_duties_for_room(room_id=room_id, month=month, year=year,
-                                                       duties_per_day=duties_per_day)
-    assert expected_duties == len(duties)
-    duties_in_db = await duty_queries.get_all_duties_in_room(room_id=room_id)
-    assert len(duties_in_db) == len(duties)
-    print(duties_in_db)
 
 
 @pytest.mark.asyncio

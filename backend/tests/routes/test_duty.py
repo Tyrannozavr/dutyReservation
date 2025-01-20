@@ -10,7 +10,7 @@ from core.config import get_settings
 from db.database import DATABASE_URL, engine
 from main import app
 from models.pydantic.auth import UserDataCreate, TokenData
-from models.pydantic.room import RoomCreate, DateParam
+from models.pydantic.room import RoomCreate
 from models.pydantic.types import UserOriginTypes
 from services.auth import UserServices, TokenServices
 from services.duty import DutyServices
@@ -84,14 +84,12 @@ class TestDutyHandlers(unittest.IsolatedAsyncioTestCase):
         self.token = await token_service._create_access_token(token_data)
 
     async def create_test_room(self):
-        duties_date = DateParam(
-            month=2,
-            year=2025
-        )
         room_data = RoomCreate(
             is_multiple_selection=False,
-            duties_per_day=1,
-            date=duties_date
+            duty_dates=[
+                datetime.date(2025, 2, 2),
+                datetime.date(2025, 2, 12),
+            ]
         )
         room = await self.room_services.create_room(room_data=room_data, owner_id=self.owner_id)
         self.room_identifier = room.identifier
@@ -103,7 +101,7 @@ class TestDutyHandlers(unittest.IsolatedAsyncioTestCase):
             headers={"Authorization": f"Bearer {self.token}"},
             json={"duty_date": new_date}
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
         self.assertIn("id", response.json())  # Adjust according to your actual response structure
         duty = response.json()
         return duty
@@ -127,7 +125,7 @@ class TestDutyHandlers(unittest.IsolatedAsyncioTestCase):
             headers={"Authorization": f"Bearer {self.token}"}
         )
         self.assertEqual(response.json(), {"status": "success"})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
 
     async def test_change_duty(self):
         duty = await self.test_reserve_date()
@@ -136,7 +134,6 @@ class TestDutyHandlers(unittest.IsolatedAsyncioTestCase):
             headers={"Authorization": f"Bearer {self.token}"},
             json={"duty_date": "2025-02-12"}
         )
-
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
         self.assertIn("date", response.json())
 

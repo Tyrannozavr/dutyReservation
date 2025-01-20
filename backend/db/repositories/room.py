@@ -31,19 +31,18 @@ class RoomRepositoriesMixin:
         room = self.db.exec(stmt).first()
         return room
 
-    async def create_room(self, owner_id: int, month: int, year: int, name: str = "", duties_per_day: int = 1,
+    async def create_room(self, owner_id: int, name: str = "",
                           is_multiple_selection: bool = False) -> DutiesRoom:
-        room = DutiesRoom(owner_id=owner_id, duties_per_day=duties_per_day, name=name,
-                          is_multiple_selection=is_multiple_selection, year=year, month=month
+        room = DutiesRoom(owner_id=owner_id, name=name,
+                          is_multiple_selection=is_multiple_selection
                           )
         self.db.add(room)
         return room
 
-    async def create_duties_for_room(self, room_id: int, month: int, year: int, duties_per_day: int):
-        days_per_month = (datetime.date(year=year, month=month + 1, day=1) - datetime.timedelta(days=1)).day
+    async def create_duties_for_room(self, room_id: int, dates: list[datetime.date]):
         available_duties = [
-            Duty(room_id=room_id, date=datetime.date(year=year, month=month, day=day))
-            for _ in range(duties_per_day) for day in range(1, days_per_month + 1)
+            Duty(room_id=room_id, date=duty_date)
+            for duty_date in dates
         ]
 
         self.db.add_all(available_duties)
