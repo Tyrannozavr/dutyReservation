@@ -27,10 +27,10 @@ class RoomServices:
             is_multiple_selection=room_data.is_multiple_selection,
         )
         self.db.commit()
-        if room_data.duty_dates:
+        if room_data.duty_list:
             await self.repositories.create_duties_for_room(
                 room_id=room.id,
-                dates=room_data.duty_dates
+                duty_list=room_data.duty_list
             )
         self.db.commit()
         self.db.refresh(room)
@@ -64,9 +64,10 @@ class RoomServices:
             room.name = update_data.name
         if update_data.is_multiple_selection:
             room.is_multiple_selection = update_data.is_multiple_selection
-        await self.repositories.create_duties_for_room(
+        if update_data.extra_duties:
+            await self.repositories.create_duties_for_room(
             room_id=room.id,
-            dates=update_data.extra_duties_dates if update_data.extra_duties_dates else []
+            duty_list=update_data.extra_duties
         )
         self.db.add(room)
         try:

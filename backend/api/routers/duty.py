@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 
 from api.dependencies.auth import TokenDataDep
-from api.dependencies.duty import DutyIdDp, DutyServicesDep, DutyDataDep
+from api.dependencies.duty import DutyIdDp, DutyServicesDep, DutyDataDep, DutyIdBodyDp
 from api.dependencies.room import DutiesRoomIdentifierDep
 from models.pydantic.auth import UserRead
 from models.pydantic.duty import DutiesWithUsersResponse, FreeDutiesResponse, FreeDuty, DutyWithUser, DutyTaken
@@ -36,14 +36,14 @@ async def get_all_duties_in_room(
 @router.post("/", response_model=DutyTaken)
 async def reserve_duty(
         token_data: TokenDataDep,
-        duty_data: DutyDataDep,
+        duty_data: DutyIdBodyDp,
         room: DutiesRoomIdentifierDep,
         duty_services: DutyServicesDep,
 ):
-    duty = await duty_services.set_duty_user(
+    duty = await duty_services.set_duty_user_by_duty_id(
         user_id=token_data.user_id,
         room_id=room.id,
-        date=duty_data.duty_date
+        duty_id=duty_data.duty_id
     )
     return duty
 

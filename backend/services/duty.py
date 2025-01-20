@@ -63,6 +63,20 @@ class DutyServices:
         self.db.commit()
         return duty
 
+    async def set_duty_user_by_duty_id(self, duty_id: int, user_id: int, room_id: int) -> Duty:
+        await self.validate_user_can_reserve_duty(user_id=user_id, room_id=room_id)
+        duty = await self.duty_repository.get_duty_by_id(duty_id=duty_id)
+        if duty.user_id is None:
+            duty.user_id = user_id
+        self.db.add(duty)
+        try:
+            self.db.commit()
+            return duty
+
+        except Exception as e:
+            print(f"set duty by id error {e}")
+            self.db.rollback()
+
     async def set_or_change_duty_user(self, user_id: int, room_id: int, date: datetime.date) -> Duty:
         if await self.is_user_can_reserve_duty(user_id=user_id, room_id=room_id):
             duty = await self.set_duty_user(user_id=user_id, room_id=room_id, date=date)

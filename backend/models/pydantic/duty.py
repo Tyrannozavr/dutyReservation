@@ -18,10 +18,12 @@ class DutyWithUser(BaseModel):
     id: int
     user: UserRead | None = None
     date: date
+    name: str | None
 
 class FreeDuty(BaseModel):
     id: int
     date: date
+    name: str | None
 
 class DutyTaken(BaseModel):
     id: int
@@ -36,3 +38,6 @@ class FreeDutiesResponse(BaseModel):
 
 class DutyData(BaseModel):
     duty_date: date
+
+class DutyReserve(BaseModel):
+    duty_id: int

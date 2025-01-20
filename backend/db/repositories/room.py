@@ -4,6 +4,7 @@ import uuid
 from sqlalchemy import delete
 from sqlmodel import Session, select
 
+from models.pydantic.room import DutyCreate
 from models.sqlmodels.auth import DutiesRoom, Duty
 
 
@@ -39,10 +40,10 @@ class RoomRepositoriesMixin:
         self.db.add(room)
         return room
 
-    async def create_duties_for_room(self, room_id: int, dates: list[datetime.date]):
+    async def create_duties_for_room(self, room_id: int, duty_list: list[DutyCreate]):
         available_duties = [
-            Duty(room_id=room_id, date=duty_date)
-            for duty_date in dates
+            Duty(room_id=room_id, date=duty_data.duty_date, name=duty_data.name)
+            for duty_data in duty_list
         ]
 
         self.db.add_all(available_duties)
