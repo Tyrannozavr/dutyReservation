@@ -1,8 +1,6 @@
 <template>
   <NuxtPage />
-<!--  <ClientOnly>-->
-<!--    <MiniApp />-->
-<!--  </ClientOnly>-->
+  <NuxtLink to="/auth" >Auth</NuxtLink>
 </template>
 
 <script setup lang="ts">
