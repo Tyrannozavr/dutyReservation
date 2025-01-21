@@ -2,12 +2,12 @@ import { useFetch } from "#app";
 import { UserData } from '~/store/user.ts';
 
 const settings = {
-    SERVER: true
+    SERVER: false
 }
 
 export function getUserToken() {
     const user = UserData();
-    return user.getToken();
+    return user.getAccessToken();
 }
 
 export function getRefreshToken() {
@@ -17,7 +17,7 @@ export function getRefreshToken() {
 
 async function refreshAccessToken() {
     const refreshToken = getRefreshToken();
-    const response = await fetch(`${useRuntimeConfig().public.baseURL}/token/refresh`, {
+    const response = await fetch(`${useRuntimeConfig().public.baseURL}/auth/token/refresh`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -34,7 +34,7 @@ async function refreshAccessToken() {
     } else {
         console.error("Failed to refresh token", await response.json());
         // Handle redirection to login or other logic
-        window.location.href = '/login'; // Adjust as necessary for your app
+        window.location.href = '/auth'; // Adjust as necessary for your app
         throw new Error('Failed to refresh token');
     }
 }
@@ -79,6 +79,7 @@ export default () => {
         },
 
         post: (request, opt) => {
+            console.log("post is")
             return useFetch(request, { baseURL: config.public.baseURL, ...opt, server: settings.SERVER, method: 'POST' });
         },
 
