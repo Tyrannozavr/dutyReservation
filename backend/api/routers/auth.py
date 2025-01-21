@@ -11,7 +11,7 @@ from models.pydantic.auth import Token, UserOut, TokenData, UserOriginTypes
 router = APIRouter()
 
 
-@router.post("/token")
+@router.post("/token", response_model=Token)
 async def login_for_access_token(user_services: UserServicesDep,
                                  token_services: TokenServicesDep,
                                  telegram_services: TelegramInitDataServiceDep,
@@ -57,7 +57,8 @@ async def refresh_access_token(token_services: TokenServicesDep, refresh_token: 
         200: {"description": "Successful authorization"},
         201: {"description": "Resource created"},
         404: {"description": "InitData isn't appropriate"},
-    }
+    },
+    response_model=Token
 )
 async def telegram_auth(init_data: InitDataDep, user_services: UserServicesDep, token_services: TokenServicesDep):
     """allows to get access to this platform using telegram's webapp initData"""
