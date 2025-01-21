@@ -32,9 +32,7 @@ onMounted(() => {
       }, 100);
 
       authenticateUser(initData.value)
-      toast.add({
-        title: "Вы вошли в систему"
-      })
+      console.log("Вы вошли в систему", userStore.getAccessToken)
       // showPopup("You are authenticated")
     }
 )
@@ -62,7 +60,7 @@ const authenticateUser = async (init_data: string) => {
       `${useRuntimeConfig().public.baseURL}/auth/telegram`,
       {
         method: 'POST',
-        body: `"${init_data}"`
+        body: JSON.stringify(init_data)
       })
   // console.log("Got data", Tokens, Tokens.value)
   // console.log("Hello", Tokens.value.access_token, Tokens.value.refresh_token )
