@@ -1,6 +1,6 @@
 export const useAuthStore = defineStore('auth', {
     state: () => ({
-        accessToken: 'testAccessToken',
+        accessToken: '',
         refreshToken: '',
         isAuthenticated: false,
         username: '',

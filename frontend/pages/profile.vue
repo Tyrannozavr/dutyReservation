@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useUserData} from "~/store/user";
+import {useUserStore} from "~/store/user";
 
 // const $backend = Fetch()
 // const store = useUserData()

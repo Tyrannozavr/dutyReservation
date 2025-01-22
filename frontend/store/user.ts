@@ -8,7 +8,7 @@ interface  UserState {
     origin: string | null,
 }
 
-export const useUserData = defineStore('user', {
+export const useUserStore = defineStore('user', {
     state: (): UserState => {
         return {
             first_name: "",
@@ -20,6 +20,9 @@ export const useUserData = defineStore('user', {
 
     },
     actions: {
+        setOrigin (origin: string) {
+            this.origin = origin
+        }
     },
     getters: {
     },

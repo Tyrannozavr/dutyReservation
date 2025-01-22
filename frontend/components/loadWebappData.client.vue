@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useUserData } from "~/store/user";
+import { useUserStore } from "~/store/user";
 // import {useWebAppPopup} from "vue-tg";
 
-const userStore = useUserData()
+const userStore = useUserStore()
 // userStore.set_telegram_data(initData)
 
 // const tg = window.Telegram?.WebApp

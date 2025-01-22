@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useUserData} from "~/store/user";
+import {useUserStore} from "~/store/user";
 import {useAuthStore} from "~/store/auth";
 
 
@@ -7,7 +7,7 @@ const isLoading = ref(true);
 const user = ref();
 const showCard = ref(false);
 const initData = ref("")
-const userStore = useUserData()
+const userStore = useUserStore()
 const authStore = useAuthStore()
 
 const route = useRoute()
@@ -48,9 +48,9 @@ const authenticateUser = async (init_data: string) => {
   authStore.login(
       response.access_token,
       response.refresh_token,
-      "telegram"
   )
-  console.log("getters", userStore.getAccessToken)
+  userStore.setOrigin("telegram")
+  console.log("getters", authStore.accessToken, authStore.refreshToken)
   if (nextPage) {
     await router.push(nextPage.toString())
   } else {
