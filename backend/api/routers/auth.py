@@ -43,7 +43,7 @@ async def login_for_access_token(user_services: UserServicesDep,
     response_model=Token
 )
 async def refresh_access_token(token_services: TokenServicesDep, refresh_token: RefreshTokenDep):
-    refresh_token_data = await token_services.decode_token(refresh_token)
+    refresh_token_data = await token_services.decode_token(refresh_token.refresh_token)
     if refresh_token_data.type == "refresh":
         return await token_services.get_tokens(data=refresh_token_data)
     else:
