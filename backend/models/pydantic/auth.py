@@ -61,6 +61,8 @@ class Token(BaseModel):
     refresh_token: str
     token_type: str
 
+class RefreshTokenIn(BaseModel):
+    refresh_token: str
 
 class TokenData(BaseModel):
     sub: str  # here will be a id

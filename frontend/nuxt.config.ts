@@ -5,7 +5,8 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             baseURL: process.env.NUXT_API_URL,
-        }
+            telegramInitData: process.env.NUXT_TELEGRAM_INIT_DATA,
+        },
     },
     app: {
         head: {

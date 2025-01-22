@@ -1,4 +1,5 @@
 <template>
+  <NuxtLink to="/">Main</NuxtLink>
     <div class="auth-container">
       <h1 class="auth-title">Login</h1>
       <form @submit.prevent="handleSubmit" class="auth-form">

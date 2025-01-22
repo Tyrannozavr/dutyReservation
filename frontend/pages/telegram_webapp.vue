@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
-// import {UserData} from "~/store/user.js";
+// import {useUserData} from "~/store/user.js";
 // import {useWebAppPopup} from "vue-tg";
-// // const defaultUserData = UserData()
+// // const defaultuseUserData = useUserData()
 // const {showAlert} = useWebAppPopup()
 
 // console.log('client only')

@@ -25,9 +25,9 @@
 
 <script setup>
 const currentYear = new Date().getFullYear();
-import {UserData} from "~/store/user.ts";
+import {useUserData} from "~/store/user.ts";
 
-const userStore = UserData();
+const userStore = useUserData();
 const people = computed(() => {
   return selectedDay.value ? [{
     username: userStore.username ? `@${userStore.username}` : '',
