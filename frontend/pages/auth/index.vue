@@ -17,10 +17,15 @@
 </template>
 
 <script setup>
+import {useAuthStore} from "~/store/auth";
+import {useUserStore} from "~/store/user";
+
+const toast = useToast()
 const $backend = useBackend()
 const username = ref('');
 const password = ref('');
-
+const authStore = useAuthStore()
+const userStore = useUserStore()
 const handleSubmit = async () => {
   const { data: tokens, error, status } = await $backend.post('/auth/login', {
     body: {
@@ -29,9 +34,22 @@ const handleSubmit = async () => {
     },
   })
   if (status.value === 'success') {
-    console.log('Login successful:', tokens.value);
+    const { access_token, refresh_token } = tokens.value;
+    authStore.setTokens(access_token, refresh_token)
+    userStore.setOrigin("web")
+    navigateTo('/profile')
   } else {
     console.error('Login failed:', error.value);
+    if (error.value.statusCode === 401) {
+      error.value = "Неверный логин или пароль"
+    }
+    toast.add({
+      title: "Ошибка авторизации",
+      description: error.value,
+      color: "red",
+      icon: "i-heroicons-x-circle",
+      life: 3000
+    })
   }
 }
 // const handleSubmit = async () => {
