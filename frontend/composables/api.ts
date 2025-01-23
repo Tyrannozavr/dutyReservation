@@ -1,20 +1,9 @@
 import {useAuthStore} from "~/store/auth";
-import type {TokenResponse} from "~/types/auth";
+import type {FetchMethods, TokenResponse} from "~/types/auth";
 import {useUserStore} from "~/store/user";
+import {fetchWithRefreshToken} from "~/services/api";
 
-function refreshToken(refreshUrl: string, refreshToken: string) {
-    return useFetch<TokenResponse>(refreshUrl, {
-        method: "post",
-        body: JSON.stringify({
-            refresh_token: refreshToken
-        }),
-        onResponse({response}) {
-            if (response.status !== 200) {
-                console.error("Refresh token: ", response)
-            }
-        }
-    });
-}
+
 
 
 export const useBackend = () => {
@@ -23,6 +12,11 @@ export const useBackend = () => {
     const userStore = useUserStore();
 
     return {
+        $post: async (url: string, opt: object = {}) => {
+            return fetchWithRefreshToken(
+                url, opt, config.public.baseURL, "POST", "/auth/token/refresh",
+            )
+        },
         $get: async (url: string, opt: object = {}) => {
             // Create a function to perform the fetch request
             const performFetch = async (attempt = 1) => {
@@ -36,32 +30,31 @@ export const useBackend = () => {
                     }
                 });
 
-                if (response.error.value?.statusCode === 401 && attempt === 1) {
-                    // Attempt to refresh the token
-                    const { data: tokens, error: refreshError } = await refreshToken(
-                        `${config.public.baseURL}/auth/token/refresh`,
-                        authStore.refreshToken
-                );
-
-                    if (tokens.value) {
-                        console.log("There is a tokens value", tokens.value)
-                        // Set new tokens in auth store
-                        authStore.setTokens(tokens.value.access_token, tokens.value.refresh_token);
-                        // Retry the original request with the new access token
-                        return await performFetch(attempt + 1); // Increment attempt count
-                    } else {
-                        // Handle redirection based on user origin
-                        if (userStore.origin === "telegram") {
-                            navigateTo("/auth/telegram");
-                        } else {
-                            navigateTo("/auth");
-                        }
-                    }
-                }
+                // if (response.error.value?.statusCode === 401 && attempt === 1) {
+                //     // Attempt to refresh the token
+                //     const { data: tokens, error: refreshError } = await refreshToken(
+                //         `${config.public.baseURL}/auth/token/refresh`,
+                //         authStore.refreshToken
+                // );
+                //
+                //     if (tokens.value) {
+                //         console.log("There is a tokens value", tokens.value)
+                //         // Set new tokens in auth store
+                //         authStore.setTokens(tokens.value.access_token, tokens.value.refresh_token);
+                //         // Retry the original request with the new access token
+                //         return await performFetch(attempt + 1); // Increment attempt count
+                //     } else {
+                //         // Handle redirection based on user origin
+                //         if (userStore.origin === "telegram") {
+                //             navigateTo("/auth/telegram");
+                //         } else {
+                //             navigateTo("/auth");
+                //         }
+                //     }
+                // }
 
                 return response
             };
-
             return await performFetch(); // Call the fetch function
         }
     };
