@@ -32,6 +32,7 @@ export async function fetchWithAuth(
     });
 }
 
+
 export async function fetchWithRefreshToken(
     url: string, opt: object = {},
     baseURL: string, method: FetchMethods, refreshURL: string) {
@@ -42,7 +43,7 @@ export async function fetchWithRefreshToken(
         const response = await fetchWithAuth(url, opt, baseURL, method)
         if (response.error.value?.statusCode === 401 && attempt === 1) {
             refreshURL = `${baseURL}${refreshURL}`
-            const { data: tokens } = await refreshAccessToken(refreshURL, refreshToken)
+            const {data: tokens} = await refreshAccessToken(refreshURL, refreshToken)
             if (tokens.value) {
                 authStore.setTokens(tokens.value.access_token, tokens.value.refresh_token)
                 return await performFetch(attempt += 1)

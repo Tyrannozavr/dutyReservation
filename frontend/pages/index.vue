@@ -1,7 +1,5 @@
 <template>
   <UVerticalNavigation :links="links" />
-  <br>
-  The tokens are {{tokens}}
 </template>
 
 <script setup lang="ts">

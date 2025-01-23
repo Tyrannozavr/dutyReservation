@@ -17,60 +17,50 @@
 </template>
 
 <script setup>
+const $backend = useBackend()
 const username = ref('');
 const password = ref('');
 
-// const tgInitData = ref(null)
-// const tgInitDataUnsafe = ref(null)
-// const tgUsername = ref(null)
-// onMounted(() => {
-//   const tg = window.Telegram?.WebApp
-//   if (tg.initData) {
-//     tgInitData.value = tg.initData || null
-//     tgInitDataUnsafe.value = tg.initDataUnsafe || null
-//     let tgUser = tgInitDataUnsafe.value?.user
-//     tgUsername.value = `${tgUser.first_name} ${tgUser.last_name}` || tgUser?.username
-//   }
-//
-//     }
-// )
-
-// const tg = window.Telegram?.WebApp
-
-// Function to handle form submission
 const handleSubmit = async () => {
-  // Check if Telegram Web App data is available
-  // const telegramData = window.Telegram?.WebApp?.initData || null;
-
-  // Prepare the payload for authentication
-  // const payload = {
-  //   username: username.value,
-  //   password: password.value,
-  //   telegramData: telegramData,
-  // };
-  // alert(telegramData)
-  // try {
-  //   // Send the payload to your backend API
-  //   const response = await fetch('/api/auth/login', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify(payload),
-  //   });
-  //
-  //   if (response.ok) {
-  //     const data = await response.json();
-  //     // Handle successful login (e.g., redirect, store token)
-  //     console.log('Login successful:', data);
-  //   } else {
-  //     // Handle login error
-  //     console.error('Login failed:', response.statusText);
-  //   }
-  // } catch (error) {
-  //   console.error('Error during login:', error);
-  // }
-};
+  const { data: tokens, error, status } = await $backend.post('/auth/login', {
+    body: {
+      username: username.value,
+      password: password.value,
+    },
+  })
+  if (status.value === 'success') {
+    console.log('Login successful:', tokens.value);
+  } else {
+    console.error('Login failed:', error.value);
+  }
+}
+// const handleSubmit = async () => {
+//   const payload = {
+//     username: username.value,
+//     password: password.value,
+//   };
+//   try {
+//     // Send the payload to your backend API
+//     // const response = await fetch('/api/auth/login', {
+//     //   method: 'POST',
+//     //   headers: {
+//     //     'Content-Type': 'application/json',
+//     //   },
+//     //   body: JSON.stringify(payload),
+//     // });
+//
+//     if (response.ok) {
+//       const data = await response.json();
+//       // Handle successful login (e.g., redirect, store token)
+//       console.log('Login successful:', data);
+//     } else {
+//       // Handle login error
+//       console.error('Login failed:', response.statusText);
+//     }
+//   } catch (error) {
+//     console.error('Error during login:', error);
+//   }
+// };
 </script>
 
 <style scoped>

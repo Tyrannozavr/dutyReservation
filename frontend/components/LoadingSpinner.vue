@@ -1,7 +1,6 @@
 <template>
   <div class="loading-spinner" v-if="isLoading">
     <img src="@/assets/img/loading3.png" alt="Loading..." class="spinner" />
-<!--    <img src="@/assets/img/loading2.gif" alt="Loading..." class="spinner" />-->
   </div>
 </template>
 

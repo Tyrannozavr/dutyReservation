@@ -3,7 +3,6 @@ import {useUserStore} from "~/store/user";
 import {useAuthStore} from "~/store/auth";
 import type {TokenResponse} from "~/types/auth";
 
-
 const isLoading = ref(true);
 const user = ref();
 const showCard = ref(false);
@@ -17,6 +16,13 @@ const toast = useToast()
 const nextPage = route.query.next
 
 onMounted(() => {
+      // const tg =  window.Telegram?.WebApp
+      // if (tg.initData) {
+        // initData.value = tg.initData
+        // user.value = tg.initDataUnsafe?.user
+        // e.g.
+      // }
+
       initData.value = useRuntimeConfig().public.telegramInitData
       user.value = {
         "id": 972834722,
@@ -28,7 +34,6 @@ onMounted(() => {
         "photo_url": "https://t.me/i/userpic/320/xJjYkAlqp7Mvl8tGiKvIH2Qvh2SEY2ZYE2gKivsD9qU.svg"
       }
       isLoading.value = false;
-      // Установить загрузку в false после инициализации данных пользователя
 
       setTimeout(() => {
         showCard.value = true; // Показываем карточку после задержки
@@ -38,7 +43,6 @@ onMounted(() => {
 
     }
 )
-console.log("authenticate")
 const authenticateUser = async (init_data: string) => {
   const response = await $fetch<TokenResponse>(
       `${useRuntimeConfig().public.baseURL}/auth/telegram`,
@@ -62,7 +66,6 @@ const authenticateUser = async (init_data: string) => {
       response.access_token,
       response.refresh_token,
   )
-
   userStore.setOrigin("telegram")
   if (nextPage) {
     await router.push(nextPage.toString())
@@ -70,20 +73,6 @@ const authenticateUser = async (init_data: string) => {
     await router.push("/profile")
   }
 }
-
-// onMounted(() => {
-//   setTimeout(() => {
-//     user.value = {
-//       first_name: "Дмитрий",
-//       photo_url: "https://t.me/i/userpic/320/xJjYkAlqp7Mvl8tGiKvIH2Qvh2SEY2ZYE2gKivsD9qU.svg"
-//     };
-//     isLoading.value = false; // Установить загрузку в false после инициализации данных пользователя
-//
-//     setTimeout(() => {
-//       showCard.value = true; // Показываем карточку после задержки
-//     }, 100); // Задержка перед показом карточки
-//   }, 1000); // Симуляция задержки загрузки
-// });
 </script>
 
 <template>
