@@ -1,7 +1,11 @@
 <script setup lang="ts">
-</script>
-<template>
 
+</script>
+
+<template>
+Регистрация
 </template>
+
 <style scoped>
+
 </style>

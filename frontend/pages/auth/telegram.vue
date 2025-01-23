@@ -2,6 +2,7 @@
 import {useUserStore} from "~/store/user";
 import {useAuthStore} from "~/store/auth";
 import type {TokenResponse} from "~/types/auth";
+import {fetchUserData} from "~/services/authorization";
 
 const isLoading = ref(true);
 const user = ref();
@@ -67,6 +68,7 @@ const authenticateUser = async (init_data: string) => {
       response.refresh_token,
   )
   userStore.setOrigin("telegram")
+  await fetchUserData()
   if (nextPage) {
     await router.push(nextPage.toString())
   } else {

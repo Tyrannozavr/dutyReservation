@@ -15,7 +15,7 @@ export const useBackend = () => {
                 ...opt,
             })
         },
-        $get: async (url: string, opt: object = {}) => {
+        $get: async <T>(url: string, opt: object = {}) => {
             return fetchWithRefreshToken(
                 url, opt, config.public.baseURL, "GET", "/auth/token/refresh",
             )

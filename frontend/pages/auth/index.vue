@@ -19,6 +19,7 @@
 <script setup>
 import {useAuthStore} from "~/store/auth";
 import {useUserStore} from "~/store/user";
+import {fetchUserData} from "~/services/authorization";
 
 const toast = useToast()
 const $backend = useBackend()
@@ -37,6 +38,7 @@ const handleSubmit = async () => {
     const { access_token, refresh_token } = tokens.value;
     authStore.setTokens(access_token, refresh_token)
     userStore.setOrigin("web")
+    await fetchUserData()
     navigateTo('/profile')
   } else {
     console.error('Login failed:', error.value);
