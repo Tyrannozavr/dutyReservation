@@ -78,3 +78,5 @@ loclx tunnel http --to localhost:3000
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 https://vue-tg.pages.dev/installation
+
+tailwind in dev http://localhost:3000/_tailwind

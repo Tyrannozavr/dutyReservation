@@ -17,5 +17,5 @@ export default defineNuxtConfig({
         '@pinia/nuxt',
         'pinia-plugin-persistedstate/nuxt',
         '@nuxt/ui'
-    ]
+    ],
 })
