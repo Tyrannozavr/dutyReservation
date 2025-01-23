@@ -9,7 +9,7 @@ from passlib.context import CryptContext
 
 from api.dependencies.database import SessionDep
 from core.config import Settings, get_settings
-from models.pydantic.auth import UserDataIn, TokenData, TelegramInitData, RefreshTokenIn
+from models.pydantic.auth import UserDataIn, TokenData, TelegramInitData, RefreshTokenIn, LoginData
 from models.sqlmodels.auth import User
 from services.auth import UserServices, TokenServices
 from services.telegram import TelegramInitDataService
@@ -88,3 +88,4 @@ UserDataCreateDep = Annotated[UserDataIn, Body()]
 TokenDataDep = Annotated[TokenData, Depends(get_token_data)]
 RefreshTokenDep = Annotated[RefreshTokenIn, Body()]
 TelegramInitDataServiceDep = Annotated[TelegramInitDataService, Depends(get_telegram_services)]
+LoginDataDep = Annotated[LoginData, Body()]

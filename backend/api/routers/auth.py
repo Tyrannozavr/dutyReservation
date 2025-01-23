@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from jwt import InvalidTokenError
 
 from api.dependencies.auth import InitDataDep, AuthorizedUserType, \
-    UserDataCreateDep, UserServicesDep, TokenServicesDep, RefreshTokenDep, TelegramInitDataServiceDep
+    UserDataCreateDep, UserServicesDep, TokenServicesDep, RefreshTokenDep, TelegramInitDataServiceDep, LoginDataDep
 from api.errors.auth import IncorrectUsernameOrPassword, TelegramInitDataIncorrect
 from models.pydantic.auth import Token, UserOut, TokenData, UserOriginTypes
 
@@ -17,8 +17,7 @@ async def login_for_access_token(user_services: UserServicesDep,
                                  telegram_services: TelegramInitDataServiceDep,
                                  form_data: OAuth2PasswordRequestForm = Depends(),
                                  ):
-    # """Takes initData from telegram webapp as username and "telegram" as a password to get tokens with telegram
-    # initData"""
+    """Takes parameters as a form data to test automatically generated auth form in swagger UI"""
     if form_data.password == "telegram":
         try:
             init_data = await telegram_services.validated_telegram_init_data(form_data.username)
@@ -30,6 +29,30 @@ async def login_for_access_token(user_services: UserServicesDep,
         except TelegramInitDataIncorrect:
             print("username taken as init data is", form_data.username)
     user = await user_services.authenticate_user(username=form_data.username, password=form_data.password)
+    if not user:
+        raise IncorrectUsernameOrPassword
+    token_data = TokenData(sub=str(user.id), username=user.username, first_name=user.first_name,
+                           last_name=user.last_name, origin=UserOriginTypes.web)
+    return await token_services.get_tokens(data=token_data)
+
+
+@router.post("/login", response_model=Token)
+async def login_for_access_token(user_services: UserServicesDep,
+                                 token_services: TokenServicesDep,
+                                 telegram_services: TelegramInitDataServiceDep,
+                                 login_data: LoginDataDep,
+                                 ):
+    if login_data.password == "telegram":
+        try:
+            init_data = await telegram_services.validated_telegram_init_data(login_data.username)
+            return await telegram_auth(
+                init_data=init_data,
+                user_services=user_services,
+                token_services=token_services
+            )
+        except TelegramInitDataIncorrect:
+            print("username taken as init data is", login_data.username)
+    user = await user_services.authenticate_user(username=login_data.username, password=login_data.password)
     if not user:
         raise IncorrectUsernameOrPassword
     token_data = TokenData(sub=str(user.id), username=user.username, first_name=user.first_name,

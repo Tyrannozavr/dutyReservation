@@ -119,3 +119,8 @@ class UserRead(BaseModel):
     last_name: str | None = None
     link: str
     model_config = ConfigDict(from_attributes=True)
+
+
+class LoginData(BaseModel):
+    username: str
+    password: str
