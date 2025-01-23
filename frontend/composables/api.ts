@@ -1,10 +1,14 @@
 import {fetchWithRefreshToken} from "~/services/api";
 
+type options = {
+    body?: object | null | string,
+}
+
 export const useBackend = () => {
     const config = useRuntimeConfig();
 
     return {
-        get: async (url: string, opt: object = {}) => {
+        get: async (url: string, opt: options = {}) => {
             return useFetch(url, {
                 baseURL: config.public.baseURL,
                 method: "GET",
@@ -16,7 +20,7 @@ export const useBackend = () => {
                 url, opt, config.public.baseURL, "GET", "/auth/token/refresh",
             )
         },
-        post: async (url: string, opt: object = {}) => {
+        post: async (url: string, opt: options = {}) => {
             if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
                 opt.body = JSON.stringify(opt.body)
             }
@@ -26,7 +30,7 @@ export const useBackend = () => {
                 ...opt,
             })
         },
-        $post: async (url: string, opt: object = {}) => {
+        $post: async (url: string, opt: options = {}) => {
             if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
                 opt.body = JSON.stringify(opt.body)
             }
