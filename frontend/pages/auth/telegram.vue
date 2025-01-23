@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {useUserStore} from "~/store/user";
 import {useAuthStore} from "~/store/auth";
+import type {TokenResponse} from "~/types/auth";
 
 
 const isLoading = ref(true);
@@ -12,7 +13,7 @@ const authStore = useAuthStore()
 
 const route = useRoute()
 const router = useRouter()
-
+const toast = useToast()
 const nextPage = route.query.next
 
 onMounted(() => {
@@ -37,20 +38,32 @@ onMounted(() => {
 
     }
 )
-
+console.log("authenticate")
 const authenticateUser = async (init_data: string) => {
-  const response = await $fetch(
+  const response = await $fetch<TokenResponse>(
       `${useRuntimeConfig().public.baseURL}/auth/telegram`,
       {
         method: 'POST',
-        body: JSON.stringify(init_data)
+        body: JSON.stringify(init_data),
+        onResponse({response}) {
+          if (response.status !== 200 && response.status !== 201) {
+            toast.add({
+              title: 'Ошибка',
+              description: 'Ошибка входа через телеграм',
+              color: 'red',
+              timeout: 5000,
+            })
+            navigateTo('/auth')
+          }
+        }
       })
+
   authStore.login(
       response.access_token,
       response.refresh_token,
   )
+
   userStore.setOrigin("telegram")
-  console.log("getters", authStore.accessToken, authStore.refreshToken)
   if (nextPage) {
     await router.push(nextPage.toString())
   } else {

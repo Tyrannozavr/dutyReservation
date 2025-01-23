@@ -8,7 +8,6 @@
 import {useAuthStore} from "~/store/auth";
 
 const authStore = useAuthStore()
-// const tokens = `access: ${authStore.accessToken}, refresh: ${authStore.refreshToken}`
 const tokens = computed(() => `access: ${authStore.accessToken}, refresh: ${authStore.refreshToken}`)
 const links = [
   {
