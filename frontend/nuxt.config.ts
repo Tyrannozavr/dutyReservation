@@ -13,5 +13,9 @@ export default defineNuxtConfig({
             script: [{src: 'https://telegram.org/js/telegram-web-app.js'}],
         },
     },
-    modules: ['@pinia/nuxt', '@nuxt/ui']
+    modules: [
+        '@pinia/nuxt',
+        'pinia-plugin-persistedstate/nuxt',
+        '@nuxt/ui'
+    ]
 })

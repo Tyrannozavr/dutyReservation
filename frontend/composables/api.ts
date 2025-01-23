@@ -18,6 +18,11 @@ export const useBackend = () => {
             )
         },
         $get: async (url: string, opt: object = {}) => {
+            return fetchWithRefreshToken(
+                url, opt, config.public.baseURL, "GET", "/auth/token/refresh",
+            )
+        },
+        mock: async (url: string, opt: object = {}) => {
             // Create a function to perform the fetch request
             const performFetch = async (attempt = 1) => {
                 // Use useFetch to make the request
