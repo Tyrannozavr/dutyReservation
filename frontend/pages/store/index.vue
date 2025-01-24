@@ -5,14 +5,28 @@ const voytingList = ref([
 </script>
 
 <template>
-Список голосований пользователя
-  <div class="voyting-container">
-    <div class="voyte_contaner" v-for="voyting in voytingList">
-      <NuxtLink class="py-3" :to="`/voyting/${voyting.number}`">{{voyting.name}}</NuxtLink>
-    </div>
-  </div>
+  <UContainer>
+    <UCard>
+      <template #header>
+        <h3 class="text-lg font-semibold">
+          Доступные бронирования
+        </h3>
+      </template>
+
+      <div class="space-y-4">
+        <UCard v-for="voting in voytingList" :key="voting.number"
+               class="hover:bg-gray-50 transition-colors">
+          <NuxtLink
+            class="block p-4"
+            :to="`/store/${voting.number}`"
+          >
+            <span class="text-primary-500 font-medium">{{ voting.name }}</span>
+          </NuxtLink>
+        </UCard>
+      </div>
+    </UCard>
+  </UContainer>
 </template>
 
 <style scoped>
-
 </style>
