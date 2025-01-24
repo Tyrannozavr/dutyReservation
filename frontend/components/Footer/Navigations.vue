@@ -1,10 +1,28 @@
 <script setup lang="ts">
-defineProps<{
-  links: Array<{
-    to: string
-    icon: string
-  }>
-}>()
+// defineProps<{
+//   links: Array<{
+//     to: string
+//     icon: string
+//   }>
+// }>()
+const links = [
+  {
+    icon: 'heroicons-outline:home',
+    to: '/'
+  },
+  {
+    icon: 'heroicons-outline:collection',
+    to: '/store'
+  },
+  {
+    icon: 'heroicons-outline:server-stack',
+    to: '/created'
+  },
+  {
+    icon:  'heroicons-outline:user-circle',
+    to: "/profile"
+  }
+]
 </script>
 
 <template>

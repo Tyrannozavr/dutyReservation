@@ -4,6 +4,7 @@ import {useAuthStore} from "~/store/auth";
 import type {TokenResponse} from "~/types/auth";
 import {fetchUserData} from "~/services/authorization";
 
+
 const isLoading = ref(true);
 const user = ref();
 const showCard = ref(false);
@@ -16,12 +17,14 @@ const router = useRouter()
 const toast = useToast()
 const nextPage = route.query.next
 
-onMounted(() => {
+
+
+onMounted(async () => {
       // const tg =  window.Telegram?.WebApp
       // if (tg.initData) {
-        // initData.value = tg.initData
-        // user.value = tg.initDataUnsafe?.user
-        // e.g.
+      // initData.value = tg.initData
+      // user.value = tg.initDataUnsafe?.user
+      // e.g.
       // }
 
       initData.value = useRuntimeConfig().public.telegramInitData
@@ -39,8 +42,17 @@ onMounted(() => {
       setTimeout(() => {
         showCard.value = true; // Показываем карточку после задержки
       }, 100);
-
-      authenticateUser(initData.value)
+      try {
+        await authenticateUser(initData.value)
+      } catch (e) {
+        console.log("error is", e)
+        toast.add({
+          title: 'Ошибка',
+          description: 'Сервер временно недоступен',
+          color: 'red',
+          timeout: 5000,
+        })
+      }
 
     }
 )
@@ -68,6 +80,13 @@ const authenticateUser = async (init_data: string) => {
       response.refresh_token,
   )
   userStore.setOrigin("telegram")
+  toast.add({
+    title: 'Успешный вход',
+    description: 'Вы успешно вошли через телеграм',
+    color: 'green',
+    timeout: 5000,
+  })
+
   await fetchUserData()
   if (nextPage) {
     await router.push(nextPage.toString())
@@ -86,7 +105,8 @@ const authenticateUser = async (init_data: string) => {
         Привет,&nbsp {{ user.first_name }}
       </div>
     </div>
-    next page is {{ nextPage }}
+  </div>
+  <div class="card-container">
   </div>
 </template>
 

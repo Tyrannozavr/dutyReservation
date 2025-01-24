@@ -3,7 +3,7 @@ const route = useRoute()
 </script>
 
 <template>
-Конкретное голосование {{ route.params.voytingNumber }}
+voute by id {{route.params.id}}
 </template>
 
 <style scoped>
