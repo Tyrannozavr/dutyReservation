@@ -6,6 +6,7 @@ interface  UserState {
     username: string | null,
     language_code: string | null,
     origin: string | null,
+    photo_url: string | null
 }
 
 export const useUserStore = defineStore('user', {
@@ -15,13 +16,22 @@ export const useUserStore = defineStore('user', {
             last_name: null,
             username: null,
             language_code: null,
-            origin: null
+            origin: null,
+            photo_url: null
         }
 
     },
     actions: {
         setOrigin (origin: string) {
             this.origin = origin
+        },
+        clearData () {
+            this.first_name = ""
+            this.last_name = ""
+            this.username = ""
+            this.language_code = ""
+            this.origin = ""
+            this.photo_url = ""
         }
     },
     getters: {

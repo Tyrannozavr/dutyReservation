@@ -1,3 +1,5 @@
+import {useUserStore} from "~/store/user";
+
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         accessToken: '',
@@ -19,6 +21,12 @@ export const useAuthStore = defineStore('auth', {
             this.setTokens(accessToken, refreshToken);
             this.username = username ? username : ''
             this.isAuthenticated = true
+        },
+        logout() {
+            const userStore = useUserStore()
+            this.clearTokens()
+            this.isAuthenticated = false
+            userStore.clearData()
         }
     },
 })

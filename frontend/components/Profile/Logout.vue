@@ -2,12 +2,11 @@
 import {useAuthStore} from "~/store/auth";
 
 const authStore = useAuthStore()
-
+const logout = () => authStore.logout()
 </script>
 
 <template>
-  <ProfileUser v-if="authStore.isAuthenticated"/>
-  <ProfileLinks v-else/>
+<UIcon @click="logout" name="heroicons-outline:arrow-right-on-rectangle" class="w-8 h-8" />
 </template>
 
 <style scoped>
