@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlmodel import Session
 
 from db.repositories.auth import TelegramUserRepositoriesMixin
-from models.sqlmodels.auth import *
+from models.sqlmodels import *
 
 TEST_DATABASE_URL = "sqlite:///:memory:"
 

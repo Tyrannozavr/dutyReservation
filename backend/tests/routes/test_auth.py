@@ -11,7 +11,7 @@ from core.config import get_settings
 from db.database import DATABASE_URL, DATABASE_FILENAME
 from main import app  # Assuming your FastAPI app is defined in main.py
 from models.pydantic.auth import UserDataIn, TelegramInitData
-from models.sqlmodels.auth import *
+from models.sqlmodels import *
 from services.auth import UserServices
 from services.telegram import TelegramInitDataService
 
@@ -142,7 +142,7 @@ async def test_refresh_access_token(client, create_user):
 
     login_response = client.post("/auth/token", data={"username": "test_user", "password": "test_password"})
     refresh_token = login_response.json().get("refresh_token")
-    response = client.post("/auth/token/refresh", json=refresh_token)
+    response = client.post("/auth/token/refresh", json={"refresh_token": refresh_token})
     assert response.status_code == 200
     assert "access_token" in response.json()
 
@@ -157,7 +157,7 @@ async def test_invalid_refresh_access_token(client, create_user):
     login_response = client.post("/auth/token", data={"username": "test_user", "password": "test_password"})
     access_token = login_response.json().get("access_token")
     with pytest.raises(InvalidTokenError):
-        response = client.post("/auth/token/refresh", json=access_token)
+        response = client.post("/auth/token/refresh", json={"refresh_token": access_token})
 
 
 @pytest.mark.asyncio

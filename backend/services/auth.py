@@ -8,7 +8,7 @@ from sqlmodel import Session
 from api.errors.auth import IncorrectUsernameOrPassword, UserAlreadyExist, TokenHasExpired, InvalidToken
 from db.repositories.auth import UserRepositories
 from models.pydantic.auth import Token, TokenData, UserDbCreate, UserOriginTypes, UserDataCreate, TelegramUserDataIn
-from models.sqlmodels.auth import User, TelegramUserData
+from models.sqlmodels import User, TelegramUserData
 
 
 class TokenServices:

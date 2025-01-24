@@ -5,7 +5,7 @@ from sqlmodel import create_engine, Session
 
 from db.repositories.duty import DutyRepositories
 from db.repositories.room import RoomRepositories
-from models.sqlmodels.auth import *
+from models.sqlmodels import *
 
 # Set up an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"

@@ -33,6 +33,7 @@ async def get_all_duties_in_room(
         )
 
 
+
 @router.post("/", response_model=DutyTaken)
 async def reserve_duty(
         token_data: TokenDataDep,
@@ -80,3 +81,4 @@ async def delete_duty(
 ):
     await duty_services.delete_duty_from_user(duty_id=duty_id, user_id=token_data.user_id)
     return {"status": "success"}
+

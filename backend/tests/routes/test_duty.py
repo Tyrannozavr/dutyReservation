@@ -15,7 +15,7 @@ from models.pydantic.types import UserOriginTypes
 from services.auth import UserServices, TokenServices
 from services.duty import DutyServices
 from services.room import RoomServices
-from models.sqlmodels.auth import *
+from models.sqlmodels import *
 
 
 def cleanup_database():

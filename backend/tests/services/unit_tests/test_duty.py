@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from db.errors.duty import DutyOccupied
 from models.pydantic.duty import DutyCreate, DutyChange
-from models.sqlmodels.auth import Duty
+from models.sqlmodels import Duty
 from services.duty import DutyServices
 
 

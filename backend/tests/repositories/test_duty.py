@@ -10,8 +10,8 @@ from api.errors.duty import DutyIsAlreadyTaken
 from db.repositories.duty import DutyRepositories
 from models.pydantic.duty import DutyChange
 from models.pydantic.types import UserOriginTypes
-from models.sqlmodels.auth import DutiesRoom
-from models.sqlmodels.auth import User  # Assuming you have this model defined
+from models.sqlmodels import DutiesRoom
+from models.sqlmodels import User  # Assuming you have this model defined
 
 DATABASE_URL = "sqlite:///:memory:"
 engine = create_engine(DATABASE_URL)

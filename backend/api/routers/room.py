@@ -2,19 +2,41 @@ from fastapi import APIRouter, status
 
 from api.dependencies.auth import TokenDataDep
 from api.dependencies.room import RoomServicesDep, RoomParamsDep, DutiesRoomUpdateParams, \
-    DutiesRoomIdDp
+    DutiesRoomIdDp, DutiesRoomIdentifierDep
 from models.pydantic.room import RoomRead
 
 router = APIRouter(tags=["room"])
 
 
 @router.get("/")
-async def get_rooms_by_user(
+async def get_rooms_created_by_user(
         token_data: TokenDataDep,
         room_services: RoomServicesDep,
 ) -> list[RoomRead]:
+    """Returns rooms created by user"""
     room = await room_services.get_user_rooms(user_id=token_data.user_id)
     return room
+
+
+@router.post("/storage/{room_identifier}")
+async def store_room(
+        room: DutiesRoomIdentifierDep,
+        token_data: TokenDataDep,
+        room_services: RoomServicesDep,
+) -> RoomRead | None:
+    await room_services.store_room(user_id=token_data.user_id, room_id=room.id)
+    return room
+
+
+@router.get("/storage")
+async def get_rooms_stored_by_user(
+        token_data: TokenDataDep,
+        room_services: RoomServicesDep,
+) -> list[RoomRead]:
+    """Returns rooms stored by user"""
+    room = await room_services.get_stored_room_list(user_id=token_data.user_id)
+    return room
+
 
 
 @router.post("/", response_model=RoomRead, status_code=status.HTTP_201_CREATED)

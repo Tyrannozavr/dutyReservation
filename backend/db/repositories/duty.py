@@ -6,7 +6,7 @@ from sqlmodel import Session, select
 
 from api.errors.duty import DutyIsAlreadyTaken
 from models.pydantic.duty import DutyChange
-from models.sqlmodels.auth import Duty, User
+from models.sqlmodels import Duty, User
 
 
 class DutyRepositoriesMixin:

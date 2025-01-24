@@ -9,7 +9,7 @@ from db.errors.duty import DutyOccupied
 from db.repositories.duty import DutyRepositories
 from db.repositories.room import RoomRepositories
 from models.pydantic.duty import DutyCreate, DutyChange
-from models.sqlmodels.auth import Duty
+from models.sqlmodels import Duty
 
 
 class DutyServices:

@@ -7,7 +7,7 @@ from sqlmodel import create_engine, Session
 from api.errors.duty import UserHasNoPermission
 from db.repositories.room import RoomRepositories
 from models.pydantic.room import RoomUpdateSettings, RoomCreate
-from models.sqlmodels.auth import *
+from models.sqlmodels import *
 from services.duty import DutyServices
 from services.room import RoomServices
 
@@ -164,7 +164,7 @@ async def test_validate_is_user_owner_for_non_existent_room(room_services):
     # Arrange
     room_id = 999  # Non-existent room ID
     user_id = 1
-    room_services.repositories.get_room_by_id = AsyncMock(return_value=None)
+    room_services.room_repositories.get_room_by_id = AsyncMock(return_value=None)
 
     # Act & Assert
     with pytest.raises(Exception, match="Room not found"):

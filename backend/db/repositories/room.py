@@ -4,8 +4,10 @@ import uuid
 from sqlalchemy import delete
 from sqlmodel import Session, select
 
+from db.repositories.auth import UserRepositories
+from db.repositories.duty import DutyRepositories
 from models.pydantic.room import DutyCreate
-from models.sqlmodels.auth import DutiesRoom, Duty
+from models.sqlmodels import DutiesRoom, Duty, RoomStorage
 
 
 class RoomRepositoriesMixin:
@@ -70,7 +72,26 @@ class RoomRepositoriesMixin:
         return rooms.all()
 
 
-class RoomRepositories(RoomRepositoriesMixin):
+class RoomStorageRepositoriesMixin:
+    def __init__(self, db: Session):
+        self.db = db
+        self.model = RoomStorage
+        self.room_repositories = RoomRepositories(db=db)
+        self.duty_repositories = DutyRepositories(db=db)
+        self.user_repositories = UserRepositories(db=db)
+
+    async def store_room_to_user(self, user_id: int, room_id: int) -> RoomStorage:
+        storage = RoomStorage(user_id=user_id, room_id=room_id)
+        self.db.add(storage)
+        return storage
+
+    async def get_stored_room_list(self, user_id: int):
+        # stmt = select(RoomStorage).where(RoomStorage.user_id == user_id)
+        stmt = select(DutiesRoom).join(RoomStorage).where(RoomStorage.user_id == user_id)
+        room_list = self.db.exec(stmt)
+        return room_list.all()
+
+class RoomRepositories(RoomRepositoriesMixin, RoomStorageRepositoriesMixin):
     pass
 
 # room_queries = Queries()

@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from api.dependencies.database import SessionDep
 from core.config import Settings, get_settings
 from models.pydantic.auth import UserDataIn, TokenData, TelegramInitData, RefreshTokenIn, LoginData
-from models.sqlmodels.auth import User
+from models.sqlmodels import User
 from services.auth import UserServices, TokenServices
 from services.telegram import TelegramInitDataService
 

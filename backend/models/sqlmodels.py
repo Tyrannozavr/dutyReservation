@@ -25,6 +25,7 @@ class User(SQLModel, table=True):
     hashed_password: str | None = Field(default=None)
     origin: UserOriginTypes
     rooms: list["DutiesRoom"] = Relationship(back_populates="owner")
+    room_storage: list["RoomStorage"] = Relationship(back_populates="user")
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -61,7 +62,7 @@ class DutiesRoom(SQLModel, table=True):
     owner: User = Relationship(back_populates="rooms")
     is_multiple_selection: bool = Field(default=False)
     duties: list["Duty"] = Relationship(back_populates="room", sa_relationship_kwargs={"cascade": "delete"})
-
+    participants: list["RoomStorage"] = Relationship(back_populates="room")
 
 class Duty(SQLModel, table=True):
     id: int | None = Field(primary_key=True)
@@ -72,3 +73,15 @@ class Duty(SQLModel, table=True):
     room: DutiesRoom = Relationship(back_populates="duties")
 
     date: datetime.date = Field(default=None)
+
+
+class RoomStorage(SQLModel, table=True):
+    """Stores room which user has access to"""
+    id: int | None = Field(primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="room_storage")
+    room_id: int = Field(foreign_key="dutiesroom.id")
+    room: DutiesRoom = Relationship(back_populates="participants")
+
+
+

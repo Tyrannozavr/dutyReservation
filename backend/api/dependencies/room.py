@@ -7,7 +7,7 @@ from fastapi.params import Depends
 from api.dependencies.database import SessionDep
 from api.errors.room import RoomNotFound
 from models.pydantic.room import RoomCreate, RoomUpdateSettings
-from models.sqlmodels.auth import DutiesRoom
+from models.sqlmodels import DutiesRoom
 from services.room import RoomServices
 
 

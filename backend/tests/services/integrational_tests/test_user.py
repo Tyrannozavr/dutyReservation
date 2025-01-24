@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from sqlmodel import Session, create_engine
 
 from models.pydantic.auth import UserDataCreate, UserInDb, TelegramUserDataIn
-from models.sqlmodels.auth import *
+from models.sqlmodels import *
 from services.auth import UserServices  # Replace with the actual module name
 
 

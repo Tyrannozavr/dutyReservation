@@ -2,7 +2,7 @@ from sqlmodel import Session, select
 
 from models.pydantic.auth import UserDbCreate, \
     TelegramUserDataIn
-from models.sqlmodels.auth import User, TelegramUserData
+from models.sqlmodels import User, TelegramUserData
 
 
 class TelegramUserRepositoriesMixin:
