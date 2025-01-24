@@ -20,6 +20,7 @@ class User(SQLModel, table=True):
     first_name: str | None = Field(default=None)
     last_name: str | None = Field(default=None)
     username: str | None = Field(unique=True, nullable=True)
+    photo_url: str | None = Field(default=None)
     tg_data: Optional["TelegramUserData"] = Relationship(back_populates="user")
     duties: list["Duty"] = Relationship(back_populates="user")
     hashed_password: str | None = Field(default=None)
@@ -46,7 +47,6 @@ class TelegramUserData(SQLModel, table=True):
     username: str = Field(index=True, description="This is telegram username")
     language_code: str | None = Field(default=None)
     allows_write_to_pm: bool | None = Field(default=None)
-    photo_url: str | None = Field(default=None)
 
     user_id: int | None = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="tg_data")

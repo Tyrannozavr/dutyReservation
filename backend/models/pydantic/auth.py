@@ -9,6 +9,7 @@ class BaseUser(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     username: str | None = None
+    photo_url: str | None = None
 
 
 class UserInDb(BaseUser):
@@ -20,10 +21,6 @@ class UserInDb(BaseUser):
 class UserDbCreate(BaseUser):
     hashed_password: str | None = None
     origin: UserOriginTypes
-
-
-class UserOut(BaseUser):
-    link: str | None
 
 
 class TelegramUserInitData(BaseModel):
@@ -112,12 +109,11 @@ class UserDataCreate(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     password: str | None = None
+    photo_url: str | None = None
 
-class UserRead(BaseModel):
-    username: str | None = None
-    first_name: str | None = None
-    last_name: str | None = None
+class UserRead(BaseUser):
     link: str
+    photo_url: str | None = None
     model_config = ConfigDict(from_attributes=True)
 
 

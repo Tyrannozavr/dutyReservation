@@ -6,7 +6,7 @@ from jwt import InvalidTokenError
 from api.dependencies.auth import InitDataDep, AuthorizedUserType, \
     UserDataCreateDep, UserServicesDep, TokenServicesDep, RefreshTokenDep, TelegramInitDataServiceDep, LoginDataDep
 from api.errors.auth import IncorrectUsernameOrPassword, TelegramInitDataIncorrect
-from models.pydantic.auth import Token, UserOut, TokenData, UserOriginTypes
+from models.pydantic.auth import Token, UserRead, TokenData, UserOriginTypes
 
 router = APIRouter()
 
@@ -118,7 +118,7 @@ async def create_user(
 @router.get(
     "/me",
     status_code=200,
-    response_model=UserOut
+    response_model=UserRead
 )
 def get_user(user: AuthorizedUserType):
     return user

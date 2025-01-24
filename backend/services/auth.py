@@ -102,6 +102,7 @@ class UserServices:
             username=username,
             first_name=init_data.first_name,
             last_name=init_data.last_name,
+            photo_url=init_data.photo_url,
         )
         user = await self.create_user(origin=UserOriginTypes.telegram, user_data=user_data)
         tg_data = await self.repositories.create_tg_user(init_data=init_data)

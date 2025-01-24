@@ -15,7 +15,6 @@ class TelegramUserRepositoriesMixin:
             username=init_data.username,
             language_code=init_data.language_code,
             allows_write_to_pm=init_data.allows_write_to_pm,
-            photo_url=init_data.photo_url
         )
         self.db.add(user_tg)
         return user_tg
