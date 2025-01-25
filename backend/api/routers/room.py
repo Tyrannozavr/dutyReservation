@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, status, HTTPException
 
 from api.dependencies.auth import TokenDataDep
@@ -34,6 +36,7 @@ async def create_room(
 async def get_room(
         room: DutiesRoomIdentifierDep,
 ) -> RoomCommonRead | None:
+    # await asyncio.sleep(5)  #it is for testing frontend
     return room
 
 @router.post("/storage/{room_identifier}")

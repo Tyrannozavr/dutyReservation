@@ -3,6 +3,7 @@ import uuid
 from typing import Optional
 
 from pydantic import ConfigDict
+from sqlalchemy import UniqueConstraint
 from sqlmodel import SQLModel, Field, Relationship
 
 from models.pydantic.types import UserOriginTypes
@@ -76,12 +77,19 @@ class Duty(SQLModel, table=True):
 
 
 class RoomStorage(SQLModel, table=True):
+    __table_args__ = (
+        UniqueConstraint("room_id", "user_id", name="user_room_unique_constraint"),
+    )
+
     """Stores room which user has access to"""
     id: int | None = Field(primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="room_storage")
     room_id: int = Field(foreign_key="dutiesroom.id")
     room: DutiesRoom = Relationship(back_populates="participants")
+
+    model_config = ConfigDict(from_attributes=True)
+
 
 
 
