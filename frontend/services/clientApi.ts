@@ -18,7 +18,7 @@ export async function refreshAccessToken(refreshUrl: string, refreshToken: strin
     }
 }
 
-export async function fetchWithAuth(
+export async function fetchWithAuth<T>(
     url: string,
     opt: object = {},
     baseURL: string,
@@ -27,7 +27,7 @@ export async function fetchWithAuth(
     const authStore = useAuthStore();
     const accessToken = authStore.accessToken;
 
-    return await $fetch(url, {
+    return await $fetch<T>(url, {
         baseURL,
         method,
         ...opt,
@@ -38,7 +38,7 @@ export async function fetchWithAuth(
     });
 }
 
-export async function fetchWithRefreshToken(
+export async function fetchWithRefreshToken<T>(
     url: string,
     opt: object = {},
     baseURL: string,
@@ -51,7 +51,7 @@ export async function fetchWithRefreshToken(
 
     const performFetch = async (attempt: number = 1) => {
         try {
-            const response = await fetchWithAuth(url, opt, baseURL, method);
+            const response = await fetchWithAuth<T>(url, opt, baseURL, method);
             if (response.error?.statusCode === 401 && attempt === 1) {
                 const fullRefreshUrl = `${baseURL}${refreshURL}`;
                 const tokens = await refreshAccessToken(fullRefreshUrl, refreshToken);

@@ -27,11 +27,11 @@ export const useClientFetch = () => {
                 ...opt,
             })
         },
-        $post: async (url: string, opt: options = {}) => {
+        $post: async <T>(url: string, opt: options = {}) => {
             if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
                 opt.body = JSON.stringify(opt.body)
             }
-            return fetchWithRefreshToken(
+            return fetchWithRefreshToken<T>(
                 url, opt, config.public.baseURL, "POST", "/auth/token/refresh",
             )
         },
