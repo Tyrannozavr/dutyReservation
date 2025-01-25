@@ -1,26 +1,39 @@
 <script setup lang="ts">
-const voytingList = ref([
-  {number: "234234", name: "test"}
-])
+const $backend = useBackend()
+// {
+//   "name": "string",
+//     "is_multiple_selection": false,
+//     "duty_list": [
+//   {
+//     "duty_date": "2025-01-25",
+//     "name": "string"
+//   }
+// ]
+// } /room/
+
+const {data: roomList} = await $backend.$get('/room')
+// const createRoom = async () => {
+//   const {data: room} = await $backend.$post('/room')
+// }
 </script>
 
 <template>
   <UContainer>
     <UCard>
       <template #header>
-        <h3 class="text-lg font-semibold">
+        <h3 class="text-lg font-semibold flex flex-row">
           Созданные бронирования
+          <RoomCreate class="ml-auto" />
         </h3>
       </template>
-
       <div class="space-y-4">
-        <UCard v-for="voting in voytingList" :key="voting.number"
+        <UCard v-for="room in roomList" :key="room.identifier"
                class="hover:bg-gray-50 transition-colors">
           <NuxtLink
               class="block p-4"
-              :to="`/store/${voting.number}`"
+              :to="`/store/${room.identifier}`"
           >
-            <span class="text-primary-500 font-medium">{{ voting.name }}</span>
+            <span class="text-primary-500 font-medium">{{ room.name }}</span>
           </NuxtLink>
         </UCard>
       </div>
