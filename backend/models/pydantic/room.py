@@ -24,6 +24,12 @@ class RoomRead(BaseModel):
     is_multiple_selection: bool
     name: str
 
+class RoomCommonRead(BaseModel):
+    identifier: uuid.UUID
+    is_multiple_selection: bool
+    name: str
+
+
 
 class RoomUpdateSettings(BaseModel):
     name: str | None = None

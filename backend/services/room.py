@@ -22,6 +22,16 @@ class RoomServices:
         self.db.commit()
         return storage
 
+    async def delete_room_from_storage(self, user_id: int, room_id: int) -> str | None:
+        await self.room_repositories.delete_room_from_storage(room_id=room_id, user_id=user_id)
+        try:
+            self.db.commit()
+            return "ok"
+        except Exception as e:
+            self.db.rollback()
+            print("Error with removing room")
+            return None
+
     async def get_stored_room_list(self, user_id: int) -> list[DutiesRoom]:
         return await self.room_repositories.get_stored_room_list(user_id=user_id)
 

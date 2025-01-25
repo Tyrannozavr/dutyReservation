@@ -85,6 +85,11 @@ class RoomStorageRepositoriesMixin:
         self.db.add(storage)
         return storage
 
+    async def delete_room_from_storage(self, user_id: int, room_id: int):
+        stmt = delete(RoomStorage).where(RoomStorage.user_id == user_id, RoomStorage.room_id == room_id)
+        self.db.exec(stmt)
+
+
     async def get_stored_room_list(self, user_id: int):
         # stmt = select(RoomStorage).where(RoomStorage.user_id == user_id)
         stmt = select(DutiesRoom).join(RoomStorage).where(RoomStorage.user_id == user_id)
