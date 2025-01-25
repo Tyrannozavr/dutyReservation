@@ -1,30 +1,27 @@
-import {fetchWithRefreshToken} from "~/services/api";
+import {fetchWithRefreshToken} from "~/services/clientApi";
+import type {options} from "~/composables/api"
 
-export type options = {
-    body?: object | null | string,
-}
-
-export const useBackend = () => {
+export const useClientFetch = () => {
     const config = useRuntimeConfig();
 
     return {
-        get: async (url: string, opt: options = {}) => {
-            return useFetch(url, {
+        get: async <T>(url: string, opt: options = {}) => {
+            return $fetch<T>(url, {
                 baseURL: config.public.baseURL,
                 method: "GET",
                 ...opt,
             })
         },
-        $get: async (url: string, opt: object = {}) => {
+        $get: async <T>(url: string, opt: object = {}) => {
             return fetchWithRefreshToken(
                 url, opt, config.public.baseURL, "GET", "/auth/token/refresh",
             )
         },
-        post: async (url: string, opt: options = {}) => {
+        post: async <T>(url: string, opt: options = {}) => {
             if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
                 opt.body = JSON.stringify(opt.body)
             }
-            return useFetch(url, {
+            return $fetch<T>(url, {
                 baseURL: config.public.baseURL,
                 method: "POST",
                 ...opt,

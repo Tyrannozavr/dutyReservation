@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const $backend = useBackend()
-import  type {RoomList} from "~/types/room";
-const {data: roomList} = await $backend.$get<RoomList>('/room/storage')
+const {data: roomList} = await $backend.$get('/room/storage')
 
 </script>
 

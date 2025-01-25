@@ -1,8 +1,22 @@
 <script setup lang="ts">
-const $backend = useBackend()
+import type {RoomRead} from "~/types/room";
+
+const clientFetch = useClientFetch()
 const $toast = useToast()
-const roomIdentifier = ref()
+const roomIdentifier = ref('')
 const isOpen = ref(false)
+const room = ref<RoomRead | null>(null)
+
+const urlRequest = computed(() => `/room/storage/${roomIdentifier.value}`)
+
+
+
+watch(roomIdentifier, async () => {
+  if (roomIdentifier.value?.length > 16) {
+      room.value = await clientFetch.get<RoomRead>(urlRequest.value).catch(() => null)
+  }
+})
+
 const getRoomToAdd = async () => {
   isOpen.value = true
   try {
@@ -12,6 +26,7 @@ const getRoomToAdd = async () => {
   } catch (error) {
   }
 }
+
 const addRoom = async () => {
   isOpen.value = false
   $toast.add({
@@ -32,7 +47,7 @@ const addRoom = async () => {
             <div class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
               Добавить комнату
             </div>
-            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="getRoomToAdd" />
+            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isOpen = false"/>
           </div>
         </template>
         <div class="flex flex-col gap-4">
@@ -41,6 +56,10 @@ const addRoom = async () => {
               Идентификатор комнаты
             </div>
             <UInput v-model="roomIdentifier" />
+            room data identifier is {{roomIdentifier}}
+            <br>
+            is {{room}}
+            <USkeleton class="h-4 w-[250px]" />
           </div>
           <div class="flex justify-end">
             <UButton @click="addRoom">Добавить</UButton>
