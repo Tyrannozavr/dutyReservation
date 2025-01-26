@@ -7,9 +7,22 @@ const clientFetch = useClientFetch()
 const $toast = useToast()
 const roomIdentifier = ref('')
 const isOpen = ref(false)
+const $backend = useBackend()
+const route = useRoute()
+const roomIdentifierFromRoute = computed(() => route.query.roomIdentifier)
 const room = ref<RoomRead | null>(null)
-
 const urlRequest = computed(() => `/room/storage/${roomIdentifier.value}`)
+const router = useRouter()
+
+
+
+if (roomIdentifierFromRoute.value) {
+  roomIdentifier.value = roomIdentifierFromRoute.value.toString()
+  const { data } = await $backend.get<RoomRead>(urlRequest.value)
+  room.value = data.value
+  isOpen.value = true
+}
+
 watch(roomIdentifier, async () => {
   if (roomIdentifier.value?.length > 16) {
     room.value = await clientFetch.get<RoomRead>(urlRequest.value).catch(() => null)
@@ -36,6 +49,7 @@ const addRoom = async () => {
         description: 'Комната добавлена',
         color: 'green'
       })
+      await router.push(`/store/${response.identifier}`)
     } else {
       $toast.add({
         title: 'Добавление комнаты',

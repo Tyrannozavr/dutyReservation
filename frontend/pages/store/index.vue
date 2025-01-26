@@ -26,15 +26,10 @@ const {data: roomList, refresh} = await $backend.$get('/room/storage')
             <span>Нет доступных бронирований</span>
           </div>
         </UCard>
-        <UCard v-for="room in roomList" :key="room.identifier"
-               class="hover:bg-gray-50 transition-colors">
-          <NuxtLink
-            class="block p-4"
-            :to="`/store/${room.identifier}`"
-          >
-            <span class="text-primary-500 font-medium">{{ room.name }}</span>
-          </NuxtLink>
-        </UCard>
+        <RoomUserLine
+            v-for="room in roomList" :key="room.identifier" :room="room"
+            @delete-room="refresh"
+        />
       </div>
     </UCard>
   </UContainer>

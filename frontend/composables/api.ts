@@ -8,8 +8,8 @@ export const useBackend = () => {
     const config = useRuntimeConfig();
 
     return {
-        get: async (url: string, opt: options = {}) => {
-            return useFetch(url, {
+        get: async <T>(url: string, opt: options = {}) => {
+            return useFetch<T>(url, {
                 baseURL: config.public.baseURL,
                 method: "GET",
                 ...opt,

@@ -36,6 +36,24 @@ export const useClientFetch = () => {
                 url, opt, config.public.baseURL, "POST", "/auth/token/refresh",
             )
         },
+        delete: async <T>(url: string, opt: options = {}) => {
+            if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
+                opt.body = JSON.stringify(opt.body)
+            }
+            return $fetch<T>(url, {
+                baseURL: config.public.baseURL,
+                method: "DELETE",
+                ...opt,
+            })
+        },
+        $delete: async <T>(url: string, opt: options = {}) => {
+            if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
+                opt.body = JSON.stringify(opt.body)
+            }
+            return fetchWithRefreshToken<T>(
+                url, opt, config.public.baseURL, "DELETE", "/auth/token/refresh",
+            )
+        },
 
     };
 }
