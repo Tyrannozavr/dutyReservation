@@ -15,7 +15,7 @@ const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
-const nextPage = route.query.next
+const nextPage = route.query.redirect
 
 
 

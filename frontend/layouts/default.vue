@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import {useAuthStore} from "~/store/auth";
 
+onMounted(() => {
+  const tg = window.Telegram?.WebApp
+  const authStore = useAuthStore()
+  const route = useRoute()
+  if (tg && tg.initData && (!authStore.isAuthenticated)) {
+    navigateTo('/auth/telegram?redirect=' + route.fullPath)
+  }
+})
 </script>
 <template>
   <div>
