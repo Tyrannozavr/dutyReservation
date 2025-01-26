@@ -13,6 +13,13 @@ const urlRequest = computed(() => `/room/storage/${roomIdentifier.value}`)
 watch(roomIdentifier, async () => {
   if (roomIdentifier.value?.length > 16) {
     room.value = await clientFetch.get<RoomRead>(urlRequest.value).catch(() => null)
+    if (room.value === null) {
+      $toast.add({
+        title: 'Добавление комнаты',
+        description: 'Комната не найдена',
+        color: 'red'
+      })
+    }
   } else {
     room.value = null
   }
@@ -28,6 +35,12 @@ const addRoom = async () => {
         title: 'Добавление комнаты',
         description: 'Комната добавлена',
         color: 'green'
+      })
+    } else {
+      $toast.add({
+        title: 'Добавление комнаты',
+        description: 'Комната не добавлена',
+        color: 'red'
       })
     }
   } catch (e) {

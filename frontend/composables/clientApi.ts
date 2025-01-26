@@ -6,11 +6,12 @@ export const useClientFetch = () => {
 
     return {
         get: async <T>(url: string, opt: options = {}) => {
-            return $fetch<T>(url, {
-                baseURL: config.public.baseURL,
-                method: "GET",
-                ...opt,
-            })
+                return $fetch<T>(url, {
+                    baseURL: config.public.baseURL,
+                    method: "GET",
+                    ...opt,
+                })
+
         },
         $get: async <T>(url: string, opt: object = {}) => {
             return fetchWithRefreshToken(
