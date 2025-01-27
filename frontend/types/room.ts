@@ -17,12 +17,15 @@ export type dateRangeType = {
     start: Date,
     end: Date
 }
+export type dutyType = {
+    name: string,
+    duty_date: string,
+}
+
+export type dutyListType = dutyType[]
 
 export interface State {
     name: string | undefined,
-    duty_list: {
-        name: string,
-        duty_date: string,
-    }[] | undefined,
+    duty_list: dutyListType | undefined,
     is_multiple_selection: boolean,
 }
