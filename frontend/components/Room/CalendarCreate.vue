@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import {sub, format, isSameDay, type Duration} from 'date-fns'
+import type {dateRangeType} from "~/types/room";
 
 const emits = defineEmits(['update'])
 
 let today = new Date()
-type dateRangeType = {
-  start: Date,
-  end: Date
-}
+
 const ranges = [
   {
     label: 'Выбрать текущий месяц', dateRange: {
@@ -24,12 +22,13 @@ const ranges = [
   },
 
 ]
-// const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
+// const selected = ref({start: sub(new Date(), {days: 14}), end: new Date()})
 const selected = ref({start: sub(new Date(), {days: 14}), end: new Date()})
 
 watch(
     selected,
     (value) => {
+      console.log("update somehintg")
       emits('update', value)
     },
     {

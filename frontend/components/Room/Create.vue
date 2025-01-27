@@ -1,34 +1,43 @@
-
 <script setup lang="ts">
-import { object, string, type InferType } from 'yup'
+import {object, string, type InferType} from 'yup'
 
 // State management
 import CalendarCreate from "~/components/Room/CalendarCreate.vue";
+import type {dateRangeType, State} from "~/types/room";
 
 const isOpen = ref(true); // Control modal visibility
-const showCalendar = ref(false);
 const selectedDates = ref<string[]>([]);
 
 const schema = object({
   name: string()
 })
-const state = reactive({
+const state = reactive<State>({
   name: undefined,
-  dateList: undefined
+  duty_list: undefined
 })
 
-// Toggle calendar visibility
-const toggleCalendar = () => {
-  showCalendar.value = !showCalendar.value;
-};
+function formatDateToYYYYMMDD(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, '0');
 
-// Handle date changes
-const onDateChange = (dates: string[]) => {
-  selectedDates.value = dates;
-};
+  return `${year}-${month}-${day}`;
+}
 
-const updateListData = (dateRange: {start: string, end: string}) => {
-  console.log(dateRange, "helloworld")
+
+const updateListData = (dateRange: dateRangeType) => {
+  const dateList: Date[] = []
+  const currentDate = dateRange.start
+  while (currentDate < dateRange.end) {
+    dateList.push(currentDate)
+    currentDate.setDate(currentDate.getDate() + 1)
+  }
+  state.duty_list = dateList.map((item) => {
+    return {
+      name: "",
+      duty_date: formatDateToYYYYMMDD(item)
+    }
+  })
 }
 
 // Submit selected dates
@@ -49,24 +58,25 @@ const submitDates = () => {
 
 
 <template>
-<div>
-  <UButton @click="isOpen  = true">Создать</UButton>
-  <UModal v-model="isOpen">
-    <UCard>
-      <template #header>
-        Создание комнаты
-      </template>
-      <UForm class="space-y-4" :schema="schema" :state="state">
-        <UFormGroup label="Название комнаты">
-          <UInput v-model="state.name" />
-        </UFormGroup>
-        <UFormGroup label="Даты">
-          <CalendarCreate  @update="updateListData" />
-        </UFormGroup>
-      </UForm>
-    </UCard>
-  </UModal>
-</div>
+  <div>
+    <UButton @click="isOpen  = true">Создать</UButton>
+    <UModal v-model="isOpen">
+      <UCard>
+        <template #header>
+          Создание комнаты
+        </template>
+        <UForm class="space-y-4" :schema="schema" :state="state">
+          <UFormGroup label="Название комнаты">
+            <UInput v-model="state.name"/>
+          </UFormGroup>
+          <UFormGroup label="Даты">
+            <CalendarCreate @update="updateListData"/>
+          </UFormGroup>
+        </UForm>
+        result data is {{ state }}
+      </UCard>
+    </UModal>
+  </div>
 </template>
 
 <style scoped>

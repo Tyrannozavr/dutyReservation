@@ -12,3 +12,16 @@ export type RoomRead = {
     "is_multiple_selection": boolean,
     "name": string
 }
+
+export type dateRangeType = {
+    start: Date,
+    end: Date
+}
+
+export interface State {
+    name: string | undefined,
+    duty_list: {
+        name: string,
+        duty_date: string,
+    } | undefined
+}
