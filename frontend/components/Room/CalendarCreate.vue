@@ -28,7 +28,6 @@ const selected = ref({start: sub(new Date(), {days: 14}), end: new Date()})
 watch(
     selected,
     (value) => {
-      console.log("update somehintg")
       emits('update', value)
     },
     {

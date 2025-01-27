@@ -23,5 +23,6 @@ export interface State {
     duty_list: {
         name: string,
         duty_date: string,
-    } | undefined
+    }[] | undefined,
+    is_multiple_selection: boolean,
 }

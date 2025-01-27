@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import {object, string, type InferType} from 'yup'
-
-// State management
-import CalendarCreate from "~/components/Room/CalendarCreate.vue";
 import type {dateRangeType, State} from "~/types/room";
+import CalendarCreate from "~/components/Room/CalendarCreate.vue";
 
 const isOpen = ref(true); // Control modal visibility
 const selectedDates = ref<string[]>([]);
 
 const schema = object({
-  name: string()
+  name: string().required("Длина должна быть больше нуля"),
 })
 const state = reactive<State>({
   name: undefined,
-  duty_list: undefined
+  duty_list: undefined,
+  is_multiple_selection: false
 })
 
 function formatDateToYYYYMMDD(date: Date): string {
@@ -38,6 +37,10 @@ const updateListData = (dateRange: dateRangeType) => {
       duty_date: formatDateToYYYYMMDD(item)
     }
   })
+}
+
+const submitForm = () => {
+  console.log("submit form", state)
 }
 
 // Submit selected dates
@@ -65,22 +68,21 @@ const submitDates = () => {
         <template #header>
           Создание комнаты
         </template>
-        <UForm class="space-y-4" :schema="schema" :state="state">
-          <UFormGroup label="Название комнаты">
-            <UInput v-model="state.name"/>
+        <UForm class="space-y-4" :schema="schema" :state="state" @submit="submitForm">
+          <UFormGroup label="Название комнаты" name="name">
+            <UInput v-model="state.name" is-required />
           </UFormGroup>
-          <UFormGroup label="Даты">
-            <CalendarCreate @update="updateListData"/>
-          </UFormGroup>
+            <UFormGroup label="Даты">
+              <CalendarCreate @update="updateListData"/>
+            </UFormGroup>
+            <UFormGroup label="Может ли один человек выбрать несколько дат">
+              <UToggle v-model="state.is_multiple_selection" />
+            </UFormGroup>
+          <UButton type="submit">Создать</UButton>
+
         </UForm>
         result data is {{ state }}
       </UCard>
     </UModal>
   </div>
 </template>
-
-<style scoped>
-.container {
-  max-width: 600px;
-}
-</style>
