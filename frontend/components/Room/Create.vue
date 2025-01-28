@@ -4,7 +4,7 @@ import type {dateRangeType, dutyListType, State} from "~/types/room";
 import CalendarCreate from "~/components/Room/CalendarCreate.vue";
 import DetailSettings from "~/components/Room/DetailSettings.vue";
 
-const isOpen = ref(true); // Control modal visibility
+const isOpen = ref(false);
 const selectedDates = ref<string[]>([]);
 
 const schema = object({
@@ -87,7 +87,6 @@ const submitDates = () => {
           <UButton type="submit">Создать</UButton>
 
         </UForm>
-<!--        result data is {{ state }}-->
       </UCard>
     </UModal>
   </div>
