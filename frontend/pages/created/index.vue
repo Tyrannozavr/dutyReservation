@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type {RoomRead, RoomReadList} from "~/types/room";
+
 const $backend = useBackend()
 // {
 //   "name": "string",
@@ -11,7 +13,7 @@ const $backend = useBackend()
 // ]
 // } /room/
 
-const {data: roomList} = await $backend.$get('/room')
+const {data: roomList, refresh} = await $backend.$get<RoomReadList>('/room')
 // const createRoom = async () => {
 //   const {data: room} = await $backend.$post('/room')
 // }
@@ -23,7 +25,7 @@ const {data: roomList} = await $backend.$get('/room')
       <template #header>
         <h3 class="text-lg font-semibold flex flex-row">
           Созданные бронирования
-          <RoomCreate class="ml-auto" />
+          <RoomCreate class="ml-auto" @room-created="refresh" />
         </h3>
       </template>
       <div class="space-y-4">

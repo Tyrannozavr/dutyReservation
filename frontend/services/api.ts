@@ -16,13 +16,13 @@ export function refreshAccessToken(refreshUrl: string, refreshToken: string) {
     });
 }
 
-export async function fetchWithAuth(
+export async function fetchWithAuth<T>(
     url: string, opt: object = {},
     baseURL: string, method: FetchMethods) {
     const authStore = useAuthStore()
     const accessToken = authStore.accessToken
 
-    return useFetch(url, {
+    return useFetch<T>(url, {
         baseURL: baseURL,
         method: method,
         ...opt,
@@ -33,14 +33,14 @@ export async function fetchWithAuth(
 }
 
 
-export async function fetchWithRefreshToken(
+export async function fetchWithRefreshToken<T>(
     url: string, opt: object = {},
     baseURL: string, method: FetchMethods, refreshURL: string) {
     const authStore = useAuthStore()
     const userStore = useUserStore()
     const refreshToken = authStore.refreshToken
     const performFetch = async (attempt: number = 1) => {
-        const response = await fetchWithAuth(url, opt, baseURL, method)
+        const response = await fetchWithAuth<T>(url, opt, baseURL, method)
         if (response.error.value?.statusCode === 401 && attempt === 1) {
             refreshURL = `${baseURL}${refreshURL}`
             const {data: tokens} = await refreshAccessToken(refreshURL, refreshToken)

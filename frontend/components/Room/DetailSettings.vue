@@ -25,6 +25,12 @@ const doubleSingleDuty = (index: number) => {
   const dutyToDouble = dutyListToShow.value[index];
   emits('onUpdateDutyList', ([...props.dutyList, { ...dutyToDouble }]))
 };
+
+const removeSingleDuty = (index: number) => {
+  const updatedDutyList = [...props.dutyList];
+  updatedDutyList.splice(index, 1);
+  emits('onUpdateDutyList', updatedDutyList);
+};
 </script>
 
 <template>
@@ -32,17 +38,19 @@ const doubleSingleDuty = (index: number) => {
     <UButton @click="toggleDetailSettings">
       {{ showDetailSettings ? 'Скрыть детальные настройки' : 'Показать детальные настройки' }}
     </UButton>
-
       <UCard class="mt-5" v-if="showDetailSettings">
         <div class="header flex flex-row pb-4">
-          <UButton class="rounded-full ml-auto" @click="doubleAllDuties">
-            <UIcon name="heroicons-outline:plus" />
+          <UButton label="дублировать все" class="" @click="doubleAllDuties">
+             дублировать все
           </UButton>
         </div>
-          <ul class="space-y-2">
-            <li v-for="(duty, index) in dutyListToShow" :key="index" class="flex flex-row justify-between" >
+          <ul class="space-y-4">
+            <li v-for="(duty, index) in dutyListToShow" :key="index"
+                class="flex flex-row justify-between"
+            >
               <UInput
                   type="text"
+                  class="h-4 w-2/4"
                   v-model="duty.name"
                   placeholder="задать название"
               />
@@ -50,7 +58,11 @@ const doubleSingleDuty = (index: number) => {
               <UButton @click="doubleSingleDuty(index)" class="rounded-full ">
                 <UIcon name="heroicons-outline:plus" />
               </UButton>
-
+              <UIcon
+                  name="heroicons-outline:trash"
+                  class="text-red-500 cursor-pointer w-7 h-7"
+                  @click="removeSingleDuty(index)"
+              />
             </li>
           </ul>
       </UCard>

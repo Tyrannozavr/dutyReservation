@@ -12,6 +12,13 @@ export type RoomRead = {
     "is_multiple_selection": boolean,
     "name": string
 }
+export type RoomReadList = RoomRead[]
+export type RoomOwnerRead = {
+    "id": number,
+    "identifier": string,
+    "is_multiple_selection": boolean,
+    "name": string
+}
 
 export type dateRangeType = {
     start: Date,
@@ -29,3 +36,4 @@ export interface State {
     duty_list: dutyListType | undefined,
     is_multiple_selection: boolean,
 }
+

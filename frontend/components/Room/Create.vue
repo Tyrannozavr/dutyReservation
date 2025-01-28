@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {object, string, type InferType} from 'yup'
-import type {dateRangeType, dutyListType, State} from "~/types/room";
+import type {dateRangeType, dutyListType, RoomOwnerRead, State} from "~/types/room";
 import CalendarCreate from "~/components/Room/CalendarCreate.vue";
 import DetailSettings from "~/components/Room/DetailSettings.vue";
-
+const toast = useToast()
+const $client = useClientFetch()
+const emits = defineEmits(["roomCreated"])
 const isOpen = ref(false);
-const selectedDates = ref<string[]>([]);
 
 const schema = object({
   name: string().required("Длина должна быть больше нуля"),
@@ -25,9 +26,10 @@ function formatDateToYYYYMMDD(date: Date): string {
 const updateDutyList = (dutyListValue: dutyListType) => {
   state.duty_list = dutyListValue
 }
+
 const updateListData = (dateRange: dateRangeType) => {
   const dateList: Date[] = []
-  const currentDate = dateRange.start
+  const currentDate = new Date(dateRange.start)
   while (currentDate < dateRange.end) {
     dateList.push(new Date(currentDate))
     currentDate.setDate(currentDate.getDate() + 1)
@@ -40,31 +42,28 @@ const updateListData = (dateRange: dateRangeType) => {
   })
 }
 
-const submitForm = () => {
-  console.log("submit form", state)
-}
-
 // Submit selected dates
-const submitDates = () => {
-  const payload = {
-    name: "string", // Replace with actual name or input field value
-    is_multiple_selection: true, // Set to true if multiple selection is allowed
-    duty_list: selectedDates.value.map(date => ({
-      duty_date: date,
-      name: "string" // Replace with actual duty name or input field value
-    })),
-  };
+const submitForm = async () => {
+  const response = await $client.$post<RoomOwnerRead>("/room",  {
+    body: state
+  })
+  if (response.identifier) {
+    toast.add({
+      id: 'success',
+      title: 'Успешно',
+      description: 'Комната успешно создана',
+      color: 'green',
+    });
+    emits("roomCreated")
+  }
 
-  console.log('Payload for creation:', payload);
-  alert('Payload for creation: ' + JSON.stringify(payload));
 };
 </script>
-
 
 <template>
   <div>
     <UButton @click="isOpen  = true">Создать</UButton>
-    <UModal v-model="isOpen">
+    <UModal v-model="isOpen" :ui="{ container: 'flex items-start justify-center mt-12' }">
       <UCard>
         <template #header>
           Создание комнаты
@@ -85,7 +84,6 @@ const submitDates = () => {
               @onUpdateDutyList="updateDutyList"
           />
           <UButton type="submit">Создать</UButton>
-
         </UForm>
       </UCard>
     </UModal>
