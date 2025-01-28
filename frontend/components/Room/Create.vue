@@ -55,6 +55,7 @@ const submitForm = async () => {
       color: 'green',
     });
     emits("roomCreated")
+    isOpen.value = false
   }
 
 };

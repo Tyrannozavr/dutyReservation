@@ -1,22 +1,8 @@
 <script setup lang="ts">
-import type {RoomRead, RoomReadList} from "~/types/room";
+import type {RoomReadList} from "~/types/room";
 
 const $backend = useBackend()
-// {
-//   "name": "string",
-//     "is_multiple_selection": false,
-//     "duty_list": [
-//   {
-//     "duty_date": "2025-01-25",
-//     "name": "string"
-//   }
-// ]
-// } /room/
-
 const {data: roomList, refresh} = await $backend.$get<RoomReadList>('/room')
-// const createRoom = async () => {
-//   const {data: room} = await $backend.$post('/room')
-// }
 </script>
 
 <template>
