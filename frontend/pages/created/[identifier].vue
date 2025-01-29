@@ -1,20 +1,32 @@
 <script setup lang="ts">
-import {format} from "date-fns";
-import type { RoomOwnerRead } from "~/types/room";
-import type {DutiesWithUserResponse, dutyWithUserTypeList} from "~/types/duty";
+import type {dutyListType, RoomOwnerRead} from "~/types/room";
+import type {DutiesWithUserResponse} from "~/types/duty";
 import {formatDateToYYYYMMDD} from "~/services/date";
 
 const route = useRoute();
 const $backend = useBackend();
 
 const roomIdentifier = route.params.identifier;
-
+const newDuties = reactive<dutyListType>([]);
 // Fetch room data
-const { data: roomData } = await $backend.$get<RoomOwnerRead>(`/room/owner/${roomIdentifier}`);
-const room: RoomOwnerRead= reactive({ ...roomData.value });
-const { data: dutiesData } = await $backend.$get<DutiesWithUserResponse>(`/duty/${roomIdentifier}`);
-const duties = reactive([...dutiesData.value["duties"]]);
-
+const {data: roomData} = await $backend.$get<RoomOwnerRead>(`/room/owner/${roomIdentifier}`);
+const room: RoomOwnerRead = reactive({...roomData.value});
+const {data: dutiesData} = await $backend.$get<DutiesWithUserResponse>(`/duty/${roomIdentifier}`);
+// const duties = reactive([...dutiesData.value["duties"]]);
+const duties = computed(() => {
+  let existingDuties = dutiesData.value["duties"]
+  existingDuties.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateA.getTime() - dateB.getTime();
+  })
+  return [...existingDuties, ...newDuties]
+      // .sort((a, b) => {
+    // const dateA = new Date(a.date);
+    // const dateB = new Date(b.date);
+    // return dateA.getTime() - dateB.getTime();
+  // })
+})
 // Function to update room name
 const updateRoomName = async () => {
   // console.log("change to", room.value.name)
@@ -29,12 +41,10 @@ const updateRoomName = async () => {
 // Function to add a new duty
 const addDuty = () => {
   const newDuty = {
-    id: duties.length + 1, // Temporary ID (replace with backend-generated ID)
-    user: null,
-    date: "2025-01-01", // Default date
+    duty_date: "2025-01-01", // Default date
     name: "", // Default name
   };
-  duties.push(newDuty);
+  newDuties.push(newDuty);
 };
 
 // Function to update a duty
@@ -65,31 +75,31 @@ const removeDuty = async (dutyId: number) => {
   <div class="p-8">
     <!-- Room Information -->
     <div class="mb-8">
-      <h1 class="text-2xl font-bold mb-4">Информация о комнате</h1>
-      <UInput v-model="room.name" label="Room Name" class="mb-4" />
-      <UButton @click="updateRoomName" color="primary">Обновить название</UButton>
+      <h1 class="text-2xl font-bold mb-4">Настройки комнаты</h1>
+      <UInput v-model="room.name" label="Room Name" class="mb-4"/>
+      <UButton @click="updateRoomName" color="primary">Обновить название и сохранить новые дежурства</UButton>
     </div>
 
     <!-- Duties List -->
     <div class="mb-8">
       <h2 class="text-xl font-bold mb-4">Дежурства</h2>
-      <div v-for="duty in duties" :key="duty.id" class="mb-4 p-4 border rounded">
-        <UInput v-model="duty.name" label="Duty Name" class="mb-2" />
+      <div v-for="duty in duties" :key="duty.id" class="mb-4 p-4 border rounded-xl flex flex-col gap-2">
+        <UInput v-model="duty.name" label="Duty Name"/>
         <UPopover :popper="{ placement: 'bottom-start' }">
-          <UButton icon="i-heroicons-calendar-days-20-solid" :label="duty.date" />
+          <UButton icon="i-heroicons-calendar-days-20-solid" :label="duty.date"/>
 
           <template #panel="{ close }">
             <DatePicker @update:model-value="(value) => {
               duty.date = formatDateToYYYYMMDD(value)
-            }" :model-value="new Date(duty.date)" is-required @close="close" />
+            }" :model-value="new Date(duty.date)" is-required @close="close"/>
           </template>
         </UPopover>
         <div class="flex gap-2">
-          <UButton @click="updateDuty(duty)" color="primary">Update Duty</UButton>
-          <UButton @click="removeDuty(duty.id)" color="red">Remove Duty</UButton>
+          <UButton @click="updateDuty(duty)" color="primary">Обновить</UButton>
+          <UButton @click="removeDuty(duty.id)" color="red">Удалить</UButton>
         </div>
       </div>
-      <UButton @click="addDuty" color="green">Add New Duty</UButton>
+      <UButton @click="addDuty" color="green">Добавить новое дежурство</UButton>
     </div>
 
     <!-- Debugging: Display raw data -->
