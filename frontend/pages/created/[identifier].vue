@@ -13,22 +13,15 @@ const newDuties = reactive<dutyListType>([]);
 // Fetch room data
 const {data: roomData} = await $backend.$get<RoomOwnerRead>(`/room/owner/${roomIdentifier}`);
 const room: RoomOwnerRead = reactive({...roomData.value});
-const {data: dutiesData, refresh: refreshDuties} = await $backend.$get<DutiesWithUserResponse>(`/duty/${roomIdentifier}`);
-// const duties = reactive([...dutiesData.value["duties"]]);
+const {
+  data: dutiesData,
+  refresh: refreshDuties
+} = await $backend.$get<DutiesWithUserResponse>(`/duty/${roomIdentifier}`);
 const duties = computed(() => {
   let existingDuties = dutiesData.value["duties"]
-  // existingDuties.sort((a, b) => {
-  //   const dateA = new Date(a.date);
-  //   const dateB = new Date(b.date);
-  //   return dateA.getTime() - dateB.getTime();
-  // })
   return [...newDuties, ...existingDuties]
-      // .sort((a, b) => {
-    // const dateA = new Date(a.date);
-    // const dateB = new Date(b.date);
-    // return dateA.getTime() - dateB.getTime();
-  // })
 })
+
 // Function to update room name
 const updateRoomName = async () => {
   // console.log("change to", room.value.name)
@@ -49,16 +42,11 @@ const addDuty = () => {
   newDuties.push(newDuty);
 };
 
-// Function to update a duty
 const updateDuty = async (duty: any) => {
-  // console.log("change to", duty)
-  // {
-  //   "duty_date": "2025-01-29",
-  //     "name": "string"
-  // }
+
   try {
     let response = await $client.$put(`/duty/${duty.id}`, {
-    body: duty
+      body: duty
     });
     if (response) {
       toast.add({
@@ -121,6 +109,8 @@ const removeDuty = async (dutyId: number) => {
     <!-- Duties List -->
     <div class="mb-8">
       <h2 class="text-xl font-bold mb-4">Дежурства</h2>
+      <UButton @click="addDuty" color="green" class="mb-4">Добавить новое дежурство</UButton>
+
       <div v-for="duty in duties" :key="duty.id" class="mb-4 p-4 border rounded-xl flex flex-col gap-2">
         <UInput v-model="duty.name" label="Duty Name"/>
         <UPopover :popper="{ placement: 'bottom-start' }">
@@ -137,14 +127,6 @@ const removeDuty = async (dutyId: number) => {
           <UButton @click="removeDuty(duty.id)" color="red">Удалить</UButton>
         </div>
       </div>
-      <UButton @click="addDuty" color="green">Добавить новое дежурство</UButton>
-    </div>
-
-    <!-- Debugging: Display raw data -->
-    <div class="mt-8">
-      <h2 class="text-xl font-bold mb-4">Debug Data</h2>
-      <pre>Room: {{ room }}</pre>
-      <pre>Duties: {{ duties }}</pre>
     </div>
   </div>
 </template>
