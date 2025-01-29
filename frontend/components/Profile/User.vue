@@ -13,11 +13,8 @@ const userStore = useUserStore()
         </h1>
       </template>
     <UCard>
-      <p class="text-lg mb-4">Добро пожаловать, {{userStore.first_name}} {{userStore.last_name}}</p>
-      <p class="text-lg mb-4">Юзернейм: {{userStore.username}}</p>
-      <p class="text-lg mb-4 flex flex-row justify-between">Аватар:
-
-      </p>
+      <p class="text-lg mb-4">Добро пожаловать,&nbsp;&nbsp;{{userStore.first_name}} {{userStore.last_name}}</p>
+      <p class="text-lg mb-4">Юзернейм:&nbsp;&nbsp;{{userStore.username}}</p>
     </UCard>
     </UCard>
   </UContainer>

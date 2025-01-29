@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type {RoomReadList} from "~/types/room";
+import type {RoomOwnerReadList} from "~/types/room";
 
 const $backend = useBackend()
-const {data: roomList, refresh} = await $backend.$get<RoomReadList>('/room')
+const {data: roomList, refresh} = await $backend.$get<RoomOwnerReadList>('/room')
 </script>
 
 <template>
@@ -19,7 +19,7 @@ const {data: roomList, refresh} = await $backend.$get<RoomReadList>('/room')
                class="hover:bg-gray-50 transition-colors">
           <NuxtLink
               class="block p-4"
-              :to="`/store/${room.identifier}`"
+              :to="`/created/${room.identifier}`"
           >
             <span class="text-primary-500 font-medium">{{ room.name }}</span>
           </NuxtLink>

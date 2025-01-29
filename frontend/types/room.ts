@@ -13,12 +13,14 @@ export type RoomRead = {
     "name": string
 }
 export type RoomReadList = RoomRead[]
+
 export type RoomOwnerRead = {
     "id": number,
     "identifier": string,
     "is_multiple_selection": boolean,
     "name": string
 }
+export type RoomOwnerReadList = RoomOwnerRead[]
 
 export type dateRangeType = {
     start: Date,
