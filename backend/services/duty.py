@@ -123,6 +123,14 @@ class DutyServices:
             duty = await self.get_duty(duty_id=duty_id)
         return duty.user_id == user_id
 
+    async def is_user_creator(self, user_id: int, duty_id: int) -> bool:
+        creator_id = await self.duty_repository.get_duty_creator_id(duty_id=duty_id)
+        return creator_id == user_id
+
+    async def validate_is_user_a_creator(self, user_id: int, duty_id: int):
+        if not await self.is_user_creator(user_id=user_id, duty_id=duty_id):
+            raise UserHasNoPermission
+
     async def validate_is_user_owner(self, user_id: int, duty_id: int | None = None, duty: Duty | None = None):
         if not await self.is_user_owner(user_id=user_id, duty_id=duty_id, duty=duty):
             raise UserHasNoPermission
@@ -137,3 +145,14 @@ class DutyServices:
         self.db.add(duty)
         self.db.commit()
         return duty
+
+    async def delete_duty(self, user_id: int, duty_id: int) -> Duty | None:
+        await self.validate_is_user_a_creator(user_id=user_id, duty_id=duty_id)
+        response = await self.duty_repository.delete_duty(duty_id=duty_id)
+        try:
+            self.db.commit()
+            return response
+        except Exception as e:
+            print("Error", e)
+            self.db.rollback()
+

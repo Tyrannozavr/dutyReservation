@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import type {dutyListType, RoomOwnerRead} from "~/types/room";
-import type {DutiesWithUserResponse} from "~/types/duty";
+import type {DutiesWithUserResponse, SuccessDeleteType} from "~/types/duty";
 import {formatDateToYYYYMMDD} from "~/services/date";
 
+const toast = useToast();
 const route = useRoute();
 const $backend = useBackend();
+const $client = useClientFetch()
 
 const roomIdentifier = route.params.identifier;
 const newDuties = reactive<dutyListType>([]);
 // Fetch room data
 const {data: roomData} = await $backend.$get<RoomOwnerRead>(`/room/owner/${roomIdentifier}`);
 const room: RoomOwnerRead = reactive({...roomData.value});
-const {data: dutiesData} = await $backend.$get<DutiesWithUserResponse>(`/duty/${roomIdentifier}`);
+const {data: dutiesData, refresh: refreshDuties} = await $backend.$get<DutiesWithUserResponse>(`/duty/${roomIdentifier}`);
 // const duties = reactive([...dutiesData.value["duties"]]);
 const duties = computed(() => {
   let existingDuties = dutiesData.value["duties"]
@@ -60,7 +62,27 @@ const updateDuty = async (duty: any) => {
 
 // Function to remove a duty
 const removeDuty = async (dutyId: number) => {
-  console.log("remove", dutyId)
+  try {
+    let response = await $client.$delete<SuccessDeleteType>(`/duty/${dutyId}`)
+    // console.log(response)
+    // console.log("Hello,", response.status)
+    if (response.status === "success") {
+      console.log("success refresh")
+      await refreshDuties()
+      toast.add({
+        title: "Успешно",
+        description: "Дежурство удалено",
+        color: "green"
+      })
+    }
+  } catch (error) {
+    console.error("Failed to remove duty:", error);
+    toast.add({
+      title: "Ошибка",
+      description: "Не удалось удалить дежурство",
+      color: "red"
+    })
+  }
   // try {
   //   await $backend.$delete(`/duty/${dutyId}`);
   //   duties.splice(duties.findIndex((d) => d.id === dutyId), 1);

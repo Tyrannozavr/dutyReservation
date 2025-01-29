@@ -16,3 +16,6 @@ export type dutyWithUserTypeList = dutyWithUserType[]
 export type DutiesWithUserResponse = {
     duties: dutyWithUserTypeList
 }
+export type SuccessDeleteType = {
+    status: "success"
+}

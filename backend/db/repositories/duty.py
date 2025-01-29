@@ -6,7 +6,7 @@ from sqlmodel import Session, select
 
 from api.errors.duty import DutyIsAlreadyTaken
 from models.pydantic.duty import DutyChange
-from models.sqlmodels import Duty, User
+from models.sqlmodels import Duty, User, DutiesRoom
 
 
 class DutyRepositoriesMixin:
@@ -38,6 +38,11 @@ class DutyRepositoriesMixin:
         stmt = select(Duty).where(Duty.id == duty_id)
         duty = self.db.exec(stmt).first()
         return duty
+
+    async def get_duty_creator_id(self, duty_id: int) -> int:
+        stmt = select(Duty).where(Duty.id == duty_id).join(DutiesRoom)
+        duty: Duty = self.db.exec(stmt).first()
+        return duty.room.owner_id
 
     async def get_free_duty_by_date(self, date: datetime.date) -> Duty | None:
         stmt = select(Duty).where(Duty.date == date).where(Duty.user_id.is_(None))

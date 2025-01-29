@@ -73,8 +73,8 @@ async def change_duty(
     return duty
 
 
-@router_without_room.delete("/{duty_id}")
-async def delete_duty(
+@router_without_room.post("clear/{duty_id}")
+async def set_duty_as_free(
         duty_id: DutyIdDp,
         token_data: TokenDataDep,
         duty_services: DutyServicesDep,
@@ -82,3 +82,12 @@ async def delete_duty(
     await duty_services.delete_duty_from_user(duty_id=duty_id, user_id=token_data.user_id)
     return {"status": "success"}
 
+@router_without_room.delete("/{duty_id}")
+async def delete_duty(
+        duty_id: DutyIdDp,
+        token_data: TokenDataDep,
+        duty_services: DutyServicesDep,
+):
+    response = await duty_services.delete_duty(duty_id=duty_id, user_id=token_data.user_id)
+    if response:
+        return {"status": "success"}
