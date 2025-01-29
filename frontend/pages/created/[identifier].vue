@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import {format} from "date-fns";
 import type { RoomOwnerRead } from "~/types/room";
 import type {DutiesWithUserResponse, dutyWithUserTypeList} from "~/types/duty";
+import {formatDateToYYYYMMDD} from "~/services/date";
 
 const route = useRoute();
 const $backend = useBackend();
@@ -9,14 +11,8 @@ const roomIdentifier = route.params.identifier;
 
 // Fetch room data
 const { data: roomData } = await $backend.$get<RoomOwnerRead>(`/room/owner/${roomIdentifier}`);
-const room = reactive({ ...roomData.value });
-// console.log("room is", room, 2, room.value)
-// console.log("room name is", roomData.value)
-// Fetch duties data
+const room: RoomOwnerRead= reactive({ ...roomData.value });
 const { data: dutiesData } = await $backend.$get<DutiesWithUserResponse>(`/duty/${roomIdentifier}`);
-// console.log(dutiesData)
-// console.log("Hello")
-// console.log(dutiesData.value)
 const duties = reactive([...dutiesData.value["duties"]]);
 
 // Function to update room name
@@ -69,17 +65,25 @@ const removeDuty = async (dutyId: number) => {
   <div class="p-8">
     <!-- Room Information -->
     <div class="mb-8">
-      <h1 class="text-2xl font-bold mb-4">Room Information</h1>
+      <h1 class="text-2xl font-bold mb-4">Информация о комнате</h1>
       <UInput v-model="room.name" label="Room Name" class="mb-4" />
-      <UButton @click="updateRoomName" color="primary">Update Room Name</UButton>
+      <UButton @click="updateRoomName" color="primary">Обновить название</UButton>
     </div>
 
     <!-- Duties List -->
     <div class="mb-8">
-      <h2 class="text-xl font-bold mb-4">Duties</h2>
+      <h2 class="text-xl font-bold mb-4">Дежурства</h2>
       <div v-for="duty in duties" :key="duty.id" class="mb-4 p-4 border rounded">
         <UInput v-model="duty.name" label="Duty Name" class="mb-2" />
-        <UInput v-model="duty.date" label="Date" type="date" class="mb-2" />
+        <UPopover :popper="{ placement: 'bottom-start' }">
+          <UButton icon="i-heroicons-calendar-days-20-solid" :label="duty.date" />
+
+          <template #panel="{ close }">
+            <DatePicker @update:model-value="(value) => {
+              duty.date = formatDateToYYYYMMDD(value)
+            }" :model-value="new Date(duty.date)" is-required @close="close" />
+          </template>
+        </UPopover>
         <div class="flex gap-2">
           <UButton @click="updateDuty(duty)" color="primary">Update Duty</UButton>
           <UButton @click="removeDuty(duty.id)" color="red">Remove Duty</UButton>

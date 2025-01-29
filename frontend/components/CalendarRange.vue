@@ -67,7 +67,7 @@ const updateDaysInMonth = () => {
           disabledDate.getDate() === dayDate.getDate() &&
           disabledDate.getMonth() === dayDate.getMonth() &&
           disabledDate.getFullYear() === dayDate.getFullYear()
-      )дш
+      )
     };
   });
 };
