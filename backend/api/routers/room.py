@@ -5,6 +5,7 @@ from fastapi import APIRouter, status, HTTPException
 from api.dependencies.auth import TokenDataDep
 from api.dependencies.room import RoomServicesDep, RoomParamsDep, DutiesRoomUpdateParams, \
     DutiesRoomIdDp, DutiesRoomIdentifierDep
+from api.errors.duty import UserHasNoPermission
 from models.pydantic.room import RoomRead, RoomCommonRead
 from fastapi import Response
 router = APIRouter(tags=["room"])
@@ -36,7 +37,7 @@ async def create_room(
 async def get_room(
         room: DutiesRoomIdentifierDep,
 ) -> RoomCommonRead | None:
-    # await asyncio.sleep(5)  #it is for testing frontend
+
     return room
 
 @router.post("/storage/{room_identifier}")
@@ -71,6 +72,27 @@ async def get_rooms_stored_by_user(
     return room
 
 
+@router.get("/{room_id}")
+async def get_room_by_id(
+        token_data: TokenDataDep,
+        room_id: DutiesRoomIdDp,
+        room_services: RoomServicesDep
+) -> RoomRead:
+    room = await room_services.get_room_by_id(room_id=room_id)
+    if room.owner_id == token_data.user_id:
+        return room
+    else:
+        raise UserHasNoPermission
+
+@router.get("/owner/{room_identifier}")
+async def get_room_by_identifier_to_owner(
+        token_data: TokenDataDep,
+        room: DutiesRoomIdentifierDep,
+) -> RoomRead:
+    if room.owner_id == token_data.user_id:
+        return room
+    else:
+        raise UserHasNoPermission
 @router.delete("/{room_id}")
 async def delete_room(
         token_data: TokenDataDep,

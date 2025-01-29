@@ -11,7 +11,7 @@ router = APIRouter(prefix="/{room_identifier}")
 router_without_room = APIRouter()
 
 
-@router.get("/", response_model=DutiesWithUsersResponse | FreeDutiesResponse)
+@router.get("", response_model=DutiesWithUsersResponse | FreeDutiesResponse)
 async def get_all_duties_in_room(
         room: DutiesRoomIdentifierDep,
         duty_services: DutyServicesDep,
@@ -34,7 +34,7 @@ async def get_all_duties_in_room(
 
 
 
-@router.post("/", response_model=DutyTaken)
+@router.post("", response_model=DutyTaken)
 async def reserve_duty(
         token_data: TokenDataDep,
         duty_data: DutyIdBodyDp,
@@ -49,7 +49,7 @@ async def reserve_duty(
     return duty
 
 
-@router.put("/", response_model=DutyTaken, deprecated=True)
+@router.put("", response_model=DutyTaken, deprecated=True)
 async def reserve_or_change_duty_date(
         token_data: TokenDataDep,
         duty_data: DutyDataDep,
