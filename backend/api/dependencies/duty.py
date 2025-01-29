@@ -6,7 +6,7 @@ from fastapi import Depends, Path, Body
 from api.dependencies.database import SessionDep
 from db.repositories.duty import DutyRepositories
 from db.repositories.room import RoomRepositories
-from models.pydantic.duty import DutyData, DutyReserve
+from models.pydantic.duty import DutyData, DutyReserve, DutyDate
 from services.duty import DutyServices
 
 
@@ -26,4 +26,5 @@ DutyRepositoriesDep = Annotated[DutyRepositories, Depends(get_duty_queries)]
 RoomRepositoriesDep = Annotated[RoomRepositories, Depends(get_room_queries)]
 DutyServicesDep = Annotated[DutyServices, Depends(get_duty_services)]
 DutyDataDep = Annotated[DutyData, Body()]
+DutyDateDep = Annotated[DutyDate, Body()]
 DutyIdDep = Annotated[int, Body()]

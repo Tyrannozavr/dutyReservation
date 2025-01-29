@@ -17,12 +17,12 @@ const {data: dutiesData, refresh: refreshDuties} = await $backend.$get<DutiesWit
 // const duties = reactive([...dutiesData.value["duties"]]);
 const duties = computed(() => {
   let existingDuties = dutiesData.value["duties"]
-  existingDuties.sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return dateA.getTime() - dateB.getTime();
-  })
-  return [...existingDuties, ...newDuties]
+  // existingDuties.sort((a, b) => {
+  //   const dateA = new Date(a.date);
+  //   const dateB = new Date(b.date);
+  //   return dateA.getTime() - dateB.getTime();
+  // })
+  return [...newDuties, ...existingDuties]
       // .sort((a, b) => {
     // const dateA = new Date(a.date);
     // const dateB = new Date(b.date);
@@ -51,21 +51,44 @@ const addDuty = () => {
 
 // Function to update a duty
 const updateDuty = async (duty: any) => {
-  console.log("change to", duty)
-  // try {
-  //   await $backend.$patch(`/duty/${duty.id}`, { name: duty.name, date: duty.date });
-  //   alert("Duty updated successfully!");
-  // } catch (error) {
-  //   console.error("Failed to update duty:", error);
+  // console.log("change to", duty)
+  // {
+  //   "duty_date": "2025-01-29",
+  //     "name": "string"
   // }
+  try {
+    let response = await $client.$put(`/duty/${duty.id}`, {
+    body: duty
+    });
+    if (response) {
+      toast.add({
+        title: "Успешно",
+        description: "Дежурство обновлено",
+        color: "green"
+      })
+      await refreshDuties();
+    } else {
+      toast.add({
+        title: "Ошибка",
+        description: "Не удалось обновить дежурство",
+        color: "red"
+      })
+    }
+    refreshDuties();
+  } catch (error) {
+    console.error("Failed to update duty:", error);
+    toast.add({
+      title: "Ошибка",
+      description: "Не удалось обновить дежурство",
+      color: "red"
+    })
+  }
 };
 
 // Function to remove a duty
 const removeDuty = async (dutyId: number) => {
   try {
     let response = await $client.$delete<SuccessDeleteType>(`/duty/${dutyId}`)
-    // console.log(response)
-    // console.log("Hello,", response.status)
     if (response.status === "success") {
       console.log("success refresh")
       await refreshDuties()
@@ -83,13 +106,6 @@ const removeDuty = async (dutyId: number) => {
       color: "red"
     })
   }
-  // try {
-  //   await $backend.$delete(`/duty/${dutyId}`);
-  //   duties.splice(duties.findIndex((d) => d.id === dutyId), 1);
-  //   alert("Duty removed successfully!");
-  // } catch (error) {
-  //   console.error("Failed to remove duty:", error);
-  // }
 };
 </script>
 

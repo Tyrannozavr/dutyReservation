@@ -1,4 +1,5 @@
 import datetime
+from typing import Any, Coroutine
 
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
@@ -8,7 +9,7 @@ from api.errors.duty import UserAlreadyTookAllDuties, DutyDoesntExist, UserHasNo
 from db.errors.duty import DutyOccupied
 from db.repositories.duty import DutyRepositories
 from db.repositories.room import RoomRepositories
-from models.pydantic.duty import DutyCreate, DutyChange
+from models.pydantic.duty import DutyCreate, DutyChange, DutyData
 from models.sqlmodels import Duty
 
 
@@ -38,7 +39,7 @@ class DutyServices:
         else:
             return True
 
-    async def change_duty_date(self, duty_id: int, user_id: int, date: datetime.date) -> Duty:
+    async def reserve_another_duty(self, duty_id: int, user_id: int, date: datetime.date) -> Duty:
         duty = await self.get_duty(duty_id=duty_id)
         await self.validate_is_user_owner(duty=duty, user_id=user_id)
         new_duty = await self.duty_repository.get_free_duty_by_date(date=date)
@@ -80,7 +81,7 @@ class DutyServices:
             print(f"set duty by id error {e}")
             self.db.rollback()
 
-    async def set_or_change_duty_user(self, user_id: int, room_id: int, date: datetime.date) -> Duty:
+    async def set_or_change_duty_user(self, user_id: int, room_id: int, date: datetime.date) -> Duty | None:
         if await self.is_user_can_reserve_duty(user_id=user_id, room_id=room_id):
             duty = await self.set_duty_user(user_id=user_id, room_id=room_id, date=date)
         else:
@@ -95,6 +96,21 @@ class DutyServices:
         except Exception as e:
             self.db.rollback()
             print("Error in set or change duty user ", e)
+
+    # async def update_duty(self, update_data: DutyData, duty_id: int, user_id: int):
+    #     await self.validate_is_user_a_creator(duty_id=duty_id, user_id=user_id)
+    #     duty = await self.duty_repository.get_duty_by_id(duty_id=duty_id)
+    #     duty.date = update_data.duty_date
+    #     duty.name = update_data.name
+    #     self.db.add(duty)
+    #     self.db.refresh(duty)
+    #     try:
+    #         self.db.commit()
+    #         return duty
+    #     except Exception as e:
+    #         print("Error", e)
+    #         self.db.rollback()
+
 
     async def get_duty(self, duty_id):
         return await self.duty_repository.get_duty_by_id(duty_id)
@@ -112,8 +128,16 @@ class DutyServices:
             self.db.rollback()
             raise DutyOccupied("Duty already exists for this user in this room on this date.")
 
-    async def update_duty(self, duty_id: int, duty_change: DutyChange):
-        return await self.duty_repository.update_duty(duty_id=duty_id, duty_change=duty_change)
+    async def update_duty(self, update_data: DutyData, duty_id: int, user_id: int) -> Duty | None:
+        await self.validate_is_user_a_creator(duty_id=duty_id, user_id=user_id)
+        response = await self.duty_repository.update_duty(duty_id=duty_id, duty_change=update_data)
+        if response:
+            try:
+                self.db.commit()
+                return response
+            except Exception as e:
+                print("Error", e)
+                self.db.rollback()
 
 
     async def is_user_owner(self, user_id: int, duty_id: int | None = None, duty: Duty | None = None) -> bool:
@@ -123,7 +147,9 @@ class DutyServices:
             duty = await self.get_duty(duty_id=duty_id)
         return duty.user_id == user_id
 
+
     async def is_user_creator(self, user_id: int, duty_id: int) -> bool:
+
         creator_id = await self.duty_repository.get_duty_creator_id(duty_id=duty_id)
         return creator_id == user_id
 

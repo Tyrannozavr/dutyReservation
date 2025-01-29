@@ -29,6 +29,8 @@ class DutyTaken(BaseModel):
     id: int
     date: date
 
+class DutyRead(DutyTaken):
+    name: str
 
 class DutiesWithUsersResponse(BaseModel):
     duties: list[DutyWithUser]
@@ -37,6 +39,10 @@ class FreeDutiesResponse(BaseModel):
     duties: list[FreeDuty]
 
 class DutyData(BaseModel):
+    date: date
+    name: str
+
+class DutyDate(BaseModel):
     duty_date: date
 
 class DutyReserve(BaseModel):

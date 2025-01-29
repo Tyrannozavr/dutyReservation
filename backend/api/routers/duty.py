@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Query
 
 from api.dependencies.auth import TokenDataDep
-from api.dependencies.duty import DutyIdDp, DutyServicesDep, DutyDataDep, DutyIdBodyDp
+from api.dependencies.duty import DutyIdDp, DutyServicesDep, DutyDataDep, DutyIdBodyDp, DutyDateDep
 from api.dependencies.room import DutiesRoomIdentifierDep
 from models.pydantic.auth import UserRead
-from models.pydantic.duty import DutiesWithUsersResponse, FreeDutiesResponse, FreeDuty, DutyWithUser, DutyTaken
+from models.pydantic.duty import DutiesWithUsersResponse, FreeDutiesResponse, FreeDuty, DutyWithUser, DutyTaken, \
+    DutyRead
 from tests.services.integrational_tests.test_room import duty_services
 
 router = APIRouter(prefix="/{room_identifier}")
@@ -49,7 +50,7 @@ async def reserve_duty(
     return duty
 
 
-@router.put("", response_model=DutyTaken, deprecated=True)
+@router.put("reserve/", response_model=DutyTaken, deprecated=True)
 async def reserve_or_change_duty_date(
         token_data: TokenDataDep,
         duty_data: DutyDataDep,
@@ -62,16 +63,25 @@ async def reserve_or_change_duty_date(
     return duty
 
 
-@router_without_room.put("/{duty_id}", response_model=DutyTaken)
-async def change_duty(
+@router_without_room.put("/change_date/{duty_id}", response_model=DutyTaken)
+async def change_duty_date(
+        duty_id: DutyIdDp,
+        token_data: TokenDataDep,
+        duty_date: DutyDateDep,
+        duty_services: DutyServicesDep
+):
+    """reserves free duty by the duty_date parameter"""
+    duty = await duty_services.change_duty_date(duty_id=duty_id, user_id=token_data.user_id, date=duty_date.duty_date)
+    return duty
+
+@router_without_room.put("/{duty_id}", response_model=DutyRead | None)
+async def update_duty(
         duty_id: DutyIdDp,
         token_data: TokenDataDep,
         duty_data: DutyDataDep,
         duty_services: DutyServicesDep
 ):
-    duty = await duty_services.change_duty_date(duty_id=duty_id, user_id=token_data.user_id, date=duty_data.duty_date)
-    return duty
-
+    return await duty_services.update_duty(update_data=duty_data, duty_id=duty_id, user_id=token_data.user_id)
 
 @router_without_room.post("clear/{duty_id}")
 async def set_duty_as_free(

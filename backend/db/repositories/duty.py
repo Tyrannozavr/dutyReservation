@@ -4,8 +4,8 @@ from typing import Sequence
 from sqlalchemy import update
 from sqlmodel import Session, select
 
-from api.errors.duty import DutyIsAlreadyTaken
-from models.pydantic.duty import DutyChange
+from api.errors.duty import DutyIsAlreadyTaken, DutyDoesntExist
+from models.pydantic.duty import DutyData
 from models.sqlmodels import Duty, User, DutiesRoom
 
 
@@ -14,17 +14,17 @@ class DutyRepositoriesMixin:
         self.db = db
 
     async def get_all_duties_in_room(self, room_id: int) -> list[Duty]:
-        stmt = select(Duty).where(Duty.room_id == room_id)
+        stmt = select(Duty).where(Duty.room_id == room_id).order_by(Duty.date.asc())
         duties = self.db.exec(stmt).all()
         return duties
 
     async def get_all_free_duties_in_the_room(self, room_id: int) -> list[Duty]:
-        stmt = select(Duty).where(Duty.room_id == room_id).where(Duty.user_id.is_(None))
+        stmt = select(Duty).where(Duty.room_id == room_id).where(Duty.user_id.is_(None)).order_by(Duty.date.asc())
         duties = self.db.exec(stmt).all()
         return duties
 
     async def get_all_duties_with_users_in_the_room(self, room_id: int) -> list[Duty]:
-        stmt = select(Duty, User).join(User, isouter=True).where(Duty.room_id == room_id)
+        stmt = select(Duty, User).join(User, isouter=True).where(Duty.room_id == room_id).order_by(Duty.date.asc())
         duties = self.db.exec(stmt).scalars().all()
         return duties
 
@@ -42,13 +42,14 @@ class DutyRepositoriesMixin:
     async def get_duty_creator_id(self, duty_id: int) -> int:
         stmt = select(Duty).where(Duty.id == duty_id).join(DutiesRoom)
         duty: Duty = self.db.exec(stmt).first()
+        if not duty:
+            raise DutyDoesntExist
         return duty.room.owner_id
 
     async def get_free_duty_by_date(self, date: datetime.date) -> Duty | None:
         stmt = select(Duty).where(Duty.date == date).where(Duty.user_id.is_(None))
         duties = self.db.exec(stmt)
         return duties.first()
-
 
     async def get_all_users_duty_in_the_room(self, user_id: int, room_id: int) -> list[Duty]:
         stmt = select(Duty).where(Duty.user_id == user_id).where(Duty.room_id == room_id).order_by(Duty.id.asc())
@@ -81,7 +82,7 @@ class DutyRepositoriesMixin:
         else:
             raise DutyIsAlreadyTaken
 
-    async def update_duty(self, duty_id, duty_change: DutyChange):
+    async def update_duty(self, duty_id: int, duty_change: DutyData) -> Duty | None:
         duty_data = duty_change.model_dump(exclude_unset=True)
         db_duty = self.db.get(Duty, duty_id)
         db_duty.sqlmodel_update(duty_data)
