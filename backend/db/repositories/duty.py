@@ -5,7 +5,7 @@ from sqlalchemy import update
 from sqlmodel import Session, select
 
 from api.errors.duty import DutyIsAlreadyTaken, DutyDoesntExist
-from models.pydantic.duty import DutyData
+from models.pydantic.duty import DutyUpdate
 from models.sqlmodels import Duty, User, DutiesRoom
 
 
@@ -82,7 +82,7 @@ class DutyRepositoriesMixin:
         else:
             raise DutyIsAlreadyTaken
 
-    async def update_duty(self, duty_id: int, duty_change: DutyData) -> Duty | None:
+    async def update_duty(self, duty_id: int, duty_change: DutyUpdate) -> Duty | None:
         duty_data = duty_change.model_dump(exclude_unset=True)
         db_duty = self.db.get(Duty, duty_id)
         db_duty.sqlmodel_update(duty_data)

@@ -19,3 +19,4 @@ class UserAlreadyTookAllDuties(HTTPException):
 
 DutyDoesntExist = HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The duty doesn't exist")
 DutyDoesntMatchRoom = HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="The duty doesn't exist in this room")
+DutyUpdateBadRequest = HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="duty_id or date must be provided")

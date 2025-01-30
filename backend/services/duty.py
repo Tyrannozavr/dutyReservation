@@ -9,7 +9,7 @@ from api.errors.duty import UserAlreadyTookAllDuties, DutyDoesntExist, UserHasNo
 from db.errors.duty import DutyOccupied
 from db.repositories.duty import DutyRepositories
 from db.repositories.room import RoomRepositories
-from models.pydantic.duty import DutyCreate, DutyChange, DutyData
+from models.pydantic.duty import DutyCreate, DutyChange, DutyUpdate
 from models.sqlmodels import Duty
 
 
@@ -66,20 +66,22 @@ class DutyServices:
         return duty
 
     async def set_duty_user_by_duty_id(self, duty_id: int, user_id: int, room_id: int) -> Duty:
+        """Sets given use_id as duty.user_id if user can reserve duty in given room and duty.user_id is still free"""
         await self.validate_user_can_reserve_duty(user_id=user_id, room_id=room_id)
         duty = await self.duty_repository.get_duty_by_id(duty_id=duty_id)
         if duty.room_id != room_id:
             raise DutyDoesntMatchRoom
-        if duty.user_id is None:
-            duty.user_id = user_id
+        if duty.user_id is not None:
+            raise DutyIsAlreadyTaken
+        duty.user_id = user_id
         self.db.add(duty)
         try:
             self.db.commit()
             return duty
-
         except Exception as e:
-            print(f"set duty by id error {e}")
+            print(f"Error set duty by id {e}")
             self.db.rollback()
+            raise e
 
     async def set_or_change_duty_user(self, user_id: int, room_id: int, date: datetime.date) -> Duty | None:
         if await self.is_user_can_reserve_duty(user_id=user_id, room_id=room_id):
@@ -128,7 +130,7 @@ class DutyServices:
             self.db.rollback()
             raise DutyOccupied("Duty already exists for this user in this room on this date.")
 
-    async def update_duty(self, update_data: DutyData, duty_id: int, user_id: int) -> Duty | None:
+    async def update_duty(self, update_data: DutyUpdate, duty_id: int, user_id: int) -> Duty | None:
         await self.validate_is_user_a_creator(duty_id=duty_id, user_id=user_id)
         response = await self.duty_repository.update_duty(duty_id=duty_id, duty_change=update_data)
         if response:

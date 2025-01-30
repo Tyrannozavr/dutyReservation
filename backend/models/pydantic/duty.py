@@ -38,12 +38,9 @@ class DutiesWithUsersResponse(BaseModel):
 class FreeDutiesResponse(BaseModel):
     duties: list[FreeDuty]
 
-class DutyData(BaseModel):
+class DutyUpdate(BaseModel):
     date: date
     name: str
 
 class DutyDate(BaseModel):
     duty_date: date
-
-class DutyReserve(BaseModel):
-    duty_id: int
