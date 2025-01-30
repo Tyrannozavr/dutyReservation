@@ -84,7 +84,7 @@ async def get_room_by_id(
     else:
         raise UserHasNoPermission
 
-@router.get("/owner/{room_identifier}")
+@router.get("/{room_identifier}")
 async def get_room_by_identifier_to_owner(
         token_data: TokenDataDep,
         room: DutiesRoomIdentifierDep,
