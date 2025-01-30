@@ -7,18 +7,9 @@ from models.pydantic.auth import UserRead
 from models.pydantic.duty import DutiesWithUsersResponse, FreeDutiesResponse, FreeDuty, DutyWithUser, DutyTaken, \
     DutyRead
 from tests.services.integrational_tests.test_room import duty_services
-from fastapi import APIRouter, Query
 
-from api.dependencies.auth import TokenDataDep
-from api.dependencies.duty import DutyIdDp, DutyServicesDep, DutyDataDep
-from api.dependencies.room import DutiesRoomIdentifierDep
-from models.pydantic.auth import UserRead
-from models.pydantic.duty import DutiesWithUsersResponse, FreeDutiesResponse, FreeDuty, DutyWithUser, DutyTaken, \
-    DutyRead
-from tests.services.integrational_tests.test_room import duty_services
-
-router = APIRouter(prefix="/{room_identifier}")
-router_without_room = APIRouter()
+router = APIRouter(prefix="/{room_identifier}", tags=["customer"])
+router_without_room = APIRouter(tags=["owner"])
 
 
 @router.get("/duties", response_model=DutiesWithUsersResponse | FreeDutiesResponse)
@@ -58,6 +49,7 @@ async def update_duty(
     )
     return duty
 
+
 @router.delete("/duties/{duty_id}")
 async def set_duty_as_free(
         duty_id: DutyIdDp,
@@ -67,6 +59,7 @@ async def set_duty_as_free(
 ):
     await duty_services.delete_duty_from_user(duty_id=duty_id, user_id=token_data.user_id)
     return {"status": "success"}
+
 
 @router_without_room.put("/{duty_id}", response_model=DutyRead | None)
 async def update_duty(

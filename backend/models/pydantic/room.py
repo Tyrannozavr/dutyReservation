@@ -18,7 +18,7 @@ class RoomCreate(BaseModel):
                                                                              "созданы при создании комнаты")
 
 
-class RoomRead(BaseModel):
+class RoomOwnerRead(BaseModel):
     id: int
     identifier: uuid.UUID
     is_multiple_selection: bool

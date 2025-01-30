@@ -6,7 +6,7 @@ from api.dependencies.auth import TokenDataDep
 from api.dependencies.room import RoomServicesDep, RoomParamsDep, DutiesRoomUpdateParams, \
     DutiesRoomIdDp, DutiesRoomIdentifierDep
 from api.errors.duty import UserHasNoPermission
-from models.pydantic.room import RoomRead, RoomCommonRead
+from models.pydantic.room import RoomOwnerRead, RoomCommonRead
 from fastapi import Response
 router = APIRouter(tags=["room"])
 
@@ -15,12 +15,12 @@ router = APIRouter(tags=["room"])
 async def get_rooms_created_by_user(
         token_data: TokenDataDep,
         room_services: RoomServicesDep,
-) -> list[RoomRead]:
+) -> list[RoomOwnerRead]:
     """Returns rooms created by user"""
     room = await room_services.get_user_rooms(user_id=token_data.user_id)
     return room
 
-@router.post("", response_model=RoomRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=RoomOwnerRead, status_code=status.HTTP_201_CREATED)
 async def create_room(
         token: TokenDataDep,
         room_data: RoomParamsDep,
@@ -33,14 +33,18 @@ async def create_room(
     return room
 
 
-@router.get("/storage/{room_identifier}")
-async def get_room(
+@router.get("/storage/{room_identifier}", tags=["customer"])
+async def get_room_by_identifier(
         room: DutiesRoomIdentifierDep,
-) -> RoomCommonRead | None:
+        token_data: TokenDataDep
+) -> RoomCommonRead | RoomOwnerRead:
+    if room.owner_id == token_data.user_id:
+        return RoomOwnerRead.model_validate(room.model_dump())
+    else:
+        return RoomCommonRead.model_validate(room.model_dump())
 
-    return room
 
-@router.post("/storage/{room_identifier}")
+@router.post("/storage/{room_identifier}", tags=["customer"])
 async def add_room_to_storage(
         room: DutiesRoomIdentifierDep,
         token_data: TokenDataDep,
@@ -50,7 +54,7 @@ async def add_room_to_storage(
     return room
 
 @router.delete(
-    "/storage/{room_identifier}",
+    "/storage/{room_identifier}", tags=["customer"]
 )
 async def delete_room_from_storage(
         room: DutiesRoomIdentifierDep,
@@ -62,38 +66,30 @@ async def delete_room_from_storage(
         return Response(status_code=status.HTTP_200_OK)
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request")
 
-@router.get("/storage")
+@router.get("/storage", tags=["customer"])
 async def get_rooms_stored_by_user(
         token_data: TokenDataDep,
         room_services: RoomServicesDep,
-) -> list[RoomRead]:
+) -> list[RoomOwnerRead]:
     """Returns rooms stored by user"""
     room = await room_services.get_stored_room_list(user_id=token_data.user_id)
     return room
 
 
-@router.get("/{room_id}")
+@router.get("/{room_id}", tags=["owner"])
 async def get_room_by_id(
         token_data: TokenDataDep,
-        room_id: DutiesRoomIdDp,
+        room_identifier: DutiesRoomIdentifierDep,
         room_services: RoomServicesDep
-) -> RoomRead:
-    room = await room_services.get_room_by_id(room_id=room_id)
+) -> RoomOwnerRead:
+    room = await room_services.get_room_by_identifier(room_identifier=room_identifier)
     if room.owner_id == token_data.user_id:
         return room
     else:
         raise UserHasNoPermission
 
-@router.get("/{room_identifier}")
-async def get_room_by_identifier_to_owner(
-        token_data: TokenDataDep,
-        room: DutiesRoomIdentifierDep,
-) -> RoomRead:
-    if room.owner_id == token_data.user_id:
-        return room
-    else:
-        raise UserHasNoPermission
-@router.delete("/{room_id}")
+
+@router.delete("/{room_id}", tags=["owner"])
 async def delete_room(
         token_data: TokenDataDep,
         room_id: DutiesRoomIdDp,
@@ -103,13 +99,13 @@ async def delete_room(
     return {"status": "success"}
 
 
-@router.patch("/{room_id}")
+@router.patch("/{room_id}", tags=["owner"])
 async def update_room(
         token_data: TokenDataDep,
         room_id: DutiesRoomIdDp,
         room_services: RoomServicesDep,
         room_data: DutiesRoomUpdateParams,
-) -> RoomRead:
+) -> RoomOwnerRead:
     updated_room = await room_services.update_room(
         user_id=token_data.user_id,
         update_data=room_data,
