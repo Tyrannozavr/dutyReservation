@@ -18,14 +18,14 @@ const router = useRouter()
 
 if (roomIdentifierFromRoute.value) {
   roomIdentifier.value = roomIdentifierFromRoute.value.toString()
-  const { data } = await $backend.get<RoomRead>(urlRequest.value)
+  const { data } = await $backend.$get<RoomRead>(urlRequest.value)
   room.value = data.value
   isOpen.value = true
 }
 
 watch(roomIdentifier, async () => {
   if (roomIdentifier.value?.length > 16) {
-    room.value = await clientFetch.get<RoomRead>(urlRequest.value).catch(() => null)
+    room.value = await clientFetch.$get<RoomRead>(urlRequest.value).catch(() => null)
     if (room.value === null) {
       $toast.add({
         title: 'Добавление комнаты',

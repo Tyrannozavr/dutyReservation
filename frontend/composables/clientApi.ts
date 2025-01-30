@@ -73,6 +73,23 @@ export const useClientFetch = () => {
                 url, opt, config.public.baseURL, "PUT", "/auth/token/refresh",
             )
         },
-
+        patch: async <T>(url: string, opt: options = {}) => {
+            if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
+                opt.body = JSON.stringify(opt.body)
+            }
+            return $fetch<T>(url, {
+                baseURL: config.public.baseURL,
+                method: "PATCH",
+                ...opt,
+            })
+        },
+        $patch: async <T>(url: string, opt: options = {}) => {
+            if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
+                opt.body = JSON.stringify(opt.body)
+            }
+            return fetchWithRefreshToken<T>(
+                url, opt, config.public.baseURL, "PATCH", "/auth/token/refresh",
+            )
+        },
     };
 }

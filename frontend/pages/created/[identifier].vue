@@ -11,7 +11,7 @@ const $client = useClientFetch()
 const roomIdentifier = route.params.identifier;
 const newDuties = reactive<dutyListType>([]);
 // Fetch room data
-const {data: roomData} = await $backend.$get<RoomOwnerRead>(`/room/${roomIdentifier}`);
+const {data: roomData} = await $backend.$get<RoomOwnerRead>(`/room/storage/${roomIdentifier}`);
 const room: RoomOwnerRead = reactive({...roomData.value});
 const {
   data: dutiesData,
@@ -21,16 +21,33 @@ const duties = computed(() => {
   let existingDuties = dutiesData.value["duties"]
   return [...newDuties, ...existingDuties]
 })
-
+const dutyUpdateData = computed(() => {
+  return {
+    ...room,
+    extra_duties: Array.from(newDuties)
+  }
+})
 // Function to update room name
-const updateRoomName = async () => {
-  // console.log("change to", room.value.name)
-  // try {
-  //   await $backend.$patch(`/room/owner/${roomIdentifier}`, { name: room.name });
-  //   alert("Room name updated successfully!");
-  // } catch (error) {
-  //   console.error("Failed to update room name:", error);
-  // }
+const updateRoom = async () => {
+  try {
+    let response = await $client.$patch(`/room/${room.id}`, {
+      body: dutyUpdateData.value
+    })
+    if (response) {
+      toast.add({
+        title: "Успешно",
+        description: "Комната обновлена",
+        color: "green"
+      })
+    }
+  } catch (error) {
+    console.error("Failed to update room:", error);
+    toast.add({
+      title: "Ошибка",
+      description: "Не удалось обновить комнату",
+      color: "red"
+    })
+  }
 };
 
 // Function to add a new duty
@@ -43,7 +60,6 @@ const addDuty = () => {
 };
 
 const updateDuty = async (duty: any) => {
-
   try {
     let response = await $client.$put(`/duties/${duty.id}`, {
       body: duty
@@ -78,7 +94,6 @@ const removeDuty = async (dutyId: number) => {
   try {
     let response = await $client.$delete<SuccessDeleteType>(`/duties/${dutyId}`)
     if (response.status === "success") {
-      console.log("success refresh")
       await refreshDuties()
       toast.add({
         title: "Успешно",
@@ -87,7 +102,6 @@ const removeDuty = async (dutyId: number) => {
       })
     }
   } catch (error) {
-    console.error("Failed to remove duty:", error);
     toast.add({
       title: "Ошибка",
       description: "Не удалось удалить дежурство",
@@ -101,14 +115,20 @@ const removeDuty = async (dutyId: number) => {
   <div class="p-8">
     <!-- Room Information -->
     <div class="mb-8">
-      <h1 class="text-2xl font-bold mb-4">Настройки комнаты</h1>
+      <h1 class="text-2xl font-bold mb-4 flex flex-row">
+        <span>Настройки комнаты</span>
+        <RoomShare class="ml-auto" :room-identifier="room.identifier" />
+      </h1>
       <UInput v-model="room.name" label="Room Name" class="mb-4"/>
-      <UButton @click="updateRoomName" color="primary">Обновить название и сохранить новые дежурства</UButton>
+      <UButton @click="updateRoom" color="primary">Обновить данные и сохранить новые дежурства</UButton>
     </div>
-
     <!-- Duties List -->
     <div class="mb-8">
       <h2 class="text-xl font-bold mb-4">Дежурства</h2>
+      <!--      <UToggle v-model="room.is_multiple_selection" label="выбор нескольких дат" class="mb-4 block "/>-->
+      <UFormGroup label="Может ли один человек выбрать несколько дат" class="mb-2">
+        <UToggle v-model="room.is_multiple_selection"/>
+      </UFormGroup>
       <UButton @click="addDuty" color="green" class="mb-4">Добавить новое дежурство</UButton>
 
       <div v-for="duty in duties" :key="duty.id" class="mb-4 p-4 border rounded-xl flex flex-col gap-2">
