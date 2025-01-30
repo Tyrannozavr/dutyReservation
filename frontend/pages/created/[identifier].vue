@@ -11,12 +11,12 @@ const $client = useClientFetch()
 const roomIdentifier = route.params.identifier;
 const newDuties = reactive<dutyListType>([]);
 // Fetch room data
-const {data: roomData} = await $backend.$get<RoomOwnerRead>(`/room/owner/${roomIdentifier}`);
+const {data: roomData} = await $backend.$get<RoomOwnerRead>(`/room/${roomIdentifier}`);
 const room: RoomOwnerRead = reactive({...roomData.value});
 const {
   data: dutiesData,
   refresh: refreshDuties
-} = await $backend.$get<DutiesWithUserResponse>(`/duty/${roomIdentifier}`);
+} = await $backend.$get<DutiesWithUserResponse>(`/room/${roomIdentifier}/duties`);
 const duties = computed(() => {
   let existingDuties = dutiesData.value["duties"]
   return [...newDuties, ...existingDuties]
@@ -45,7 +45,7 @@ const addDuty = () => {
 const updateDuty = async (duty: any) => {
 
   try {
-    let response = await $client.$put(`/duty/${duty.id}`, {
+    let response = await $client.$put(`/duties/${duty.id}`, {
       body: duty
     });
     if (response) {
@@ -76,7 +76,7 @@ const updateDuty = async (duty: any) => {
 // Function to remove a duty
 const removeDuty = async (dutyId: number) => {
   try {
-    let response = await $client.$delete<SuccessDeleteType>(`/duty/${dutyId}`)
+    let response = await $client.$delete<SuccessDeleteType>(`/duties/${dutyId}`)
     if (response.status === "success") {
       console.log("success refresh")
       await refreshDuties()
