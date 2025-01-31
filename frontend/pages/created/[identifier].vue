@@ -115,28 +115,32 @@ const removeDuty = async (dutyId: number) => {
   <div class="p-8">
     <!-- Room Information -->
     <div class="mb-8">
-      <h1 class="text-2xl font-bold mb-4 flex flex-row">
-        Настройки
-      </h1>
-
-      <div class="flex flex-row items-center gap-2 mb-2
+      <div class="flex flex-row items-center gap-2 mb-4
        max-sm:flex-col">
         Чтобы пригласить кого нибудь в комнату просто поделитесь ссылкой
         <RoomShare :room-identifier="room.identifier" />
       </div>
+      <h1 class="text-2xl font-bold mb-4 flex flex-row">
+        Настройки
+      </h1>
       <UInput v-model="room.name" label="Room Name" class="mb-4"/>
-      <UButton @click="updateRoom" color="primary">Обновить данные и сохранить новые дежурства</UButton>
+      <div class="flex flex-row max-sm:flex-col gap-2">
+        <UButton @click="updateRoom" color="primary" class="w-auto max-w-fit">
+          Обновить данные и сохранить новые дежурства
+        </UButton>
+        <RoomDelete :id="room.id" class="w-auto max-w-fit"/>
+      </div>
     </div>
     <!-- Duties List -->
     <div class="mb-8">
       <h2 class="text-xl font-bold mb-4">Дежурства</h2>
-      <!--      <UToggle v-model="room.is_multiple_selection" label="выбор нескольких дат" class="mb-4 block "/>-->
       <UFormGroup label="Может ли один человек выбрать несколько дат" class="mb-2">
         <UToggle v-model="room.is_multiple_selection"/>
       </UFormGroup>
       <UButton @click="addDuty" color="green" class="mb-4">Добавить новое дежурство</UButton>
 
-      <div v-for="duty in duties" :key="duty.id" class="mb-4 p-4 border rounded-xl flex flex-col gap-2">
+      <div v-for="duty in duties" :key="duty.id"
+           class="mb-4 p-4 border rounded-xl flex flex-col gap-2">
         <UInput v-model="duty.name" label="Duty Name"/>
         <UPopover :popper="{ placement: 'bottom-start' }">
           <UButton icon="i-heroicons-calendar-days-20-solid" :label="duty.date"/>

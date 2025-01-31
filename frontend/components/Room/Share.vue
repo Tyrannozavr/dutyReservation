@@ -6,7 +6,6 @@ const props = defineProps({
       }
     }
 )
-const route = useRoute()
 const toast = useToast()
 const Link = `${window.location.origin}/store?roomIdentifier=${props.roomIdentifier}`
 
@@ -27,14 +26,14 @@ const copyLink = () => {
     icon="i-heroicons-clipboard"
     color="gray"
     variant="ghost"
-    size="sm"
+    size="xl"
     @click="copyLink"
   />
   <UButton
     icon="i-simple-icons-telegram"
     color="blue"
     variant="ghost"
-    size="sm"
+    size="xl"
     :to="`https://t.me/share/url?url=${Link}`"
     target="_blank"
   />
@@ -42,7 +41,7 @@ const copyLink = () => {
     icon="i-simple-icons-whatsapp"
     color="green"
     variant="ghost"
-    size="sm"
+    size="xl"
     :to="`https://api.whatsapp.com/send?text=${Link}`"
     target="_blank"
   />
@@ -50,7 +49,7 @@ const copyLink = () => {
     icon="i-simple-icons-vk"
     color="blue"
     variant="ghost"
-    size="sm"
+    size="xl"
     :to="`https://vk.com/share.php?url=${Link}`"
     target="_blank"
   />
@@ -58,7 +57,7 @@ const copyLink = () => {
     icon="i-simple-icons-odnoklassniki"
     color="orange"
     variant="ghost"
-    size="sm"
+    size="xl"
     :to="`https://connect.ok.ru/offer?url=${Link}`"
     target="_blank"
   />
