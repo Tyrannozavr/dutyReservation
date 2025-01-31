@@ -41,7 +41,7 @@ async def websocket_docs():
         "url": "/ws/duties",
         "usage": "Connect using a WebSocket client to send and receive messages."
     }
-
+# https://fastapi.tiangolo.com/advanced/websockets/#using-depends-and-others
 @router.websocket("/ws/duties")
 async def websocket_endpoint(websocket: WebSocket):
     """
