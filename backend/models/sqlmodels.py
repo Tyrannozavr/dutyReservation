@@ -63,7 +63,7 @@ class DutiesRoom(SQLModel, table=True):
     owner: User = Relationship(back_populates="rooms")
     is_multiple_selection: bool = Field(default=False)
     duties: list["Duty"] = Relationship(back_populates="room", sa_relationship_kwargs={"cascade": "delete"})
-    participants: list["RoomStorage"] = Relationship(back_populates="room")
+    participants: list["RoomStorage"] = Relationship(back_populates="room", sa_relationship_kwargs={"cascade": "delete"})
 
 class Duty(SQLModel, table=True):
     id: int | None = Field(primary_key=True)

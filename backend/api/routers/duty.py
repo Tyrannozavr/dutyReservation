@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Query
+from fastapi.websockets import WebSocket
 
 from api.dependencies.auth import TokenDataDep
 from api.dependencies.duty import DutyIdDp, DutyServicesDep, DutyDataDep
@@ -32,6 +33,27 @@ async def get_all_duties_in_room(
                 for duty in duties
             ]
         )
+
+@router.get("/ws/duties")
+async def websocket_docs():
+    return {
+        "description": "WebSocket endpoint for duties.",
+        "url": "/ws/duties",
+        "usage": "Connect using a WebSocket client to send and receive messages."
+    }
+
+@router.websocket("/ws/duties")
+async def websocket_endpoint(websocket: WebSocket):
+    """
+    WebSocket endpoint for duties.
+
+    - **Accepts** messages from the client and echoes them back.
+    - Connect using a WebSocket client to ws://<your-domain>/ws/duties.
+    """
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        await websocket.send_text(f"Message text was: {data}")
 
 
 @router.patch("/duties/{duty_id}", response_model=DutyTaken)
