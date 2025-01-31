@@ -26,10 +26,13 @@ class ConnectionManager:
 
 duty_connection_manager = ConnectionManager()
 
-async def refresh_websocket_duties(
+async def refresh_websocket_duties_task(
         background_tasks: BackgroundTasks,
         duty_services: DutyServicesDep,
         room: DutiesRoomIdentifierDep,
 ):
     duties_json = await duty_services.get_all_duties_with_users_in_the_room_json(room_id=room.id)
+    print("updated", duties_json)
     background_tasks.add_task(duty_connection_manager.send_group_message, duties_json)
+
+

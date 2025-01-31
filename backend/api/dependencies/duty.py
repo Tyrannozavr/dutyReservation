@@ -1,4 +1,3 @@
-import datetime
 from typing import Annotated
 
 from fastapi import Depends, Path, Body
@@ -17,8 +16,12 @@ async def get_duty_queries(db: SessionDep) -> DutyRepositories:
 async def get_room_queries(db: SessionDep) -> RoomRepositories:
     return RoomRepositories(db=db)
 
+
 async def get_duty_services(db: SessionDep) -> DutyServices:
     return DutyServices(db=db)
+
+
+
 
 DutyIdDp = Annotated[int, Path()]
 DutyRepositoriesDep = Annotated[DutyRepositories, Depends(get_duty_queries)]
@@ -27,4 +30,5 @@ DutyServicesDep = Annotated[DutyServices, Depends(get_duty_services)]
 DutyDataDep = Annotated[DutyUpdate, Body()]
 DutyDateDep = Annotated[DutyDate, Body()]
 DutyIdDep = Annotated[int, Body()]
+
 

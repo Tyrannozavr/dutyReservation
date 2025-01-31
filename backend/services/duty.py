@@ -11,6 +11,7 @@ from api.errors.duty import UserAlreadyTookAllDuties, DutyDoesntExist, UserHasNo
 from db.errors.duty import DutyOccupied
 from db.repositories.duty import DutyRepositories
 from db.repositories.room import RoomRepositories
+from models.pydantic.auth import UserRead
 from models.pydantic.duty import DutyCreate, DutyUpdate, DutiesWithUsersResponse, DutyWithUser
 from models.sqlmodels import Duty
 
@@ -167,7 +168,10 @@ class DutyRoomManagementServices(DutyValidationMixin):
     async def get_all_duties_with_users_in_the_room_json(self, room_id: int) -> json:
         duties = await self.get_all_duties_with_users_in_the_room(room_id=room_id)
         duties_data = DutiesWithUsersResponse(duties=[
-            DutyWithUser(**duty.model_dump()) for duty in duties
+            DutyWithUser(
+                **duty.model_dump(), user=UserRead(**duty.user.model_dump()))
+            if duty.user else DutyWithUser(**duty.model_dump())
+            for duty in duties
         ])
         duties_data_jsonable = jsonable_encoder(duties_data)
         duties_json = json.dumps(duties_data_jsonable)

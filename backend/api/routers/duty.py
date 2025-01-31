@@ -1,11 +1,11 @@
-import json
-
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, BackgroundTasks
 from fastapi.websockets import WebSocket
+from fastapi.websockets import WebSocketDisconnect
 
 from api.dependencies.auth import TokenDataDep, TokenDataQueryDep
 from api.dependencies.duty import DutyIdDp, DutyServicesDep, DutyDataDep
 from api.dependencies.room import DutiesRoomIdentifierDep
+from api.dependencies.websockets import DutyRefreshWebSocketTask
 from models.pydantic.auth import UserRead
 from models.pydantic.duty import DutiesWithUsersResponse, FreeDutiesResponse, FreeDuty, DutyWithUser, DutyTaken, \
     DutyRead
@@ -68,6 +68,11 @@ async def websocket_endpoint(
     await duty_connection_manager.connect(websocket=websocket)
     duties_json = await duty_services.get_all_duties_with_users_in_the_room_json(room_id=room.id)
     await duty_connection_manager.send_personal_message(websocket=websocket, message=duties_json)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        await duty_connection_manager.disconnect(websocket)
     # await websocket.accept()
     # while True:
     #     data = await websocket.receive_text()
@@ -80,6 +85,7 @@ async def update_duty(
         duty_id: DutyIdDp,
         room: DutiesRoomIdentifierDep,
         duty_services: DutyServicesDep,
+        background_tasks: BackgroundTasks
 ):
     """Sets duty user as user requested if duty is still free and user can reserve duty in this room"""
     duty = await duty_services.set_duty_user_by_duty_id(
@@ -87,6 +93,9 @@ async def update_duty(
         room_id=room.id,
         duty_id=duty_id
     )
+    duties_json = await duty_services.get_all_duties_with_users_in_the_room_json(room_id=room.id)
+    # background_tasks.add_task(duty_connection_manager.send_group_message, duties_json)
+    await duty_connection_manager.send_group_message(duties_json)
     return duty
 
 
