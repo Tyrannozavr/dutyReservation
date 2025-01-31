@@ -22,7 +22,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import {useAuthStore} from "~/store/auth";
 const props = defineProps({
   roomIdentifier: {
@@ -49,7 +48,6 @@ const connect = () => {
       .replace('http://', 'ws://')
       .replace('https://', 'wss://')
 
-      // /room/{room_identifier}/ws/duties
   const url = `${websocketsBaseUrl}/room/${props.roomIdentifier}/ws/duties?token=${authStore.accessToken}`
   ws = new WebSocket(url);
 

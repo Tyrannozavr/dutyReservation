@@ -1,12 +1,15 @@
+import json
+
 from fastapi import APIRouter, Query
 from fastapi.websockets import WebSocket
 
-from api.dependencies.auth import TokenDataDep
+from api.dependencies.auth import TokenDataDep, TokenDataQueryDep
 from api.dependencies.duty import DutyIdDp, DutyServicesDep, DutyDataDep
 from api.dependencies.room import DutiesRoomIdentifierDep
 from models.pydantic.auth import UserRead
 from models.pydantic.duty import DutiesWithUsersResponse, FreeDutiesResponse, FreeDuty, DutyWithUser, DutyTaken, \
     DutyRead
+from services.Websockets import duty_connection_manager
 from tests.services.integrational_tests.test_room import duty_services
 
 router = APIRouter(prefix="/{room_identifier}", tags=["customer"])
@@ -17,7 +20,9 @@ router_without_room = APIRouter(tags=["owner"])
 async def get_all_duties_in_room(
         room: DutiesRoomIdentifierDep,
         duty_services: DutyServicesDep,
-        free: bool = Query(default=False, description="Set true to retrieve only free duties")
+        token_data: TokenDataDep,
+        free: bool = Query(default=False, description="Set true to retrieve only free duties"),
+
 ):
     if free:
         free_duties = await duty_services.get_all_free_duties_in_the_room(room_id=room.id)
@@ -34,8 +39,13 @@ async def get_all_duties_in_room(
             ]
         )
 
-@router.get("/ws/duties")
-async def websocket_docs():
+@router.get("/ws/duties", response_model=list[DutyWithUser])
+async def websocket_docs(
+        websocket: WebSocket,
+        duty_services: DutyServicesDep,
+        room: DutiesRoomIdentifierDep,
+        token_data: TokenDataQueryDep,
+):
     return {
         "description": "WebSocket endpoint for duties.",
         "url": "/ws/duties",
@@ -43,17 +53,25 @@ async def websocket_docs():
     }
 # https://fastapi.tiangolo.com/advanced/websockets/#using-depends-and-others
 @router.websocket("/ws/duties")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_endpoint(
+        websocket: WebSocket,
+        duty_services: DutyServicesDep,
+        room: DutiesRoomIdentifierDep,
+        token_data: TokenDataQueryDep,
+):
     """
     WebSocket endpoint for duties.
 
     - **Accepts** messages from the client and echoes them back.
     - Connect using a WebSocket client to ws://<your-domain>/ws/duties.
     """
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+    await duty_connection_manager.connect(websocket=websocket)
+    duties_json = await duty_services.get_all_duties_with_users_in_the_room_json(room_id=room.id)
+    await duty_connection_manager.send_personal_message(websocket=websocket, message=duties_json)
+    # await websocket.accept()
+    # while True:
+    #     data = await websocket.receive_text()
+    #     await websocket.send_text(f"Message text was: {data}")
 
 
 @router.patch("/duties/{duty_id}", response_model=DutyTaken)

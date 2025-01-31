@@ -13,7 +13,7 @@ from models.pydantic.auth import UserDataIn, TokenData, TelegramInitData, Refres
 from models.sqlmodels import User
 from services.auth import UserServices, TokenServices
 from services.telegram import TelegramInitDataService
-
+from fastapi import Query
 InitDataStringDep = Annotated[str, Body(title="body title", description="body description")]
 
 SettingsDep = Annotated[Settings, Depends(get_settings)]
@@ -38,6 +38,10 @@ oauth2_scheme = OAuth2PasswordBearer(
 async def get_token_data(token: Annotated[str, Depends(oauth2_scheme)], token_services: TokenServicesDep) -> TokenData:
     """Have no requests to DB"""
     return await token_services.decode_token(token=token)
+
+async def get_token_data_query(access_token: Annotated[str, Query()], token_services: TokenServicesDep) -> TokenData:
+    """Have no requests to DB"""
+    return await token_services.decode_token(token=access_token)
 
 
 def get_pwd_context():
@@ -86,6 +90,7 @@ InitDataDep = Annotated[TelegramInitData, Depends(get_telegram_init_data)]
 AuthorizedUserType = Annotated[User, Depends(get_current_user)]
 UserDataCreateDep = Annotated[UserDataIn, Body()]
 TokenDataDep = Annotated[TokenData, Depends(get_token_data)]
+TokenDataQueryDep = Annotated[TokenData, Depends(get_token_data_query)]
 RefreshTokenDep = Annotated[RefreshTokenIn, Body()]
 TelegramInitDataServiceDep = Annotated[TelegramInitDataService, Depends(get_telegram_services)]
 LoginDataDep = Annotated[LoginData, Body()]
