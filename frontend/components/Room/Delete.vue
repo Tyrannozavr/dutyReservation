@@ -24,12 +24,26 @@ const deleteRoom = async () => {
       color: 'red'
     })
   }
-
 }
+const isOpen = ref(false)
 </script>
 
 <template>
-  <UButton @click="deleteRoom" color="red">Удалить дежурство</UButton>
+  <div>
+    <UButton @click="isOpen = true" color="red">Удалить комнату</UButton>
+    <UModal v-model="isOpen">
+      <UCard>
+        <template #header>
+          <h1 class="text-center">Вы уверены?</h1>
+        </template>
+        <div class="flex flex-row justify-evenly">
+          <UButton @click="isOpen = false" color="gray">Отмена</UButton>
+          <UButton @click="deleteRoom" color="red">Удалить
+          </UButton>
+        </div>
+      </UCard>
+    </UModal>
+  </div>
 </template>
 
 <style scoped>

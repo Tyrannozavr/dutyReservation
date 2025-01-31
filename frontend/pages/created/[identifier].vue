@@ -13,19 +13,20 @@ const newDuties = reactive<dutyListType>([]);
 // Fetch room data
 const {data: roomData} = await $backend.$get<RoomOwnerRead>(`/room/storage/${roomIdentifier}`);
 const room: RoomOwnerRead = reactive({...roomData.value});
-const {
-  data: dutiesData,
-  refresh: refreshDuties
-} = await $backend.$get<DutiesWithUserResponse>(`/room/${roomIdentifier}/duties`);
+const { data: dutiesData, refresh: refreshDuties } = await $backend.$get<DutiesWithUserResponse>(
+    `/room/${roomIdentifier}/duties`);
+
 const duties = computed(() => {
   let existingDuties = dutiesData.value["duties"]
   return [...newDuties, ...existingDuties]
 })
+
 const dutyUpdateData = computed(() => {
   return {
     ...room,
     extra_duties: Array.from(newDuties)
   }
+
 })
 // Function to update room name
 const updateRoom = async () => {
@@ -48,6 +49,15 @@ const updateRoom = async () => {
       color: "red"
     })
   }
+};
+
+const copyIdentifier = () => {
+  navigator.clipboard.writeText(room.identifier);
+  toast.add({
+    title: "Успешно",
+    description: "Ссылка скопирована",
+    color: "green"
+  })
 };
 
 // Function to add a new duty
@@ -112,13 +122,13 @@ const removeDuty = async (dutyId: number) => {
 </script>
 
 <template>
-  <div class="p-8">
+  <div>
     <!-- Room Information -->
     <div class="mb-8">
       <div class="flex flex-row items-center gap-2 mb-4
        max-sm:flex-col">
-        Чтобы пригласить кого нибудь в комнату просто поделитесь ссылкой
-        <RoomShare :room-identifier="room.identifier" />
+
+      <RoomShare :room-identifier="room.identifier" />
       </div>
       <h1 class="text-2xl font-bold mb-4 flex flex-row">
         Настройки

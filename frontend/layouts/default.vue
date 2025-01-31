@@ -14,7 +14,7 @@ onMounted(() => {
   <div>
     <UNotifications position="left-top" />
     <UContainer>
-      <div class="container min-h-screen pt-4">
+      <div class="container min-h-screen pt-4 pb-16">
         <slot/>
         <Footer class="fixed bottom-0 left-0 right-0" />
       </div>
