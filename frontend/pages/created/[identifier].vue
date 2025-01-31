@@ -116,9 +116,14 @@ const removeDuty = async (dutyId: number) => {
     <!-- Room Information -->
     <div class="mb-8">
       <h1 class="text-2xl font-bold mb-4 flex flex-row">
-        <span>Настройки комнаты</span>
-        <RoomShare class="ml-auto" :room-identifier="room.identifier" />
+        Настройки
       </h1>
+
+      <div class="flex flex-row items-center gap-2 mb-2
+       max-sm:flex-col">
+        Чтобы пригласить кого нибудь в комнату просто поделитесь ссылкой
+        <RoomShare :room-identifier="room.identifier" />
+      </div>
       <UInput v-model="room.name" label="Room Name" class="mb-4"/>
       <UButton @click="updateRoom" color="primary">Обновить данные и сохранить новые дежурства</UButton>
     </div>
