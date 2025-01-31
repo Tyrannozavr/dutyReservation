@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query, BackgroundTasks
+from fastapi import APIRouter, Query
 from fastapi.websockets import WebSocket
 from fastapi.websockets import WebSocketDisconnect
 
@@ -65,7 +65,7 @@ async def websocket_endpoint(
     - **Accepts** messages from the client and echoes them back.
     - Connect using a WebSocket client to ws://<your-domain>/ws/duties.
     """
-    await duty_connection_manager.connect(websocket=websocket)
+    await duty_connection_manager.connect(websocket=websocket, identifier=room.identifier)
     duties_json = await duty_services.get_all_duties_with_users_in_the_room_json(room_id=room.id)
     await duty_connection_manager.send_personal_message(websocket=websocket, message=duties_json)
     try:
@@ -90,9 +90,6 @@ async def update_duty(
         room_id=room.id,
         duty_id=duty_id
     )
-    # duties_json = await duty_services.get_all_duties_with_users_in_the_room_json(room_id=room.id)
-    # background_tasks.add_task(duty_connection_manager.send_group_message, duties_json)
-    # await duty_connection_manager.send_group_message(duties_json)
     await refresh_websocket_duties()
     return duty
 
@@ -102,9 +99,12 @@ async def set_duty_as_free(
         duty_id: DutyIdDp,
         token_data: TokenDataDep,
         duty_services: DutyServicesDep,
-        room: DutiesRoomIdentifierDep
+        room: DutiesRoomIdentifierDep,
+        refresh_websocket_duties: DutyRefreshWebSocketTask
+
 ):
     await duty_services.delete_duty_from_user(duty_id=duty_id, user_id=token_data.user_id)
+    await refresh_websocket_duties()
     return {"status": "success"}
 
 
@@ -113,9 +113,12 @@ async def update_duty(
         duty_id: DutyIdDp,
         token_data: TokenDataDep,
         duty_data: DutyDataDep,
-        duty_services: DutyServicesDep
+        duty_services: DutyServicesDep,
+        refresh_websocket_duties: DutyRefreshWebSocketTask
+
 ):
     """Updates duty if user is a creator of the room"""
+    await refresh_websocket_duties()
     return await duty_services.update_duty(update_data=duty_data, duty_id=duty_id, user_id=token_data.user_id)
 
 
@@ -124,7 +127,9 @@ async def delete_duty(
         duty_id: DutyIdDp,
         token_data: TokenDataDep,
         duty_services: DutyServicesDep,
+        refresh_websocket_duties: DutyRefreshWebSocketTask
 ):
     response = await duty_services.delete_duty(duty_id=duty_id, user_id=token_data.user_id)
     if response:
+        await refresh_websocket_duties
         return {"status": "success"}

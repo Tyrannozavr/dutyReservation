@@ -5,6 +5,7 @@ from fastapi import APIRouter, status, HTTPException
 from api.dependencies.auth import TokenDataDep
 from api.dependencies.room import RoomServicesDep, RoomParamsDep, DutiesRoomUpdateParams, \
     DutiesRoomIdDp, DutiesRoomIdentifierDep
+from api.dependencies.websockets import DutyRefreshWebSocketTask
 from api.errors.duty import UserHasNoPermission
 from models.pydantic.room import RoomOwnerRead, RoomCommonRead
 from fastapi import Response
@@ -93,9 +94,11 @@ async def get_room_by_id(
 async def delete_room(
         token_data: TokenDataDep,
         room_id: DutiesRoomIdDp,
-        room_services: RoomServicesDep
+        room_services: RoomServicesDep,
+        refresh_websocket_duties: DutyRefreshWebSocketTask
 ) -> dict[str, str]:
     await room_services.delete_room(user_id=token_data.user_id, room_id=room_id)
+    await refresh_websocket_duties
     return {"status": "success"}
 
 
@@ -105,10 +108,12 @@ async def update_room(
         room_id: DutiesRoomIdDp,
         room_services: RoomServicesDep,
         room_data: DutiesRoomUpdateParams,
+        refresh_websocket_duties: DutyRefreshWebSocketTask,
 ) -> RoomOwnerRead:
     updated_room = await room_services.update_room(
         user_id=token_data.user_id,
         update_data=room_data,
         room_id=room_id
     )
+    await refresh_websocket_duties
     return updated_room

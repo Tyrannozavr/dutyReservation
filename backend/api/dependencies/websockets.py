@@ -10,6 +10,8 @@ from services.Websockets import refresh_websocket_duties_task
 async def get_refresh_duties_task(background_tasks: BackgroundTasks,
                                   duty_services: DutyServicesDep,
                                   room: DutiesRoomIdentifierDep):
+    """Allows to use refresh websocket duties task directly in parameter of a function with automatically
+    put dependencies"""
     async def wrapped():
         return await refresh_websocket_duties_task(
             background_tasks=background_tasks,
