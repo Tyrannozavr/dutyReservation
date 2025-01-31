@@ -73,10 +73,7 @@ async def websocket_endpoint(
             await websocket.receive_text()
     except WebSocketDisconnect:
         await duty_connection_manager.disconnect(websocket)
-    # await websocket.accept()
-    # while True:
-    #     data = await websocket.receive_text()
-    #     await websocket.send_text(f"Message text was: {data}")
+
 
 
 @router.patch("/duties/{duty_id}", response_model=DutyTaken)
@@ -85,7 +82,7 @@ async def update_duty(
         duty_id: DutyIdDp,
         room: DutiesRoomIdentifierDep,
         duty_services: DutyServicesDep,
-        background_tasks: BackgroundTasks
+        refresh_websocket_duties: DutyRefreshWebSocketTask
 ):
     """Sets duty user as user requested if duty is still free and user can reserve duty in this room"""
     duty = await duty_services.set_duty_user_by_duty_id(
@@ -93,9 +90,10 @@ async def update_duty(
         room_id=room.id,
         duty_id=duty_id
     )
-    duties_json = await duty_services.get_all_duties_with_users_in_the_room_json(room_id=room.id)
+    # duties_json = await duty_services.get_all_duties_with_users_in_the_room_json(room_id=room.id)
     # background_tasks.add_task(duty_connection_manager.send_group_message, duties_json)
-    await duty_connection_manager.send_group_message(duties_json)
+    # await duty_connection_manager.send_group_message(duties_json)
+    await refresh_websocket_duties()
     return duty
 
 
