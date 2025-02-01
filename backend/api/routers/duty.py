@@ -70,9 +70,10 @@ async def websocket_endpoint(
     await duty_connection_manager.send_personal_message(websocket=websocket, message=duties_json)
     try:
         while True:
+            # pass
             await websocket.receive_text()
     except WebSocketDisconnect:
-        await duty_connection_manager.disconnect(websocket)
+        await duty_connection_manager.disconnect(websocket, identifier=room.identifier)
 
 
 
@@ -82,7 +83,7 @@ async def update_duty(
         duty_id: DutyIdDp,
         room: DutiesRoomIdentifierDep,
         duty_services: DutyServicesDep,
-        refresh_websocket_duties: DutyRefreshWebSocketTask
+        refresh_websocket_duties: DutyRefreshWebSocketTask.by_room_identifier
 ):
     """Sets duty user as user requested if duty is still free and user can reserve duty in this room"""
     duty = await duty_services.set_duty_user_by_duty_id(
@@ -99,8 +100,7 @@ async def set_duty_as_free(
         duty_id: DutyIdDp,
         token_data: TokenDataDep,
         duty_services: DutyServicesDep,
-        room: DutiesRoomIdentifierDep,
-        refresh_websocket_duties: DutyRefreshWebSocketTask
+        refresh_websocket_duties: DutyRefreshWebSocketTask.by_room_identifier
 
 ):
     await duty_services.delete_duty_from_user(duty_id=duty_id, user_id=token_data.user_id)
@@ -114,22 +114,22 @@ async def update_duty(
         token_data: TokenDataDep,
         duty_data: DutyDataDep,
         duty_services: DutyServicesDep,
-        refresh_websocket_duties: DutyRefreshWebSocketTask
+        refresh_websocket_duties: DutyRefreshWebSocketTask.by_duty_id
 
 ):
     """Updates duty if user is a creator of the room"""
+    response = await duty_services.update_duty(update_data=duty_data, duty_id=duty_id, user_id=token_data.user_id)
     await refresh_websocket_duties()
-    return await duty_services.update_duty(update_data=duty_data, duty_id=duty_id, user_id=token_data.user_id)
-
+    return response
 
 @router_without_room.delete("/{duty_id}")
 async def delete_duty(
         duty_id: DutyIdDp,
         token_data: TokenDataDep,
         duty_services: DutyServicesDep,
-        refresh_websocket_duties: DutyRefreshWebSocketTask
+        refresh_websocket_duties: DutyRefreshWebSocketTask.by_duty_id
 ):
     response = await duty_services.delete_duty(duty_id=duty_id, user_id=token_data.user_id)
     if response:
-        await refresh_websocket_duties
+        await refresh_websocket_duties()
         return {"status": "success"}
