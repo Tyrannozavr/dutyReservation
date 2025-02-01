@@ -95,7 +95,7 @@ async def delete_room(
         token_data: TokenDataDep,
         room_id: DutiesRoomIdDp,
         room_services: RoomServicesDep,
-        refresh_websocket_duties: DutyRefreshWebSocketTask
+        refresh_websocket_duties: DutyRefreshWebSocketTask.by_room_id
 ) -> dict[str, str]:
     await room_services.delete_room(user_id=token_data.user_id, room_id=room_id)
     await refresh_websocket_duties
@@ -108,12 +108,12 @@ async def update_room(
         room_id: DutiesRoomIdDp,
         room_services: RoomServicesDep,
         room_data: DutiesRoomUpdateParams,
-        refresh_websocket_duties: DutyRefreshWebSocketTask,
+        refresh_websocket_duties: DutyRefreshWebSocketTask.by_room_id,
 ) -> RoomOwnerRead:
     updated_room = await room_services.update_room(
         user_id=token_data.user_id,
         update_data=room_data,
         room_id=room_id
     )
-    await refresh_websocket_duties
+    await refresh_websocket_duties()
     return updated_room

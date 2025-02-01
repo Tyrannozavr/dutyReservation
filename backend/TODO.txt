@@ -1,3 +1,4 @@
 1) user id and telegram id can make conflict if I will decide to add regular authentication (done)
 2) Review all models (SQLModel alongside with Pydantic models)
 3) 500 error unique constraint value when try to add the same room to user storage
+4) refresh room connection from urls without room identifier in the path

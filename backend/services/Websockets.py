@@ -17,7 +17,7 @@ class ConnectionManager:
         await websocket.accept()
         self.active_connections[identifier].append(websocket)
 
-    def disconnect(self, websocket: WebSocket, identifier: uuid):
+    async def disconnect(self, websocket: WebSocket, identifier: uuid):
         self.active_connections[identifier].remove(websocket)
 
     async def send_personal_message(self, message: str, websocket: WebSocket):
