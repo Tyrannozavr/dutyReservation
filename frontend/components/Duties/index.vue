@@ -1,44 +1,37 @@
 <script setup lang="ts">
-import {useAuthStore} from "~/store/auth";
-import type {dutyWithUserTypeList} from "~/types/duty";
+import type {dutyWithUserType, dutyWithUserTypeList} from "~/types/duty";
 
-const props = defineProps({
-  roomIdentifier: {
-    type: String,
-    required: true
-  }
+const props = withDefaults(defineProps<{
+  duties: dutyWithUserTypeList
+}>(), {
+  duties: () => []
 })
-const config = useRuntimeConfig();
-const baseUrl = config.public.baseURL
-const authStore = useAuthStore();
-const webSocketsBaseUrl = baseUrl
-    .replace('http://', 'ws://')
-    .replace('https://', 'wss://')
-const duties: Ref<dutyWithUserTypeList> = ref([])
-const webSocketsUrl = `${webSocketsBaseUrl}/room/${props.roomIdentifier}/ws/duties?access_token=${authStore.accessToken}`
 
-let ws: WebSocket | null = null
 
-const connect = () => {
-  if (ws) {
-    ws.close()
+const groupedDuties = computed(() => {
+  let result: { date: string, duties: dutyWithUserType[] }[] = [];
+  if (Array.isArray(props.duties)) {
+    // Your logic here
+    props.duties.forEach(item => {
+      // item.date = item.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+      const existingDateGroup = result.find(group => group.date === item.date);
+
+      if (existingDateGroup) {
+        existingDateGroup.duties.push(item);
+      } else {
+        result.push({date: item.date, duties: [item]});
+      }
+    });
+  } else {
+    console.error("props.duties is not an array:", props.duties);
   }
-  ws = new WebSocket(webSocketsUrl);
-  ws.onmessage = (event) => {
-    duties.value = JSON.parse(event.data)
-  };
-}
-onMounted(() => {
-  connect()
-})
+  return result;
+});
+
 </script>
 
 <template>
-  <div class="messages">
-    <div v-for="duty in duties" :key="duty.id">
-      {{ duty }}
-    </div>
-  </div>
+  <DutiesCalendar :duties-data="groupedDuties" />
 </template>
 
 <style scoped>

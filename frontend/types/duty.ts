@@ -1,4 +1,4 @@
-type dutyUser = {
+type dutyUserType = {
     first_name: string,
     last_name: string,
     username: string,
@@ -8,11 +8,12 @@ type dutyUser = {
 
 export type dutyWithUserType = {
     id: 0,
-    user: dutyUser | null,
+    user: dutyUserType | null,
     date: string,
     name: string
 }
 export type dutyWithUserTypeList = dutyWithUserType[]
+
 export type DutiesWithUserResponse = {
     duties: dutyWithUserTypeList
 }

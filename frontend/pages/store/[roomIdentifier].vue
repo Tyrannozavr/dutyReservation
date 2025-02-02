@@ -1,12 +1,40 @@
 <script setup lang="ts">
+import type {dutyWithUserTypeList} from "~/types/duty";
+import {useAuthStore} from "~/store/auth";
+
 const route = useRoute()
 const roomIdentifier = String(route.params.roomIdentifier)
+
+
+const config = useRuntimeConfig();
+const baseUrl = config.public.baseURL
+const authStore = useAuthStore();
+const webSocketsBaseUrl = baseUrl
+    .replace('http://', 'ws://')
+    .replace('https://', 'wss://')
+
+const webSocketsUrl = `${webSocketsBaseUrl}/room/${roomIdentifier}/ws/duties?access_token=${authStore.accessToken}`
+const duties: Ref<{duties: dutyWithUserTypeList}> = ref([])
+
+let ws: WebSocket | null = null
+
+const connect = () => {
+  if (ws) {
+    ws.close()
+  }
+  ws = new WebSocket(webSocketsUrl);
+  ws.onmessage = (event) => {
+    duties.value = JSON.parse(event.data)
+  };
+}
+onMounted(() => {
+  connect()
+})
 </script>
 
 <template>
 Конкретное голосование {{ roomIdentifier }}
-  <Duties :roomIdentifier="roomIdentifier" />
-<!--  <DutiesTest :roomIdentifier="roomIdentifier" />-->
+  <Duties :duties="duties.duties"/>
 </template>
 
 <style scoped>
