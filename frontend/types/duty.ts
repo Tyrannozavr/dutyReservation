@@ -20,3 +20,8 @@ export type DutiesWithUserResponse = {
 export type SuccessDeleteType = {
     status: "success"
 }
+
+export type groupedDutiesType = {
+    date: string,
+    duties: dutyWithUserTypeList
+}

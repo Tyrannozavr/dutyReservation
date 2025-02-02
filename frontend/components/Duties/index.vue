@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {dutyWithUserType, dutyWithUserTypeList} from "~/types/duty";
+import type {dutyWithUserType, dutyWithUserTypeList, groupedDutiesType} from "~/types/duty";
 
 const props = withDefaults(defineProps<{
   duties: dutyWithUserTypeList
@@ -8,7 +8,7 @@ const props = withDefaults(defineProps<{
 })
 
 
-const groupedDuties = computed(() => {
+const groupedDuties: groupedDutiesType[] = computed(() => {
   let result: { date: string, duties: dutyWithUserType[] }[] = [];
   if (Array.isArray(props.duties)) {
     // Your logic here
