@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type {dutyWithUserTypeList} from "~/types/duty";
 import {useAuthStore} from "~/store/auth";
-
+import type {RoomRead} from "~/types/room";
+const $backend = useBackend()
 const route = useRoute()
 const roomIdentifier = String(route.params.roomIdentifier)
 
+const {data: room} = await $backend.$get<RoomRead>(`/room/storage/${roomIdentifier}`)
 
 const config = useRuntimeConfig();
 const baseUrl = config.public.baseURL
@@ -33,7 +35,7 @@ onMounted(() => {
 </script>
 
 <template>
-Конкретное голосование {{ roomIdentifier }}
+  <h1 class="text-xl mb-4">{{ room.name }}</h1>
   <Duties :duties="duties.duties"/>
 </template>
 

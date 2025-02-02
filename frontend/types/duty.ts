@@ -22,6 +22,6 @@ export type SuccessDeleteType = {
 }
 
 export type groupedDutiesType = {
-    date: string,
+    date: Date,
     duties: dutyWithUserTypeList
 }

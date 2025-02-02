@@ -13,8 +13,10 @@ const groupedDuties: groupedDutiesType[] = computed(() => {
   if (Array.isArray(props.duties)) {
     // Your logic here
     props.duties.forEach(item => {
-      // item.date = item.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-      const existingDateGroup = result.find(group => group.date === item.date);
+      item.date = new Date(item.date);
+      const existingDateGroup = result.find(group =>
+          group.date.toLocaleDateString() === item.date.toLocaleDateString()
+      );
 
       if (existingDateGroup) {
         existingDateGroup.duties.push(item);
