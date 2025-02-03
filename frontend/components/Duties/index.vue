@@ -33,7 +33,8 @@ const groupedDuties: groupedDutiesType[] = computed(() => {
 </script>
 
 <template>
-  <DutiesCalendar :duties-data="groupedDuties" />
+  <DutiesCalendar :duties-data="groupedDuties" @book="(id) => $emit('book', id)" />
+  <DutiesTable :duties="props.duties" />
 </template>
 
 <style scoped>

@@ -55,7 +55,7 @@ const getDutiesForDay = (dayIndex) => {
             :key="duty.id"
             class="text-sm"
         >
-          <DutiesCalendarDay :duty="duty"/>
+          <DutiesCalendarDay :duty="duty" @book="(id) => $emit('book', id)" />
         </div>
         <div
             v-if="getDutiesForDay(dayIndex).length === 0"

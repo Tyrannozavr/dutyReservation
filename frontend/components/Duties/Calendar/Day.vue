@@ -30,8 +30,7 @@ const freeDutiesCount = computed(() => {
         </template>
         <div class="flex flex-col gap-2">
           <div v-for="duty in duty.duties" class="flex gap-2">
-            {{duty }}
-            <DutiesCalendarDuty :duty="duty" />
+            <DutiesCalendarDuty :duty="duty" @book="(id) => {$emit('book', id); isOpen = false}" />
           </div>
         </div>
       </UCard>

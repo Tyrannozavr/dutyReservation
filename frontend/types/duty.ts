@@ -12,7 +12,17 @@ export type dutyWithUserType = {
     date: string,
     name: string
 }
+
+export type dutyUserDataType = {
+    id: 0,
+    user: dutyUserType | null,
+    date: Date,
+    name: string
+}
+
 export type dutyWithUserTypeList = dutyWithUserType[]
+
+export type dutyUserDataTypeList = dutyUserDataType[]
 
 export type DutiesWithUserResponse = {
     duties: dutyWithUserTypeList
@@ -23,5 +33,5 @@ export type SuccessDeleteType = {
 
 export type groupedDutiesType = {
     date: Date,
-    duties: dutyWithUserTypeList
+    duties: dutyUserDataTypeList
 }

@@ -29,6 +29,11 @@ const connect = () => {
     duties.value = JSON.parse(event.data)
   };
 }
+
+const bookDuty = async (dutyId: number) => {
+  await $backend.$patch(`/room/${roomIdentifier}/duties/${dutyId}`)
+}
+
 onMounted(() => {
   connect()
 })
@@ -36,7 +41,7 @@ onMounted(() => {
 
 <template>
   <h1 class="text-xl mb-4">{{ room.name }}</h1>
-  <Duties :duties="duties.duties"/>
+  <Duties :duties="duties.duties" @book="bookDuty"/>
 </template>
 
 <style scoped>

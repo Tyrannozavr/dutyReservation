@@ -38,6 +38,23 @@ export const useBackend = () => {
                 url, opt, config.public.baseURL, "POST", "/auth/token/refresh",
             )
         },
-
+        patch: async (url: string, opt: options = {}) => {
+            if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
+                opt.body = JSON.stringify(opt.body)
+            }
+            return useFetch(url, {
+                baseURL: config.public.baseURL,
+                method: "PATCH",
+                ...opt,
+            })
+        },
+        $patch: async (url: string, opt: options = {}) => {
+            if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
+                opt.body = JSON.stringify(opt.body)
+            }
+            return fetchWithRefreshToken(
+                url, opt, config.public.baseURL, "PATCH", "/auth/token/refresh",
+            )
+        },
     };
 }

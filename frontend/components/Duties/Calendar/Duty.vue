@@ -7,7 +7,12 @@ defineProps<{
 </script>
 
 <template>
- {{duty }}
+  <div class="flex flex-row gap-5">
+    <div>{{ duty.name ? duty.name : "Без имени" }}</div>
+    <div class="ml-auto">
+      <UButton @click="$emit('book', duty.id)">Бронировать</UButton>
+    </div>
+  </div>
 </template>
 
 <style scoped>
