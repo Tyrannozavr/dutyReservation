@@ -40,6 +40,7 @@ const rows = computed(() => {
 </script>
 
 <template>
+  <DutiesTableDownload :rows="rows" :columns="columns" />
   <UTable :columns="columns" :rows="rows">
     <template #User-data="{ row }">
       <div class="flex items-center gap-2">
