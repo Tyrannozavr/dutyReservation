@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type {dutyWithUserType} from "~/types/duty";
+import type {dutyUserDataType} from "~/types/duty";
 
 defineProps<{
-  duty: dutyWithUserType
+  duty: dutyUserDataType
 }>()
 defineEmits(['book'])
 

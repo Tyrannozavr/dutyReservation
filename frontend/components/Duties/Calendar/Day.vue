@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type {dutyWithUserType, groupedDutiesType} from "~/types/duty";
-
+import type {dutyUserDataType, groupedDutiesType} from "~/types/duty";
+import {useUserStore} from "~/store/user";
+const userStore = useUserStore()
 const props = defineProps<{
   duty: groupedDutiesType
 }>()
@@ -8,14 +9,29 @@ defineEmits(['book'])
 
 const isOpen = ref(false)
 const freeDutiesCount = computed(() => {
-  return props.duty.duties.filter((duty: dutyWithUserType) => duty.user === null ).length
+  return props.duty.duties.filter((duty: dutyUserDataType) => duty.user === null ).length
+})
+const dayDisabled = computed(() => {
+  return freeDutiesCount.value === 0
+})
+const DutyTakenByUser = computed(() => {
+  return props.duty.duties.some((duty: dutyUserDataType) => {
+    return duty.user && duty.user.id === userStore.user_id
+  })
+})
+const dayColor = computed(() => {
+  if (DutyTakenByUser.value) {
+    return 'amber'
+  } else {
+    return 'primary'
+  }
 })
 </script>
 
 <template>
   <template v-if="duty.date">
     <UChip :text="freeDutiesCount" :show="freeDutiesCount > 0" size="2xl">
-      <UButton @click="isOpen = true" :disabled="freeDutiesCount === 0" color="primary" variant="solid" class="w-8 h-8">
+      <UButton @click="isOpen = true" :disabled="dayDisabled" :color="dayColor" variant="solid" class="w-8 h-8">
         {{ duty.date.getDate() }}
       </UButton>
     </UChip>

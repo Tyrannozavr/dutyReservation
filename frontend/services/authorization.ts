@@ -11,5 +11,6 @@ export async function fetchUserData() {
         userStore.last_name = userData.value.last_name
         userStore.username = userData.value.username
         userStore.photo_url = userData.value.photo_url
+        userStore.user_id = userData.value.id
     }
 }

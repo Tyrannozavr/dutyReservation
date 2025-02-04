@@ -1,10 +1,9 @@
-<script setup>
-const props = defineProps({
-  dutiesData: {
-    type: Array,
-    required: true,
-  },
-});
+<script setup lang="ts">
+import type {dutyUserDataTypeList} from "~/types/duty.js";
+
+const props = defineProps<{
+  dutiesData: dutyUserDataTypeList
+}>();
 defineEmits(['book'])
 
 const daysOfWeek = [

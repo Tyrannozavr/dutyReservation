@@ -1,6 +1,7 @@
 import {defineStore} from "pinia";
 
 interface  UserState {
+    user_id: number | null,
     first_name: string,
     last_name: string | null,
     username: string | null,
@@ -12,6 +13,7 @@ interface  UserState {
 export const useUserStore = defineStore('user', {
     state: (): UserState => {
         return {
+            user_id: null,
             first_name: "",
             last_name: null,
             username: null,
@@ -32,6 +34,7 @@ export const useUserStore = defineStore('user', {
             this.language_code = ""
             this.origin = ""
             this.photo_url = ""
+            this.user_id = null
         }
     },
     getters: {
