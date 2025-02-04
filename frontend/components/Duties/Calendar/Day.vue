@@ -12,7 +12,7 @@ const freeDutiesCount = computed(() => {
   return props.duty.duties.filter((duty: dutyUserDataType) => duty.user === null ).length
 })
 const dayDisabled = computed(() => {
-  return freeDutiesCount.value === 0
+  return freeDutiesCount.value === 0 && !DutyTakenByUser.value
 })
 const DutyTakenByUser = computed(() => {
   return props.duty.duties.some((duty: dutyUserDataType) => {
