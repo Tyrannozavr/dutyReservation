@@ -4,6 +4,8 @@ import type {dutyWithUserType} from "~/types/duty";
 defineProps<{
   duty: dutyWithUserType
 }>()
+defineEmits(['book'])
+
 </script>
 
 <template>

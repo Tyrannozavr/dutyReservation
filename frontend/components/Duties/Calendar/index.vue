@@ -3,10 +3,9 @@ const props = defineProps({
   dutiesData: {
     type: Array,
     required: true,
-    validator: (value) =>
-        value.every((duty) => duty.date instanceof String && duty.id),
   },
 });
+defineEmits(['book'])
 
 const daysOfWeek = [
   [1, "Пн"],
@@ -26,6 +25,39 @@ const dutiesByDay = computed(() => {
         (duty) => duty.date.getDay() === dayIndex
     );
   });
+  if (props.dutiesData.length !== 0) {
+    let firstDayOfMonth = props.dutiesData[0].date.getDay()
+    let daysEmptyToAdd = []
+    switch (firstDayOfMonth) {
+      case 0:
+        // Sunday
+        daysEmptyToAdd = [1, 2, 3, 4, 5, 6]
+        break
+      case 1:
+        // Monday
+        daysEmptyToAdd = []
+        break
+      case 2:
+        daysEmptyToAdd = [1]
+        break
+      case 3:
+        daysEmptyToAdd = [1, 2]
+        break
+      case 4:
+        daysEmptyToAdd = [1, 2, 3]
+        break
+      case 5:
+        daysEmptyToAdd = [1, 2, 3, 4]
+        break
+      case 6:
+        daysEmptyToAdd = [1, 2, 3, 4, 5]
+        break
+    }
+    for (let i = 0; i < daysEmptyToAdd.length; i++) {
+      let day = daysEmptyToAdd[i]
+      grouped[day].unshift({id: null, date: null})
+    }
+  }
   return grouped;
 });
 
@@ -55,14 +87,14 @@ const getDutiesForDay = (dayIndex) => {
             :key="duty.id"
             class="text-sm"
         >
-          <DutiesCalendarDay :duty="duty" @book="(id) => $emit('book', id)" />
+          <DutiesCalendarDay :duty="duty" @book="(id) => $emit('book', id)"/>
         </div>
-        <div
-            v-if="getDutiesForDay(dayIndex).length === 0"
-            class="text-gray-500 text-sm"
-        >
-          Нет дежурств
-        </div>
+<!--        <div-->
+<!--            v-if="getDutiesForDay(dayIndex).length === 0"-->
+<!--            class="text-gray-500 text-sm"-->
+<!--        >-->
+<!--          Нет дежурств-->
+<!--        </div>-->
       </div>
     </div>
   </div>

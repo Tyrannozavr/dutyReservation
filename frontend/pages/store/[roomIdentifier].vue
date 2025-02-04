@@ -5,7 +5,6 @@ import type {RoomRead} from "~/types/room";
 const $backend = useBackend()
 const route = useRoute()
 const roomIdentifier = String(route.params.roomIdentifier)
-
 const {data: room} = await $backend.$get<RoomRead>(`/room/storage/${roomIdentifier}`)
 
 const config = useRuntimeConfig();

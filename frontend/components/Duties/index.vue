@@ -6,6 +6,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   duties: () => []
 })
+defineEmits(['book'])
 
 
 const groupedDuties: groupedDutiesType[] = computed(() => {
