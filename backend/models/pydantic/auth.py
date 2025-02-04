@@ -112,6 +112,7 @@ class UserDataCreate(BaseModel):
     photo_url: str | None = None
 
 class UserRead(BaseUser):
+    id: int
     link: str
     photo_url: str | None = None
     model_config = ConfigDict(from_attributes=True)
