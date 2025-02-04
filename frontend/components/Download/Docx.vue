@@ -43,8 +43,8 @@ const downloadDocx = async () => {
 </script>
 
 <template>
-  <UButton @click="downloadDocx" icon="i-heroicons-document-text">
-    <slot>Скачать DOCX</slot>
+  <UButton @click="downloadDocx" :disabled="!content" icon="i-heroicons-document-text">
+    <slot>Скачать DOCX </slot>
   </UButton>
 </template>
 

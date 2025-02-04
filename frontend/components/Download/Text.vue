@@ -17,7 +17,7 @@ const downloadTxt = () => {
 </script>
 
 <template>
-  <UButton @click="downloadTxt" icon="i-heroicons-document-text">
+  <UButton @click="downloadTxt" :disabled="!content" icon="i-heroicons-document-text">
     <slot>Скачать TXT</slot>
   </UButton>
 </template>
