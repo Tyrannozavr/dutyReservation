@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { saveAs } from "file-saver";
-import Docxtemplater from "docxtemplater";
-import PizZip from "pizzip";
 import * as Excel from 'exceljs'
 
 const props = defineProps<{
@@ -13,44 +10,6 @@ const props = defineProps<{
   columns: Array<{ key: string; label: string }>;
 }>();
 
-// Function to download data as DOCX
-const downloadDocx = () => {
-  const content = `
-    <table border="1">
-      <thead>
-        <tr>
-          ${props.columns.map((col) => `<th>${col.label}</th>`).join("")}
-        </tr>
-      </thead>
-      <tbody>
-        ${props.rows
-      .map(
-          (row) => `
-          <tr>
-            <td>${row.Date}</td>
-            <td>${row.Name}</td>
-            <td>${row.User.label}</td>
-          </tr>
-        `
-      )
-      .join("")}
-      </tbody>
-    </table>
-  `;
-
-  const zip = new PizZip();
-  const doc = new Docxtemplater(zip, {
-    paragraphLoop: true,
-    linebreaks: true,
-  });
-
-  doc.render({
-    table: content,
-  });
-
-  const blob = doc.getZip().generate({ type: "blob" });
-  saveAs(blob, "duties.docx");
-};
 // async function exportFile() {
 //   const workbook = new Excel.Workbook()
 //   // workbook.addImage()
@@ -99,30 +58,24 @@ const downloadDocx = () => {
 // };
 
 // Function to download data as TXT
-const downloadTxt = () => {
-  const content = props.rows
+
+const content = computed(() => {
+  return props.rows
       .map(
           (row) =>
               `${row.Date}\t${row.Name}\t${row.User.label}` // Tab-separated values
       )
-      .join("\n"); // Newline-separated rows
-
-  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-  saveAs(blob, "duties.txt");
-};
+      .join("\n");
+})
 </script>
 
 <template>
   <div class="flex gap-2">
-<!--    <UButton @click="downloadDocx" icon="i-heroicons-document-text">-->
-<!--      Скачать DOCX-->
-<!--    </UButton>-->
-<!--    <UButton @click="downloadExcel" icon="i-heroicons-document-chart-bar">-->
-<!--      Скачать Excel-->
-<!--    </UButton>-->
-    <UButton @click="downloadTxt" icon="i-heroicons-document-text">
-      Скачать TXT
-    </UButton>
+    <DownloadDocx :content="content" filename="duties"/>
+    <!--    <UButton @click="downloadExcel" icon="i-heroicons-document-chart-bar">-->
+    <!--      Скачать Excel-->
+    <!--    </UButton>-->
+    <DownloadText :content="content" filename="duties"/>
   </div>
 </template>
 
