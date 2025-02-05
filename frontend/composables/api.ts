@@ -56,5 +56,23 @@ export const useBackend = () => {
                 url, opt, config.public.baseURL, "PATCH", "/auth/token/refresh",
             )
         },
+        delete: async (url: string, opt: options = {}) => {
+            if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
+                opt.body = JSON.stringify(opt.body)
+            }
+            return useFetch(url, {
+                baseURL: config.public.baseURL,
+                method: "DELETE",
+                ...opt,
+            })
+        },
+        $delete: async (url: string, opt: options = {}) => {
+            if (opt.hasOwnProperty('body') && opt.body !== null && typeof opt.body === "object") {
+                opt.body = JSON.stringify(opt.body)
+            }
+            return fetchWithRefreshToken(
+                url, opt, config.public.baseURL, "DELETE", "/auth/token/refresh",
+            )
+        },
     };
 }

@@ -21,17 +21,17 @@ const excelColumns = [
   {header: "Название", key: "Name", width: 30},
   {header: "Пользователь", key: "User", width: 40},
 ]
-const excelRows = props.rows.map((row) => {
+const excelRows = computed(() => props.rows.map((row) => {
   return [
     row.Date,
     row.Name,
     row.User.label,
   ]
-});
+}))
 </script>
 
 <template>
-  <div class="font-bold mb-4 text-2xl">Загрузить</div>
+  <div class="font-bold mb-4 text-2xl">Загрузить результаты</div>
   <div class="flex gap-2">
     <DownloadDocx :content="content" filename="duties">docx</DownloadDocx>
     <DownloadExcel :rows="excelRows" :columns="excelColumns" filename="duties">excel</DownloadExcel>

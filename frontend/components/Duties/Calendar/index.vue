@@ -4,7 +4,7 @@ import type {dutyUserDataTypeList} from "~/types/duty.js";
 const props = defineProps<{
   dutiesData: dutyUserDataTypeList
 }>();
-defineEmits(['book'])
+defineEmits(['reserveDuty', 'releaseDuty'])
 
 const daysOfWeek = [
   [1, "Пн"],
@@ -86,7 +86,11 @@ const getDutiesForDay = (dayIndex) => {
             :key="duty.id"
             class="text-sm"
         >
-          <DutiesCalendarDay :duty="duty" @book="(id) => $emit('book', id)"/>
+          <DutiesCalendarDay
+              :duty="duty"
+              @reserveDuty="(id) => $emit('reserveDuty', id)"
+              @releaseDuty="(id) => $emit('releaseDuty', id)"
+          />
         </div>
 <!--        <div-->
 <!--            v-if="getDutiesForDay(dayIndex).length === 0"-->

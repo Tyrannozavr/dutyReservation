@@ -6,7 +6,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   duties: () => []
 })
-defineEmits(['book'])
+defineEmits(['reserveDuty', 'releaseDuty'])
 
 
 const groupedDuties: groupedDutiesType[] = computed(() => {
@@ -34,7 +34,11 @@ const groupedDuties: groupedDutiesType[] = computed(() => {
 </script>
 
 <template>
-  <DutiesCalendar :duties-data="groupedDuties" @book="(id) => $emit('book', id)" />
+  <DutiesCalendar
+      :duties-data="groupedDuties"
+      @reserveDuty="(id) => $emit('reserveDuty', id)"
+      @releaseDuty="(id) => $emit('releaseDuty', id)"
+  />
   <DutiesTable :duties="props.duties" />
 </template>
 

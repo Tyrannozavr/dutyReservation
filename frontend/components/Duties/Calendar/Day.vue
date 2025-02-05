@@ -5,7 +5,7 @@ const userStore = useUserStore()
 const props = defineProps<{
   duty: groupedDutiesType
 }>()
-defineEmits(['book'])
+defineEmits(['reserveDuty', 'releaseDuty'])
 
 const isOpen = ref(false)
 const freeDutiesCount = computed(() => {
@@ -48,7 +48,10 @@ const dayColor = computed(() => {
         </template>
         <div class="flex flex-col gap-2">
           <div v-for="duty in duty.duties" class="flex gap-2">
-            <DutiesCalendarDuty :duty="duty" @book="(id) => {$emit('book', id); isOpen = false}" />
+            <DutiesCalendarDuty :duty="duty"
+                                @reserveDuty="(id) => {$emit('reserveDuty', id); isOpen = false}"
+                                @releaseDuty="(id) => {$emit('releaseDuty', id); isOpen = false}"
+            />
           </div>
         </div>
       </UCard>
