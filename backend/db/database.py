@@ -1,12 +1,16 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlmodel import Session
 
 from models.sqlmodels import *
 
 DATABASE_FILENAME = "database.db"
-DATABASE_URL = f"sqlite:///{DATABASE_FILENAME}"
-
-connect_args = {"check_same_thread": False}
+DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DATABASE_FILENAME}")
+if DATABASE_URL == f"sqlite:///{DATABASE_FILENAME}":
+    connect_args = {"check_same_thread": False}
+else:
+    connect_args = {}
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
 
 

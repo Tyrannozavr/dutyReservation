@@ -7,7 +7,7 @@ app = FastAPI()
 
 from api.routers.api import router
 
-app.include_router(router)
+app.include_router(router, prefix="/api")
 
 origins = ['*']
 
