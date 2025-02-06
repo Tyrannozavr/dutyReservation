@@ -14,7 +14,8 @@ const webSocketsBaseUrl = baseUrl
     .replace('http://', 'ws://')
     .replace('https://', 'wss://')
 
-const webSocketsUrl = `${webSocketsBaseUrl}/room/${roomIdentifier}/ws/duties?access_token=${authStore.accessToken}`
+// /api/duties/ws/{room_identifier}/duties
+const webSocketsUrl = `${webSocketsBaseUrl}/duties/ws/${roomIdentifier}/duties?access_token=${authStore.accessToken}`
 const duties: Ref<{duties: dutyWithUserTypeList}> = ref([])
 
 let ws: WebSocket | null = null

@@ -13,6 +13,7 @@ from services.Websockets import duty_connection_manager
 from tests.services.integrational_tests.test_room import duty_services
 
 router = APIRouter(prefix="/{room_identifier}", tags=["customer"])
+ws_router = APIRouter(tags=["customer"])
 router_without_room = APIRouter(tags=["owner"])
 
 
@@ -39,7 +40,7 @@ async def get_all_duties_in_room(
             ]
         )
 
-@router.get("/ws/duties", response_model=list[DutyWithUser])
+@ws_router.get("/ws/{room_identifier}/duties", response_model=list[DutyWithUser])
 async def websocket_docs(
         websocket: WebSocket,
         duty_services: DutyServicesDep,
@@ -52,7 +53,7 @@ async def websocket_docs(
         "usage": "Connect using a WebSocket client to send and receive messages."
     }
 # https://fastapi.tiangolo.com/advanced/websockets/#using-depends-and-others
-@router.websocket("/ws/duties")
+@ws_router.websocket("/ws/{room_identifier}/duties")
 async def websocket_endpoint(
         websocket: WebSocket,
         duty_services: DutyServicesDep,

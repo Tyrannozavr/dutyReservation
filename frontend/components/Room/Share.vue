@@ -8,6 +8,7 @@ const props = defineProps({
 )
 const toast = useToast()
 const Link = `${window.location.origin}/store?roomIdentifier=${props.roomIdentifier}`
+ф// const Link = `https://t.me/DutyReservationBot/reservationpage/auth/telegram?redirect=/store?roomIdentifier=${props.roomIdentifier}`
 
 const copyLink = () => {
   navigator.clipboard.writeText(Link)
