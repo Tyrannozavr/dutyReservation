@@ -6,7 +6,7 @@ from jwt import InvalidTokenError
 from api.dependencies.auth import InitDataDep, AuthorizedUserType, \
     UserDataCreateDep, UserServicesDep, TokenServicesDep, RefreshTokenDep, TelegramInitDataServiceDep, LoginDataDep
 from api.errors.auth import IncorrectUsernameOrPassword, TelegramInitDataIncorrect
-from loging import logger
+from logger import logger
 from models.pydantic.auth import Token, UserRead, TokenData, UserOriginTypes
 
 router = APIRouter()

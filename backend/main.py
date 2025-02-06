@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from db.database import create_db_and_tables
-from loging import logger
+from logger import logger
 
 app = FastAPI(docs_url="/api/docs", redoc_url="/api/redoc")
 

@@ -7,7 +7,7 @@ from sqlmodel import Session
 from api.errors.duty import UserHasNoPermission
 from api.errors.room import RoomNotFound
 from db.repositories.room import RoomRepositories
-from loging import logger
+from logger import logger
 from models.pydantic.room import RoomUpdateSettings, RoomCreate
 from models.sqlmodels import DutiesRoom, RoomStorage
 
