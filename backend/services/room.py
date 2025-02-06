@@ -7,6 +7,7 @@ from sqlmodel import Session
 from api.errors.duty import UserHasNoPermission
 from api.errors.room import RoomNotFound
 from db.repositories.room import RoomRepositories
+from loging import logger
 from models.pydantic.room import RoomUpdateSettings, RoomCreate
 from models.sqlmodels import DutiesRoom, RoomStorage
 
@@ -29,7 +30,7 @@ class RoomServices:
             return "ok"
         except Exception as e:
             self.db.rollback()
-            print("Error with removing room")
+            logger.error(f"Error with removing room: {e}")
             return None
 
     async def get_stored_room_list(self, user_id: int) -> list[DutiesRoom]:
@@ -93,5 +94,5 @@ class RoomServices:
             self.db.refresh(room)
             return room
         except Exception as e:
-            print("Exc", e)
+            logger.error("Exception in update room while try to commit ", e)
             raise e

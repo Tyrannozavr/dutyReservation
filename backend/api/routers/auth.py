@@ -6,6 +6,7 @@ from jwt import InvalidTokenError
 from api.dependencies.auth import InitDataDep, AuthorizedUserType, \
     UserDataCreateDep, UserServicesDep, TokenServicesDep, RefreshTokenDep, TelegramInitDataServiceDep, LoginDataDep
 from api.errors.auth import IncorrectUsernameOrPassword, TelegramInitDataIncorrect
+from loging import logger
 from models.pydantic.auth import Token, UserRead, TokenData, UserOriginTypes
 
 router = APIRouter()
@@ -27,7 +28,7 @@ async def login_for_access_token(user_services: UserServicesDep,
                 token_services=token_services
             )
         except TelegramInitDataIncorrect:
-            print("username taken as init data is", form_data.username)
+            logger.info("username taken as init data is", form_data.username)
     user = await user_services.authenticate_user(username=form_data.username, password=form_data.password)
     if not user:
         raise IncorrectUsernameOrPassword
@@ -51,7 +52,7 @@ async def login_for_access_token(user_services: UserServicesDep,
                 token_services=token_services
             )
         except TelegramInitDataIncorrect:
-            print("username taken as init data is", login_data.username)
+            logger.info("username taken as init data is", login_data.username)
     user = await user_services.authenticate_user(username=login_data.username, password=login_data.password)
     if not user:
         raise IncorrectUsernameOrPassword

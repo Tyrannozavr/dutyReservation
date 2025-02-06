@@ -2,12 +2,14 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from db.database import create_db_and_tables
+from loging import logger
 
 app = FastAPI(docs_url="/api/docs", redoc_url="/api/redoc")
 
 from api.routers.api import router
 
 app.include_router(router, prefix="/api")
+
 
 origins = ['*']
 
@@ -20,6 +22,8 @@ app.add_middleware(
     max_age=30
 )
 
+
 @app.on_event("startup")
 def on_startup():
+    logger.info("Started up")
     create_db_and_tables()
