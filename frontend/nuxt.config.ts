@@ -18,4 +18,9 @@ export default defineNuxtConfig({
         'pinia-plugin-persistedstate/nuxt',
         '@nuxt/ui',
     ],
+    vite: {
+        server: {
+            allowedHosts: ['3uoqdcrdfu.loclx.io'],
+        },
+    },
 })

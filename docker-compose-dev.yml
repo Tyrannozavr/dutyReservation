@@ -14,15 +14,17 @@ services:
       - db
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: ./DockerfileDev
     env_file:
       - ./frontend/.env
     container_name: frontend
     restart: always
-#    ports:
-#      - "3000:3000"
-    expose:
-      - "3000"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
     depends_on:
       - backend
 

@@ -90,7 +90,7 @@ const updateDuty = async (duty: any) => {
     }
     refreshDuties();
   } catch (error) {
-    console.error("Failed to update duty:", error);
+    console.error("Failed to update duty: " + error);
     toast.add({
       title: "Ошибка",
       description: "Не удалось обновить дежурство",

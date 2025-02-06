@@ -24,35 +24,33 @@ onMounted(async () => {
         initData.value = tg.initData
         user.value = tg.initDataUnsafe?.user
         isLoading.value = false;
-        
+
+        // initData.value = useRuntimeConfig().public.telegramInitData
+        // user.value = {
+        //   "id": 972834722,
+        //   "first_name": "Дмитрий",
+        //   "last_name": "Счислёнок",
+        //   "username": "tyrannozavr",
+        //   "language_code": "ru",
+        //   "allows_write_to_pm": true,
+        //   "photo_url": "https://t.me/i/userpic/320/xJjYkAlqp7Mvl8tGiKvIH2Qvh2SEY2ZYE2gKivsD9qU.svg"
+        // }
+
+        setTimeout(() => {
+          showCard.value = true; // Показываем карточку после задержки
+        }, 100);
+        try {
+          await authenticateUser(initData.value)
+        } catch (e) {
+          console.log("error is", e)
+          toast.add({
+            title: 'Ошибка',
+            description: 'Сервер временно недоступен ERROR is'+e,
+            color: 'red',
+            timeout: 5000,
+          })
+        }
       }
-
-      // initData.value = useRuntimeConfig().public.telegramInitData
-      // user.value = {
-      //   "id": 972834722,
-      //   "first_name": "Дмитрий",
-      //   "last_name": "Счислёнок",
-      //   "username": "tyrannozavr",
-      //   "language_code": "ru",
-      //   "allows_write_to_pm": true,
-      //   "photo_url": "https://t.me/i/userpic/320/xJjYkAlqp7Mvl8tGiKvIH2Qvh2SEY2ZYE2gKivsD9qU.svg"
-      // }
-
-      setTimeout(() => {
-        showCard.value = true; // Показываем карточку после задержки
-      }, 100);
-      try {
-        await authenticateUser(initData.value)
-      } catch (e) {
-        console.log("error is", e)
-        toast.add({
-          title: 'Ошибка',
-          description: 'Сервер временно недоступен',
-          color: 'red',
-          timeout: 5000,
-        })
-      }
-
     }
 )
 const authenticateUser = async (init_data: string) => {
