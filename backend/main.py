@@ -3,7 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from db.database import create_db_and_tables
 
-app = FastAPI()
+app = FastAPI(docs_url="/api/docs")
 
 from api.routers.api import router
 
