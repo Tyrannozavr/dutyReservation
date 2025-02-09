@@ -91,5 +91,6 @@ class RoomStorage(SQLModel, table=True):
     model_config = ConfigDict(from_attributes=True)
 
 
-
-
+class TestAmebicTable(SQLModel, table=True):
+    id: int | None = Field(primary_key=True)
+    data: str | None = Field()

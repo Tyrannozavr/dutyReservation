@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from db.database import create_db_and_tables
 from logger import logger
 
 app = FastAPI(docs_url="/api/docs", redoc_url="/api/redoc")
@@ -26,4 +25,3 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     logger.info("Started up")
-    create_db_and_tables()

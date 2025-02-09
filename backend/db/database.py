@@ -3,7 +3,7 @@ import os
 from sqlalchemy import create_engine
 from sqlmodel import Session
 
-from models.sqlmodels import *
+from models.sqlmodels import Base
 
 DATABASE_FILENAME = "database.db"
 DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DATABASE_FILENAME}")
@@ -13,9 +13,9 @@ else:
     connect_args = {}
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
 
-
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+# print(DATABASE_URL)
+# def create_db_and_tables():
+#     SQLModel.metadata.create_all(engine)
 
 
 def get_session():
