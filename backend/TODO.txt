@@ -2,3 +2,4 @@
 2) Review all models (SQLModel alongside with Pydantic models)
 3) 500 error unique constraint value when try to add the same room to user storage
 4) refresh room connection from urls without room identifier in the path
+5) process direct link to room if it already added to storage

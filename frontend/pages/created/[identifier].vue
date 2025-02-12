@@ -127,7 +127,6 @@ const removeDuty = async (dutyId: number) => {
     <div class="mb-8">
       <div class="flex flex-row items-center gap-2 mb-4
        max-sm:flex-col">
-
       <RoomShare :room-identifier="room.identifier" />
       </div>
       <h1 class="text-2xl font-bold mb-4 flex flex-row">

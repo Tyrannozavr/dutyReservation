@@ -1,8 +1,10 @@
 version: '3'
 
 services:
-  backend:
-    build: ./backend
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: ./DockerfileDev
     restart: on-failure
     expose:
       - "8000"
@@ -11,7 +13,7 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      - ./backend/logging:/app/logging
+      - ./backend:/app
     depends_on:
       - db
 
@@ -28,14 +30,14 @@ services:
     volumes:
       - ./frontend:/app
     depends_on:
-      - backend
+      - backend-dev
 
   nginx:
     build: ./nginx
     ports:
       - "80:80"
     depends_on:
-      - backend
+      - backend-dev
       - frontend-dev
   db:
     image: postgres:11.5-alpine

@@ -20,7 +20,7 @@ const nextPage = ref(route.query.redirect)
 
 onMounted(async () => {
       const tg = window.Telegram?.WebApp
-      nextPage.value = window.Telegram.WebApp.initDataUnsafe.start_param
+      // nextPage.value = window.Telegram.WebApp.initDataUnsafe
 
       if (tg.initData) {
         initData.value = tg.initData

@@ -7,8 +7,12 @@ const props = defineProps({
     }
 )
 const toast = useToast()
-const Link = `${window.location.origin}/store?roomIdentifier=${props.roomIdentifier}`
-ф// const Link = `https://t.me/DutyReservationBot/reservationpage/auth/telegram?redirect=/store?roomIdentifier=${props.roomIdentifier}`
+const route = useRoute()
+const config = useRuntimeConfig();
+
+const Link = `${config.public.frontURL}/store?roomIdentifier=${props.roomIdentifier}`
+// const Link = `${window.location?.origin}/store?roomIdentifier=${props.roomIdentifier}`
+// const Link = `https://t.me/DutyReservationBot/reservationpage/auth/telegram?redirect=/store?roomIdentifier=${props.roomIdentifier}`
 
 const copyLink = () => {
   navigator.clipboard.writeText(Link)
@@ -34,6 +38,7 @@ const copyIdentifier = () => {
     <template #header>
       Чтобы пригласить кого нибудь в комнату поделитесь ссылкой
       или сообщите ему идентификатор комнаты
+      {{Link}}
     </template>
     <UButton icon="i-heroicons-clipboard-document-list-20-solid"
              :label="props.roomIdentifier" @click="copyIdentifier"

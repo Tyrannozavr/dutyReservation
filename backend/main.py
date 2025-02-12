@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.requests import Request
+from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 
 from logger import logger
@@ -21,10 +23,16 @@ app.add_middleware(
     max_age=30
 )
 
+
+
+
 @app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
+async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Critical error occurred: {str(exc)}")
-    return {"detail": "Internal server error"}
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"}
+    )
 
 @app.on_event("startup")
 def on_startup():

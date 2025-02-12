@@ -4,7 +4,8 @@ export default defineNuxtConfig({
     devtools: {enabled: true},
     runtimeConfig: {
         public: {
-            baseURL: process.env.NUXT_API_URL,
+            baseURL: `https://${process.env.NUXT_API_HOST}/api`,
+            frontURL: `https://${process.env.NUXT_API_HOST}`,
             telegramInitData: process.env.NUXT_TELEGRAM_INIT_DATA,
         },
     },
@@ -20,7 +21,7 @@ export default defineNuxtConfig({
     ],
     vite: {
         server: {
-            allowedHosts: ['6b43-219-100-37-233.ngrok-free.app'],
+            allowedHosts: [process.env.NUXT_API_HOST],
         },
     },
 })
