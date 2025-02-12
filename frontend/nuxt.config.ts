@@ -20,7 +20,7 @@ export default defineNuxtConfig({
     ],
     vite: {
         server: {
-            allowedHosts: ['oy3pkyxxwi.loclx.io'],
+            allowedHosts: ['6b43-219-100-37-233.ngrok-free.app'],
         },
     },
 })

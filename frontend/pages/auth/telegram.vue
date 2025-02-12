@@ -15,11 +15,13 @@ const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
-const nextPage = route.query.redirect
+const nextPage = ref(route.query.redirect)
 
 
 onMounted(async () => {
       const tg = window.Telegram?.WebApp
+      nextPage.value = window.Telegram.WebApp.initDataUnsafe.start_param
+
       if (tg.initData) {
         initData.value = tg.initData
         user.value = tg.initDataUnsafe?.user
@@ -74,8 +76,8 @@ const authenticateUser = async (init_data: string) => {
   })
 
   await fetchUserData()
-  if (nextPage) {
-    await router.push(nextPage.toString())
+  if (nextPage.value) {
+    await router.push(nextPage.value.toString())
   } else {
     await router.push("/profile")
   }

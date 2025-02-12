@@ -1,3 +1,5 @@
+<script setup lang="ts">
+</script>
 <template>
   <UContainer class="mx-auto p-4">
     <UCard class="shadow-md rounded-lg">
@@ -39,5 +41,3 @@
     </UCard>
   </UContainer>
 </template>
-<script setup lang="ts">
-</script>

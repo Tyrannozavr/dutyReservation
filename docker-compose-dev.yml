@@ -10,10 +10,12 @@ services:
       DATABASE_URL: "postgresql://postgres:postgres@db/postgres"
     env_file:
       - ./backend/.env
+    volumes:
+      - ./backend/logging:/app/logging
     depends_on:
       - db
 
-  frontend:
+  frontend-dev:
     build:
       context: ./frontend
       dockerfile: ./DockerfileDev
@@ -34,7 +36,7 @@ services:
       - "80:80"
     depends_on:
       - backend
-      - frontend
+      - frontend-dev
   db:
     image: postgres:11.5-alpine
     ports:

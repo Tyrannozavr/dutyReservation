@@ -21,6 +21,10 @@ app.add_middleware(
     max_age=30
 )
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    logger.error(f"Critical error occurred: {str(exc)}")
+    return {"detail": "Internal server error"}
 
 @app.on_event("startup")
 def on_startup():
