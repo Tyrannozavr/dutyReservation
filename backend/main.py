@@ -36,4 +36,5 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 @app.on_event("startup")
 def on_startup():
-    logger.info("Started up")
+    # logger.info("Started up")
+    pass

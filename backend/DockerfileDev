@@ -22,4 +22,4 @@ RUN apt-get update && \
     apt-get install -y libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 
-CMD python -m uvicorn main:app --reload
+CMD python -m uvicorn main:app --host=0.0.0.0 --reload

@@ -4,8 +4,10 @@ services:
   backend:
     build: ./backend
     restart: on-failure
-    expose:
-      - "8000"
+#    expose:
+#      - "8000"
+    ports:
+      - "8000:8000"
     environment:
       DATABASE_URL: "postgresql://postgres:postgres@db/postgres"
     env_file:

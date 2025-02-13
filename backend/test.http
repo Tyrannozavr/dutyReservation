@@ -1,0 +1,2 @@
+GET 127.0.0.1:8000/api/test?some=query
+Content-Type: text/json

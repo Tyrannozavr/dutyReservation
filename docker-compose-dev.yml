@@ -1,13 +1,15 @@
 version: '3'
 
 services:
-  backend-dev:
+  backend:
     build:
       context: ./backend
       dockerfile: ./DockerfileDev
     restart: on-failure
     expose:
       - "8000"
+#    ports:
+#      - "8000:8000"
     environment:
       DATABASE_URL: "postgresql://postgres:postgres@db/postgres"
     env_file:
@@ -17,7 +19,7 @@ services:
     depends_on:
       - db
 
-  frontend-dev:
+  frontend:
     build:
       context: ./frontend
       dockerfile: ./DockerfileDev
@@ -30,15 +32,17 @@ services:
     volumes:
       - ./frontend:/app
     depends_on:
-      - backend-dev
+      - backend
 
   nginx:
     build: ./nginx
     ports:
       - "80:80"
     depends_on:
-      - backend-dev
-      - frontend-dev
+      - backend
+      - frontend
+    volumes:
+      - ./nginx/logs:/var/log/nginx/
   db:
     image: postgres:11.5-alpine
     ports:
