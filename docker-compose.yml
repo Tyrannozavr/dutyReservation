@@ -4,10 +4,8 @@ services:
   backend:
     build: ./backend
     restart: on-failure
-#    expose:
-#      - "8000"
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     environment:
       DATABASE_URL: "postgresql://postgres:postgres@db/postgres"
     env_file:
@@ -21,8 +19,6 @@ services:
       - ./frontend/.env
     container_name: frontend
     restart: always
-#    ports:
-#      - "3000:3000"
     expose:
       - "3000"
     depends_on:

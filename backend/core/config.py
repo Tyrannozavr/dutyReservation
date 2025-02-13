@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     auth_algorithm: str = Field(alias='AUTH_ALGORITHM', default="HS256")
     access_token_expire_minutes: str = Field(alias='ACCESS_TOKEN_EXPIRE_MINUTES')
     refresh_token_expire_minutes: str = Field(alias='REFRESH_TOKEN_EXPIRE_MINUTES')
+    database_url: str = Field(alias='DATABASE_URL')
 
     # model_config = ConfigDict(env_file=".env")
 
