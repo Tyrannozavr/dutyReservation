@@ -23,24 +23,6 @@ class UserDbCreate(BaseUser):
     origin: UserOriginTypes
 
 
-class TelegramUserInitData(BaseModel):
-    # Unique identifier for the telegram user
-    id: int
-    first_name: str
-    last_name: str | None = None
-    username: str | None = None
-    language_code: str | None = None
-    allows_write_to_pm: bool | None = None
-    photo_url: str | None = None
-
-
-class TelegramInitData(BaseModel):
-    user: TelegramUserInitData
-    chat_instance: int | None = None
-    chat_type: str | None = None
-    auth_date: int | None = None
-
-
 class TelegramUserData(BaseModel):
     language_code: str | None
     allows_write_to_pm: bool | None
@@ -83,6 +65,12 @@ class TelegramUserDataIn(BaseModel):
     language_code: str | None = None
     allows_write_to_pm: bool | None = None
     photo_url: str | None = None
+
+class TelegramInitData(BaseModel):
+    user: TelegramUserDataIn
+    chat_instance: int | None = None
+    chat_type: str | None = None
+    auth_date: int | None = None
 
 
 class TelegramUserDataCreate(BaseModel):

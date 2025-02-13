@@ -45,7 +45,7 @@ class User(SQLModel, table=True):
 
 class TelegramUserData(SQLModel, table=True):
     id: int = Field(primary_key=True, description="This is exactly telegram id")
-    username: str = Field(index=True, description="This is telegram username")
+    username: str | None = Field(index=True, description="This is telegram username", nullable=True)
     language_code: str | None = Field(default=None)
     allows_write_to_pm: bool | None = Field(default=None)
 
