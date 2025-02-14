@@ -5,7 +5,7 @@ from sqlmodel import Session
 
 DATABASE_FILENAME = "database.db"
 DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DATABASE_FILENAME}")
-DATABASE_URL = "postgresql://postgres:postgres@db/postgres"
+
 if DATABASE_URL == f"sqlite:///{DATABASE_FILENAME}":
     connect_args = {"check_same_thread": False}
 else:
