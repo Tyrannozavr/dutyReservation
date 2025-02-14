@@ -1,21 +1,25 @@
 <script setup lang="ts">
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
-import {saveAs} from "file-saver";
+import { saveAs } from "file-saver";
+import { computed } from 'vue';
 
 const props = defineProps<{
-  content: string,
+  content: string | object, // Adjust type based on actual content structure
   filename: string
 }>();
 
 const filename = computed(() => {
-  return props.filename + ".docx";
+  return `${props.filename}.docx`;
 });
 
 const downloadDocx = async () => {
   try {
     // Load the DOCX template from the public folder
     const response = await fetch("/template.docx");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const template = await response.arrayBuffer();
 
     // Initialize PizZip with the template
@@ -26,13 +30,14 @@ const downloadDocx = async () => {
       paragraphLoop: true,
       linebreaks: true,
     });
+
     // Replace the placeholder in the template with the table content
     doc.render({
-      table: props.content,
+      table: props.content, // Ensure 'table' matches your template placeholders
     });
 
     // Generate the DOCX file
-    const blob = doc.getZip().generate({type: "blob"});
+    const blob = doc.getZip().generate({ type: "blob" });
 
     // Save the file
     saveAs(blob, filename.value);
@@ -43,11 +48,7 @@ const downloadDocx = async () => {
 </script>
 
 <template>
-  <UButton @click="downloadDocx" :disabled="!content" icon="i-heroicons-document-text">
-    <slot>Скачать DOCX </slot>
+  <UButton @click="downloadDocx" :disabled="!props.content" icon="i-heroicons-document-text">
+    <slot>Скачать DOCX</slot>
   </UButton>
 </template>
-
-<style scoped>
-
-</style>

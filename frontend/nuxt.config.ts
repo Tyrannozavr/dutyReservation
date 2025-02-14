@@ -4,7 +4,9 @@ export default defineNuxtConfig({
     devtools: {enabled: true},
     runtimeConfig: {
         public: {
-            baseURL: process.env.NUXT_API_URL,
+            // baseURL: process.env.NUXT_API_URL,
+            // baseURL: `https://${process.env.NUXT_API_HOST}/api`,
+            baseURL: `/api`,
             frontURL: `https://${process.env.NUXT_API_HOST}`,
             telegramInitData: process.env.NUXT_TELEGRAM_INIT_DATA,
         },

@@ -92,12 +92,6 @@ const getDutiesForDay = (dayIndex) => {
               @releaseDuty="(id) => $emit('releaseDuty', id)"
           />
         </div>
-<!--        <div-->
-<!--            v-if="getDutiesForDay(dayIndex).length === 0"-->
-<!--            class="text-gray-500 text-sm"-->
-<!--        >-->
-<!--          Нет дежурств-->
-<!--        </div>-->
       </div>
     </div>
   </div>

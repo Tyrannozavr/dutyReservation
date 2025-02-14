@@ -3,6 +3,7 @@ import type {dutyWithUserTypeList} from "~/types/duty";
 import {useAuthStore} from "~/store/auth";
 import type {RoomRead} from "~/types/room";
 const $backend = useBackend()
+const $client = useClientFetch()
 const route = useRoute()
 const roomIdentifier = String(route.params.roomIdentifier)
 const {data: room} = await $backend.$get<RoomRead>(`/room/storage/${roomIdentifier}`)
@@ -31,10 +32,10 @@ const connect = () => {
 }
 
 const reserveDuty = async (dutyId: number) => {
-  await $backend.$patch(`/room/${roomIdentifier}/duties/${dutyId}`)
+  await $client.$patch(`/room/${roomIdentifier}/duties/${dutyId}`)
 }
 const releaseDuty = async (dutyId: number) => {
-  await $backend.$delete(`/room/${roomIdentifier}/duties/${dutyId}`)
+  await $client.$delete(`/room/${roomIdentifier}/duties/${dutyId}`)
 }
 
 onMounted(() => {
