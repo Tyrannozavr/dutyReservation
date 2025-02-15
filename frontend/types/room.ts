@@ -10,7 +10,7 @@ export type RoomList = RoomItem[];
 export type RoomRead = {
     "identifier": string,
     "is_multiple_selection": boolean,
-    "name": string
+    "name": string | null
 }
 export type RoomReadList = RoomRead[]
 

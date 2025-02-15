@@ -14,13 +14,55 @@ const room = ref<RoomRead | null>(null)
 const urlRequest = computed(() => `/room/storage/${roomIdentifier.value}`)
 const router = useRouter()
 
+const $client = useClientFetch()
 
+const addRoom = async (notification: boolean = true) => {
+  try {
+    const response = await $client.$post<RoomRead>(urlRequest.value)
+    if (response.identifier) {
+      emits('addRoom')
+      isOpen.value = false
+      if (notification) {
+        $toast.add({
+          title: 'Добавление комнаты',
+          description: 'Комната добавлена',
+          color: 'green'
+        })
+      }
+      await router.push(`/store/${roomIdentifier.value}`)
 
+    } else {
+      if (notification) {
+        $toast.add({
+          title: 'Добавление комнаты',
+          description: 'Комната не добавлена',
+          color: 'red'
+        })
+      }
+    }
+  } catch (e) {
+    if (notification) {
+      $toast.add({
+        title: 'Добавление комнаты',
+        description: 'Ошибка при добавлении комнаты',
+        color: 'red'
+      })
+    }
+    if (e.statusCode === 400) {
+      // means already stored
+      await router.push(`/store/${roomIdentifier.value}`)
+
+    }
+  }
+  // await router.push(`/store/${roomIdentifier.value}`)
+
+}
 if (roomIdentifierFromRoute.value) {
   roomIdentifier.value = roomIdentifierFromRoute.value.toString()
-  const { data } = await $backend.$get<RoomRead>(urlRequest.value)
-  room.value = data.value
-  isOpen.value = true
+  await addRoom(false)
+  // const { data } = await $backend.$get<RoomRead>(urlRequest.value)
+  // room.value = data.value
+  // isOpen.value = true
 }
 
 watch(roomIdentifier, async () => {
@@ -38,35 +80,6 @@ watch(roomIdentifier, async () => {
   }
 })
 
-const addRoom = async () => {
-  try {
-    const response = await clientFetch.$post<RoomRead>(urlRequest.value)
-    if (response.identifier) {
-      emits('addRoom')
-      isOpen.value = false
-      $toast.add({
-        title: 'Добавление комнаты',
-        description: 'Комната добавлена',
-        color: 'green'
-      })
-      await router.push(`/store/${response.identifier}`)
-    } else {
-      $toast.add({
-        title: 'Добавление комнаты',
-        description: 'Комната не добавлена',
-        color: 'red'
-      })
-    }
-  } catch (e) {
-    $toast.add({
-      title: 'Добавление комнаты',
-      description: 'Ошибка при добавлении комнаты',
-      color: 'red'
-    })
-  }
-
-
-}
 </script>
 
 <template>
@@ -88,7 +101,7 @@ const addRoom = async () => {
             <div class="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               Идентификатор комнаты
             </div>
-            <UInput v-model="roomIdentifier" />
+            <UInput v-model="roomIdentifier"/>
             <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
               Идентификатор комнаты должен быть длиннее 16 символов
             </div>
@@ -115,7 +128,8 @@ const addRoom = async () => {
                     <span class="">Возможность бронирования нескольких дат:</span>
                     <span>
                       <template v-if="room">
-                        <UIcon v-if="room.is_multiple_selection" name="i-heroicons-check-circle" class="text-green-500 -mb-1"/>
+                        <UIcon v-if="room.is_multiple_selection" name="i-heroicons-check-circle"
+                               class="text-green-500 -mb-1"/>
                         <UIcon v-else name="i-heroicons-x-circle" class="text-red-500 -mb-1"/>
                       </template>
                       <template v-else>

@@ -35,14 +35,16 @@ services:
       - backend
 
   nginx:
-    build: ./nginx
+    build:
+      context: ./nginx
+      dockerfile: DockerfileBack
     ports:
       - "80:80"
     depends_on:
       - backend
-      - frontend
     volumes:
       - ./nginx/logs:/var/log/nginx/
+
   db:
     image: postgres:11.5-alpine
     ports:

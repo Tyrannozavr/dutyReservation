@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import {useUserStore} from "~/store/user";
+
 const props = defineProps({
       roomIdentifier: {
         type: String,
@@ -7,12 +9,17 @@ const props = defineProps({
     }
 )
 const toast = useToast()
-
+const route = useRoute()
 const TelegramWebappLink = `https://t.me/DutyReservationBot/reservationpage?startapp=${props.roomIdentifier}`
+const WebLink = `${window.location?.origin}/store?roomIdentifier=${props.roomIdentifier}`
+const userStore = useUserStore()
 
+const roomLink = computed(() => {
+  return userStore.origin ===  'web' ? WebLink : TelegramWebappLink
+})
 
 const copyLink = () => {
-  navigator.clipboard.writeText(TelegramWebappLink)
+  navigator.clipboard.writeText(roomLink.value)
   toast.add({
     title: 'Ссылка приглашение скопирована',
     color: 'green',
@@ -35,7 +42,6 @@ const copyIdentifier = () => {
     <template #header>
       Чтобы пригласить кого нибудь в комнату поделитесь ссылкой
       или сообщите ему идентификатор комнаты
-      {{ TelegramWebappLink }}
     </template>
     <UButton icon="i-heroicons-clipboard-document-list-20-solid"
              :label="props.roomIdentifier" @click="copyIdentifier"
@@ -54,7 +60,7 @@ const copyIdentifier = () => {
           color="blue"
           variant="ghost"
           size="xl"
-          :to="`https://t.me/share/url?url=${TelegramWebappLink}`"
+          :to="`https://t.me/share/url?url=${roomLink}`"
           target="_blank"
       />
       <UButton
@@ -62,7 +68,7 @@ const copyIdentifier = () => {
           color="green"
           variant="ghost"
           size="xl"
-          :to="`https://api.whatsapp.com/send?text=${TelegramWebappLink}`"
+          :to="`https://api.whatsapp.com/send?text=${roomLink}`"
           target="_blank"
       />
       <UButton
@@ -70,7 +76,7 @@ const copyIdentifier = () => {
           color="blue"
           variant="ghost"
           size="xl"
-          :to="`https://vk.com/share.php?url=${TelegramWebappLink}`"
+          :to="`https://vk.com/share.php?url=${roomLink}`"
           target="_blank"
       />
       <UButton
@@ -78,7 +84,7 @@ const copyIdentifier = () => {
           color="orange"
           variant="ghost"
           size="xl"
-          :to="`https://connect.ok.ru/offer?url=${TelegramWebappLink}`"
+          :to="`https://connect.ok.ru/offer?url=${roomLink}`"
           target="_blank"
       />
     </div>

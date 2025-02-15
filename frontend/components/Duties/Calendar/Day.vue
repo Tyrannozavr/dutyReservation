@@ -23,6 +23,9 @@ const dayColor = computed(() => {
   if (DutyTakenByUser.value) {
     return 'amber'
   } else {
+    if (freeDutiesCount.value === 0) {
+      return 'gray'
+    }
     return 'primary'
   }
 })
