@@ -27,6 +27,8 @@ services:
       - ./frontend/.env
     container_name: frontend
     restart: always
+    environment:
+      NUXT_API_HOST: "/api"
     ports:
       - "3000:3000"
     volumes:

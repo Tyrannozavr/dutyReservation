@@ -19,6 +19,8 @@ services:
       - ./frontend/.env
     container_name: frontend
     restart: always
+    environment:
+      NUXT_API_URL: "https://8t5hroixrk.loclx.io/api/"
     expose:
       - "3000"
     depends_on:

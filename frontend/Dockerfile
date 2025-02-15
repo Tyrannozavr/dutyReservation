@@ -7,6 +7,8 @@ COPY ./package*.json ./
 RUN npm install
 
 COPY . .
+RUN rm -rf ./.output
+RUN rm -rf ./.nuxt
 
 EXPOSE 3000
 
