@@ -44,7 +44,7 @@ const copyContent = () => {
 </script>
 
 <template>
-  <template v-if="userStore.origin !== 'web'">
+  <template v-if="userStore.origin == 'web'">
     <div class="font-bold mb-4 text-2xl">Загрузить результаты</div>
     <div class="flex gap-2" >
       <DownloadDocx :content="content" filename="duties">docx</DownloadDocx>
