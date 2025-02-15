@@ -31,7 +31,7 @@ const rows = computed(() => {
           } :
           {
             label: 'Не назначен',
-            href: "#"
+            href: null
           }
     }
   })
@@ -44,9 +44,10 @@ const rows = computed(() => {
   <UTable :columns="columns" :rows="rows">
     <template #User-data="{ row }">
       <div class="flex items-center gap-2">
-        <ULink :to="row.User.href" target="_blank" class="text-blue-500 hover:text-blue-600">
+        <ULink v-if="row.User.href" :to="row.User.href" target="_blank" class="text-blue-500 hover:text-blue-600">
           {{ row.User.label }}
         </ULink>
+        <span v-else>{{ row.User.label }}</span>
       </div>
     </template>
   </UTable>

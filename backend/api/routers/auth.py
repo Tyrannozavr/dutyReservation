@@ -86,7 +86,6 @@ async def refresh_access_token(token_services: TokenServicesDep, refresh_token: 
 )
 async def telegram_auth(init_data: InitDataDep, user_services: UserServicesDep, token_services: TokenServicesDep):
     """allows to get access to this platform using telegram's webapp initData"""
-    logger.info(f"try to login via telegram. Init data: {init_data}")
     if not init_data:
         raise HTTPException(status_code=404, detail="InitData isn't appropriate")
     user_tg_data = await user_services.get_or_create_tg_user(init_data.user)

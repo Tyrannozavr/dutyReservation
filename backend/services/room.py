@@ -5,7 +5,7 @@ from typing import Any
 from sqlmodel import Session
 
 from api.errors.duty import UserHasNoPermission
-from api.errors.room import RoomNotFound
+from api.errors.room import RoomNotFound, RoomAlreadyStored
 from db.repositories.room import RoomRepositories
 from logger import logger
 from models.pydantic.room import RoomUpdateSettings, RoomCreate
@@ -19,6 +19,10 @@ class RoomServices:
         self.db = db
 
     async def store_room(self, user_id: int, room_id: int) -> RoomStorage | None:
+        room = await self.room_repositories.get_room_by_id(room_id=room_id)
+        stored_room_list = await self.room_repositories.get_stored_room_list(user_id=user_id)
+        if room in stored_room_list:
+            raise RoomAlreadyStored
         storage = await self.room_repositories.store_room_to_user(user_id=user_id, room_id=room_id)
         self.db.commit()
         return storage

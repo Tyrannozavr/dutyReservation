@@ -23,7 +23,7 @@ export type dutyUserDataType = {
 
 export type dutyWithUserTypeList = dutyWithUserType[]
 
-export type dutyUserDataTypeList = dutyUserDataType[]
+export type dutyUserDataTypeList = groupedDutiesType[]
 
 export type DutiesWithUserResponse = {
     duties: dutyWithUserTypeList

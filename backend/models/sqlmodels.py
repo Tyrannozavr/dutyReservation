@@ -33,7 +33,7 @@ class User(SQLModel, table=True):
 
     @property
     def link(self):
-        if self.origin is UserOriginTypes.telegram:
+        if self.origin is UserOriginTypes.telegram and self.username:
             return generate_user_link(username=self.tg_data.username, origin=UserOriginTypes.telegram)
         return ""
 

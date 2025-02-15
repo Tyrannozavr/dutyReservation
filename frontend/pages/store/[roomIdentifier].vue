@@ -26,6 +26,7 @@ const connect = () => {
   ws = new WebSocket(webSocketsUrl);
   ws.onmessage = (event) => {
     duties.value = JSON.parse(event.data).duties
+    console.log("got duties ", duties.value)
   };
 }
 
