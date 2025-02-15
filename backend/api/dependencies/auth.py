@@ -52,11 +52,11 @@ def get_user_services(db: SessionDep, pwd_context: Annotated[CryptContext, Depen
     return UserServices(pwd_context=pwd_context, db=db)
 
 
-UserServicesDep = Annotated[UserServices, Depends(get_user_services)]
+user_services_dep = Annotated[UserServices, Depends(get_user_services)]
 
 
 async def get_current_user(
-        token: Annotated[str, Depends(oauth2_scheme)], user_services: UserServicesDep,
+        token: Annotated[str, Depends(oauth2_scheme)], user_services: user_services_dep,
         token_services: TokenServicesDep) -> User:
     """Makes request to DB"""
     credentials_exception = HTTPException(

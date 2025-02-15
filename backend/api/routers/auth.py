@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from jwt import InvalidTokenError
 
 from api.dependencies.auth import InitDataDep, AuthorizedUserType, \
-    UserDataCreateDep, UserServicesDep, TokenServicesDep, RefreshTokenDep, TelegramInitDataServiceDep, LoginDataDep
+    UserDataCreateDep, user_services_dep, TokenServicesDep, RefreshTokenDep, TelegramInitDataServiceDep, LoginDataDep
 from api.errors.auth import IncorrectUsernameOrPassword, TelegramInitDataIncorrect
 from logger import logger
 from models.pydantic.auth import Token, UserRead, TokenData, UserOriginTypes
@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.post("/token", response_model=Token)
-async def login_for_access_token(user_services: UserServicesDep,
+async def login_for_access_token(user_services: user_services_dep,
                                  token_services: TokenServicesDep,
                                  telegram_services: TelegramInitDataServiceDep,
                                  form_data: OAuth2PasswordRequestForm = Depends(),
@@ -38,7 +38,7 @@ async def login_for_access_token(user_services: UserServicesDep,
 
 
 @router.post("/login", response_model=Token)
-async def login_for_access_token(user_services: UserServicesDep,
+async def login_for_access_token(user_services: user_services_dep,
                                  token_services: TokenServicesDep,
                                  telegram_services: TelegramInitDataServiceDep,
                                  login_data: LoginDataDep,
@@ -84,7 +84,7 @@ async def refresh_access_token(token_services: TokenServicesDep, refresh_token: 
     },
     response_model=Token
 )
-async def telegram_auth(init_data: InitDataDep, user_services: UserServicesDep, token_services: TokenServicesDep):
+async def telegram_auth(init_data: InitDataDep, user_services: user_services_dep, token_services: TokenServicesDep):
     """allows to get access to this platform using telegram's webapp initData"""
     if not init_data:
         raise HTTPException(status_code=404, detail="InitData isn't appropriate")
@@ -106,7 +106,7 @@ async def telegram_auth(init_data: InitDataDep, user_services: UserServicesDep, 
     }
 )
 async def create_user(
-        user_services: UserServicesDep,
+        user_services: user_services_dep,
         user_data: UserDataCreateDep,
         token_services: TokenServicesDep
 ):
