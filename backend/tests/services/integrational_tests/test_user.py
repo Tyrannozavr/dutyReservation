@@ -94,10 +94,11 @@ class TestUserServices(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(tg_user_data.user.first_name, init_data.first_name)
         self.assertEqual(tg_user_data.user.last_name, init_data.last_name)
 
-
     async def test_get_or_create_tg_user_success2(self):
-        init_data = TelegramUserDataIn(id=1204615429, first_name='Ульяна', last_name='', username=None, language_code='ru',
- allows_write_to_pm=True, photo_url='https://t.me/i/userpic/320/kQWtXT_LxVFGPoTwIqBOn4f2g3pg5Km4OH698SLWyE8.svg')
+        init_data = TelegramUserDataIn(id=1204615429, first_name='Ульяна', last_name='', username=None,
+                                       language_code='ru',
+                                       allows_write_to_pm=True,
+                                       photo_url='https://t.me/i/userpic/320/kQWtXT_LxVFGPoTwIqBOn4f2g3pg5Km4OH698SLWyE8.svg')
 
         tg_user_data = await self.user_services.get_or_create_tg_user(init_data)
 
@@ -105,7 +106,17 @@ class TestUserServices(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(tg_user_data.user.first_name, init_data.first_name)
         self.assertEqual(tg_user_data.user.last_name, init_data.last_name)
 
+    async def test_get_or_create_tg_user_success3(self):
+        init_data = TelegramUserDataIn(id=7594503250, first_name='Влад', last_name='', username='Archetypen',
+                                       language_code='ru',
+                                       allows_write_to_pm=None,
+                                       photo_url='https://t.me/i/userpic/320/mVuI_rAVWcOsVcrQKegMdsNMg7tVWyrB-smVoHEYCXOhjGcxBDtLn2IFADSznhyo.svg')
 
+        tg_user_data = await self.user_services.get_or_create_tg_user(init_data)
+
+        self.assertEqual(tg_user_data.username, init_data.username)
+        self.assertEqual(tg_user_data.user.first_name, init_data.first_name)
+        self.assertEqual(tg_user_data.user.last_name, init_data.last_name)
 
     async def test_get_or_create_tg_user_success_double(self):
         init_data = TelegramUserDataIn(username="tg_testuser", first_name="Telegram", last_name="User",

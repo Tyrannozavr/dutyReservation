@@ -7,7 +7,7 @@ from api.dependencies.auth import InitDataDep, AuthorizedUserType, \
     UserDataCreateDep, user_services_dep, TokenServicesDep, RefreshTokenDep, TelegramInitDataServiceDep, LoginDataDep
 from api.errors.auth import IncorrectUsernameOrPassword, TelegramInitDataIncorrect
 from logger import logger
-from models.pydantic.auth import Token, UserRead, TokenData, UserOriginTypes
+from models.pydantic.auth import Token, UserRead, TokenData, UserOriginTypes, TelegramInitData, TelegramUserDataIn
 
 router = APIRouter()
 

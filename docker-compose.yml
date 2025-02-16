@@ -8,6 +8,8 @@ services:
       - "8000"
     environment:
       DATABASE_URL: "postgresql://postgres:postgres@db/postgres"
+    volumes:
+      - ./logs:/app/logging
     env_file:
       - ./backend/.env
     depends_on:
@@ -32,10 +34,15 @@ services:
       - backend
       - frontend
   db:
-    image: postgres:11.5-alpine
+    image: postgres:17-alpine
     ports:
       - "5432:5432"
     env_file:
       - ./backend/.env
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "postgres"
+
     volumes:
       - ./postgres-data:/var/lib/postgresql/data:cached

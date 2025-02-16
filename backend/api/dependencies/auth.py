@@ -7,6 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
 from passlib.context import CryptContext
 
+from logger import logger
 from api.dependencies.database import SessionDep
 from core.config import Settings, get_settings
 from models.pydantic.auth import UserDataIn, TokenData, TelegramInitData, RefreshTokenIn, LoginData
@@ -82,6 +83,7 @@ def get_telegram_services(settings: SettingsDep):
 async def get_telegram_init_data(init_data: InitDataStringDep,
                                  telegram_services: Annotated[TelegramInitDataService, Depends(get_telegram_services)]
                                  ) -> TelegramInitData:
+    logger.info(f"telegram login {init_data}")
     return await telegram_services.validated_telegram_init_data(init_data=init_data)
 
 
