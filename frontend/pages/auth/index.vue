@@ -60,7 +60,7 @@ const handleSubmit = async () => {
 <template>
   <NuxtLink to="/" class="text-blue-500 hover:text-blue-700 mb-4 inline-block">
     <UIcon name="i-heroicons-home" class="mr-1" />
-    Main
+    Главная
   </NuxtLink>
   <div class="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
     <h1 class="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">Вход</h1>

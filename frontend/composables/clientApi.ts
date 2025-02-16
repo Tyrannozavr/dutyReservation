@@ -3,9 +3,9 @@ import type {options} from "~/composables/api"
 
 export const useClientFetch = () => {
     const config = useRuntimeConfig();
-
     return {
         get: async <T>(url: string, opt: options = {}) => {
+
                 return $fetch<T>(url, {
                     baseURL: config.public.baseURL,
                     method: "GET",
