@@ -94,6 +94,9 @@ const getDutiesForDay = (dayIndex) => {
         </div>
       </div>
     </div>
+    <div class="mt-4">
+      <span>Для бронирования выберите желаемую дату</span>
+    </div>
   </div>
 </template>
 

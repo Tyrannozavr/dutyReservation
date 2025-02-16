@@ -6,7 +6,7 @@ from api.dependencies.users import username_dep
 router = APIRouter()
 
 
-@router.get("check-username")
+@router.get("/check-username", tags=["auth"])
 async def check_username(
         username: username_dep,
         user_services: user_services_dep
