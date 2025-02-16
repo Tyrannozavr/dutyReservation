@@ -68,12 +68,12 @@ const authenticateUser = async (init_data: string) => {
       response.refresh_token,
   )
   userStore.setOrigin("telegram")
-  toast.add({
-    title: 'Успешный вход',
-    description: 'Вы успешно вошли через телеграм',
-    color: 'green',
-    timeout: 5000,
-  })
+  // toast.add({
+  //   title: 'Успешный вход',
+  //   description: 'Вы успешно вошли через телеграм',
+  //   color: 'green',
+  //   timeout: 5000,
+  // })
 
   await fetchUserData()
   if (RoomIdentifier.value) {

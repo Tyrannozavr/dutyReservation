@@ -9,8 +9,16 @@ defineEmits(['reserveDuty', 'releaseDuty'])
 
 const isOpen = ref(false)
 const freeDutiesCount = computed(() => {
+  if (!props.duty.duties) return 0
   return props.duty.duties.filter((duty: dutyUserDataType) => duty.user === null ).length
 })
+
+watch(freeDutiesCount, (value) => {
+  if (value === 0) {
+    isOpen.value = false
+  }
+}, { deep: true })
+
 const dayDisabled = computed(() => {
   return freeDutiesCount.value === 0 && !DutyTakenByUser.value
 })
