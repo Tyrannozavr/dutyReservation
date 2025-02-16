@@ -14,7 +14,7 @@ const freeDutiesCount = computed(() => {
 })
 
 watch(freeDutiesCount, (value) => {
-  if (value === 0) {
+  if (value === 0 && !DutyTakenByUser.value) {
     isOpen.value = false
   }
 }, { deep: true })
