@@ -5,18 +5,11 @@ const links = [
     icon: 'heroicons-outline:home',
     to: '/',
     iconClass,
-    // label: "Главная"
   },
   {
     icon: 'heroicons-outline:collection',
     to: '/store',
     iconClass,
-    // label: "Избранное",
-    // badge: {
-    //   label: 10,
-    //   variant: 'subtle',
-    //   color: 'primary'
-    // }
   },
   {
     icon: 'heroicons-outline:server-stack',
@@ -29,6 +22,14 @@ const links = [
     iconClass,
   }
 ]
+const route = useRoute()
+const linkClass  = (link: string) => {
+  if (link !== '/') {
+    return route.path.includes(link) ? 'text-primary' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+  } else {
+    return route.path === link ? 'text-primary' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+  }
+}
 </script>
 
 <template>
@@ -39,8 +40,7 @@ const links = [
         v-for="link in links"
         :key="link.to"
         :to="link.to"
-        active-class="text-primary"
-        inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+        :class="linkClass(link.to)"
       >
         <UIcon :name="link.icon" class="w-8 h-8" />
       </ULink>
@@ -51,3 +51,5 @@ const links = [
 <style scoped>
 
 </style>
+<!--active-class="text-primary"-->
+<!--inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"-->
