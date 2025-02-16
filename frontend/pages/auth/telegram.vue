@@ -36,7 +36,7 @@ onMounted(async () => {
           console.log("error is", e)
           toast.add({
             title: 'Ошибка',
-            description: 'Сервер временно недоступен ERROR is'+e,
+            description: 'Сервер временно недоступен ERROR is '+e,
             color: 'red',
             timeout: 5000,
           })
