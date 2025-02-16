@@ -6,7 +6,6 @@ export default defineNuxtConfig({
         public: {
             baseURL: process.env.NUXT_API_URL,
             frontURL: `https://${process.env.NUXT_API_HOST}`,
-            telegramInitData: process.env.NUXT_TELEGRAM_INIT_DATA,
         },
     },
     app: {
